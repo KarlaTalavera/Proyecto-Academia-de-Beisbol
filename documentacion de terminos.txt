@@ -1,0 +1,12 @@
+IP(entradas lanzadas)
+R(carreras permitidas suma de las sucias y limpias)
+H(Hits permitidos tienen que ser limpios)
+ER(Carreras limpias que le son anotadas)
+HR(cuadrangulares o home run que permite el picher)
+HB(golpeo de manera accidental al bateador con la pelota)
+BB(bases por bola)
+ponches(cuando saca a un jugador)
+
+**Nota: cuando hablamos de carreras limpias, son aquellas donde el bateador logro mandar la pelota lejos o anotar un jonron
+que es merito propio del bateador y error de picher, pero si hablamos de carreras sucias son por error de la defensa que se
+le cae la pelota o no logra el pase a la base correspondiente.**
