@@ -2,7 +2,7 @@
 /* Usado por la etiqueta: <div class="contenedor-grid"> */
 .contenedor-grid {
     display: grid;
-    grid-template-columns: 25% 75%; /* Proporción 25/75  */
+    grid-template-columns: 50% 50%; /* Proporción 50/50  */
     gap: 20px;
     padding: 20px;
     max-width: 1200px;
@@ -25,6 +25,16 @@
     padding: 20px;
     border-radius: 8px;
     transition: transform 0.3s ease; /* Permite que el zoom sea suave */
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    
+}
+
+.columna-derecha-egreso{
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 }
 
 /* Efecto de zoom al pasar el mouse por encima de los bloques (Grips) */

@@ -5,24 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Liga Diamante</title>
     <link rel="stylesheet" href="../Estilos/Line-UP.css">
+    <link rel="stylesheet" href="../Estilos/header.css">
     <link rel="icon" type="image/x-icon" href="../Recursos/icono liga.ico">
-    l
+    
 </head>
 <body>
 
-    <header class="header-principal">
-        <h1>Liga Diamante</h1>
-    </header>
-
-    <nav class="navbar">
-        <ul>
-            <li><a href="#">Inicio</a></li>
-            <li><a href="#">Jugadores</a></li>
-            <li><a href="#">Equipos</a></li>
-            <li><a href="#">Partidos</a></li>
-            <li><a href="#">Estadísticas</a></li>
-        </ul>
-    </nav>
+    <?php include '../Componentes/header.php'; ?>
 
     <div class="contenedor-grid">
         <aside class="columna-izquierda">
