@@ -31,10 +31,12 @@
     
 }
 
+/* contenedor individual de cada div de egresos */
 .columna-derecha-egreso{
     display: flex;
     flex-direction: column;
     gap: 5px;
+    padding: 5px;
 }
 
 /* Efecto de zoom al pasar el mouse por encima de los bloques (Grips) */

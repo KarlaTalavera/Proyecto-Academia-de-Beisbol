@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 28-02-2026 a las 23:17:01
+-- Tiempo de generación: 01-03-2026 a las 19:21:51
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -80,7 +80,8 @@ CREATE TABLE `egreso` (
   `Nota-gatos` varchar(300) NOT NULL,
   `gasto` decimal(10,2) NOT NULL,
   `Fecha_egreso` datetime DEFAULT NULL,
-  `Id-Liga` int(11) NOT NULL
+  `Id-Liga` int(11) NOT NULL,
+  `Tipo_de_pago` varchar(150) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- --------------------------------------------------------
@@ -165,9 +166,8 @@ CREATE TABLE `provedor` (
   `Id_Provedor` int(11) NOT NULL,
   `R.I.F` varchar(75) NOT NULL,
   `Servicio` varchar(300) NOT NULL,
-  `Tipo_de_pago` varchar(100) NOT NULL,
   `id_egreso` int(11) NOT NULL,
-  `monto` decimal(10,2) DEFAULT NULL
+  `Nombre_provedor` varchar(125) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- --------------------------------------------------------
