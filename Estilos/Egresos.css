@@ -1,47 +1,123 @@
-/* Contenedor padre que activa el sistema de rejilla (Grid) */
-/* Usado por la etiqueta: <div class="contenedor-grid"> */
+/* --- Paleta Integrada --- */
+:root {
+    --bg-main: #F2E5C6;        /* Champagne Beige */
+    --bg-sub: #F2D9A0;         /* Sand Gold */
+    --deep-black-red: #170000; /* Negro rojizo profundo */
+    --deep-wine: #350a06;      /* Vino profundo */
+    --dark-maroon: #56070c;    /* Marrón oscuro */
+    --earth-red: #8f3d38;      /* Rojo tierra */
+    --coral-accent: #cb7169;   /* Coral (acentos) */
+}
+
+body {
+    background-color: var(--bg-main);
+    font-family: 'Segoe UI', serif;
+    color: var(--deep-black-red);
+    margin: 0;
+}
+
+/* --- Estructura de Rejilla --- */
 .contenedor-grid {
     display: grid;
-    grid-template-columns: 50% 50%; /* Proporción 50/50  */
-    gap: 20px;
-    padding: 20px;
-    max-width: 1200px;
+    grid-template-columns: 30% 65%; /* Ajuste de proporción */
+    gap: 25px;
+    padding: 30px;
+    max-width: 1300px;
     margin: auto;
 }
 
-/* Estilo independiente para la columna de la izquierda line-up*/
+/* --- Columna Izquierda (Historial) --- */
 .columna-izquierda {
-    background-color: #ecf0f1; /* Color un poco más oscuro que el body */
-    border: 1px solid #bdc3c7;
+    background-color: var(--bg-sub);
+    border: 3px solid var(--deep-wine);
     padding: 20px;
-    border-radius: 8px;
-    transition: transform 0.3s ease; /* Permite que el zoom sea suave */
+    border-radius: 4px; /* Menos redondeado para look clásico */
+    box-shadow: 6px 6px 0px var(--dark-maroon);
 }
 
-/* Estilo independiente para la columna de la derecha pocisiones del campo*/
+.columna-izquierda h3 {
+    color: var(--deep-wine);
+    border-bottom: 2px solid var(--earth-red);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* --- Columna Derecha (Formulario) --- */
 .columna-derecha {
-    background-color: #ecf0f1; /* Color un poco más oscuro que el body */
-    border: 1px solid #bdc3c7;
-    padding: 20px;
+    background-color: #fffdfa;
+    border: 1px solid var(--earth-red);
+    padding: 40px;
     border-radius: 8px;
-    transition: transform 0.3s ease; /* Permite que el zoom sea suave */
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    
+    box-shadow: 0 4px 15px rgba(23, 0, 0, 0.1);
 }
 
-/* contenedor individual de cada div de egresos */
-.columna-derecha-egreso{
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    padding: 5px;
+.columna-derecha h2 {
+    color: var(--dark-maroon);
+    text-transform: uppercase;
+    font-size: 1.8rem;
+    margin-bottom: 25px;
+    border-left: 8px solid var(--deep-wine);
+    padding-left: 15px;
 }
 
-/* Efecto de zoom al pasar el mouse por encima de los bloques (Grips) */
-.columna-izquierda:hover, .columna-derecha:hover {
-    transform: scale(1.03); /* Pequeño zoom */
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* Sombra para resaltar el efecto */
+/* --- Formulario e Inputs --- */
+.columna-derecha-egreso {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+label {
+    font-weight: bold;
+    color: var(--deep-wine);
+    text-transform: uppercase;
+    font-size: 0.85rem;
+}
+
+input, select {
+    padding: 12px;
+    border: 2px solid var(--bg-sub);
+    background-color: #ffffff;
+    color: var(--deep-black-red);
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+input:focus, select:focus {
+    border-color: var(--coral-accent);
+    outline: none;
+    background-color: #fff9f9;
+}
+
+/* --- Botones --- */
+button[type="submit"] {
+    background-color: var(--deep-wine);
+    color: var(--bg-main);
+    padding: 15px;
+    border: none;
+    font-weight: bold;
+    text-transform: uppercase;
     cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.3s;
+}
+
+button[type="submit"]:hover {
+    background-color: var(--dark-maroon);
+    border-bottom: 4px solid var(--coral-accent);
+}
+
+/* Botón "Añadir nuevo proveedor" */
+#boton-registrar-desplegar {
+    background-color: var(--earth-red);
+    color: white;
+    font-size: 0.9rem;
+    padding: 10px 20px;
+    margin-top: 20px;
+    border-radius: 4px;
+}
+
+#boton-registrar-desplegar:hover {
+    background-color: var(--coral-accent);
 }

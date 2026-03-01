@@ -1,41 +1,60 @@
-body {
-    background-color: #f9f9f9; /* Color claro para el fondo del body */
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-}
-
-/* Usado por la etiqueta: <header> */
+/* --- Estilos para el Header Principal --- */
 .header-principal {
-    background-color: #2c3e50;
-    color: white;
+    /* Usamos el negro rojizo más profundo para la base */
+    background-color: #170000; 
+    color: #F2E5C6; /* Texto en Champagne Beige para legibilidad */
     text-align: center;
-    padding: 30px 0;
-    margin-top: -19px;
+    padding: 20px 0 40px 0;
+    border-bottom: 4px solid #8f3d38; /* Línea de acento en rojo tierra */
 }
 
-/* Usado por la etiqueta: <nav> */
+/* Logo o Título Principal */
+.header-principal h1 {
+    font-family: 'Georgia', serif;
+    font-size: 2.5rem;
+    text-transform: uppercase;
+    margin: 0;
+    color: #F2D9A0; /* Sand Gold para el nombre de la liga */
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+/* --- Barra de Navegación --- */
 .navbar {
-    background-color: #34495e;
-    padding: 10px;
+    /* El tono vino profundo para la barra de menú */
+    background-color: #350a06; 
+    padding: 12px 0;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
 
-/* Usado por la etiqueta: <ul> dentro de <nav> */
 .navbar ul {
     list-style: none;
     display: flex;
     justify-content: center;
     margin: 0;
     padding: 0;
-}
-
-/* Usado por la etiqueta: <li> y <a> dentro de <nav> */
-.navbar ul li {
-    margin: 0 15px;
+    gap: 30px;
 }
 
 .navbar ul li a {
-    color: white;
+    color: #F2E5C6; /* Champagne Beige */
     text-decoration: none;
     font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 1.5px;
+    transition: all 0.3s ease;
+}
+
+/* Efecto al pasar el mouse (Hover) */
+.navbar ul li a:hover {
+    color: #cb7169; /* Cambio al tono coral de la nueva paleta */
+    border-bottom: 2px solid #cb7169;
+    padding-bottom: 5px;
+}
+
+/* --- Ajuste para el contenido PHP incluido --- */
+header {
+    width: 100%;
+    position: relative;
+    z-index: 1000;
 }

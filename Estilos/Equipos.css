@@ -1,0 +1,40 @@
+/* Contenedor principal que define la rejilla de 12 columnas */
+.contenedor-secciones {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr); /* Dividimos en 12 partes iguales */
+    gap: 20px;
+    padding: 20px;
+    max-width: 1200px;
+    margin: auto;
+}
+
+
+/* --- CLASE PARA CUADROS PEQUEÑOS (Fila Inferior) --- */
+/* Se usa en los 3 recuadros de abajo */
+.bloque-pequeno {
+    grid-column: span 4; /* Cada uno ocupa un tercio (4 de 12) */
+    background-color: #ecf0f1;
+    border: 1px solid #bdc3c7;
+    padding: 20px;
+    border-radius: 8px;
+    min-height: 150px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-align: center;
+}
+
+/* --- EFECTOS HOVER (Zoom solicitado) --- */
+.bloque-grande:hover, .bloque-mediano:hover, .bloque-pequeno:hover {
+    transform: scale(1.03); /* El pequeño zoom que pediste */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    cursor: pointer;
+    background-color: #e5e9ea; /* Cambio sutil para feedback visual */
+}
+
+img{
+    border: solid gray;
+    border-radius: 19px;
+    width: 100%;
+    max-width: 300px;
+}
+  
+  
