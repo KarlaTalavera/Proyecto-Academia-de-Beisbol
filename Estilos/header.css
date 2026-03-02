@@ -1,60 +1,74 @@
-/* --- Estilos para el Header Principal --- */
-.header-principal {
-    /* Usamos el negro rojizo más profundo para la base */
-    background-color: #170000; 
-    color: #F2E5C6; /* Texto en Champagne Beige para legibilidad */
-    text-align: center;
-    padding: 20px 0 40px 0;
-    border-bottom: 4px solid #8f3d38; /* Línea de acento en rojo tierra */
+/* --- VARIABLES GLOBALES (Paleta de la imagen) --- */
+:root {
+    --champagne-beige: #F2E5C6;
+    --sand-gold: #F2D9A0;
+    --burgundy: #75162D;
+    --dark-maroon: #3B010B; /* Bordó profundo */
 }
 
-/* Logo o Título Principal */
-.header-principal h1 {
-    font-family: 'Georgia', serif;
-    font-size: 2.5rem;
-    text-transform: uppercase;
+/* --- ESTILO BASE PARA TODAS LAS PÁGINAS --- */
+body {
+    /* Fondo del estadio con un degradado oscuro para que el contenido resalte */
+    background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
+                url('../Recursos/estadio.jpg') no-repeat center center fixed;
+    background-size: cover;
     margin: 0;
-    color: #F2D9A0; /* Sand Gold para el nombre de la liga */
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    padding: 0;
+    font-family: 'Georgia', serif;
+    color: var(--champagne-beige);
+    min-height: 100vh;
 }
 
-/* --- Barra de Navegación --- */
+/* --- HEADER (LOGO Y TÍTULO) --- */
+.header-principal {
+    background-color: var(--dark-maroon);
+    text-align: center;
+    padding: 20px 0;
+    border-bottom: 5px solid var(--sand-gold);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+}
+
+.header-principal .logo-container img {
+    max-width: 150px;
+    height: auto;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+
+/* --- MENÚ DE NAVEGACIÓN --- */
 .navbar {
-    /* El tono vino profundo para la barra de menú */
-    background-color: #350a06; 
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparente para ver el estadio */
+    backdrop-filter: blur(5px); /* Efecto cristal moderno */
     padding: 12px 0;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    text-align: center;
+    border-bottom: 1px solid rgba(242, 217, 160, 0.2);
 }
 
 .navbar ul {
-    list-style: none;
-    display: flex;
-    justify-content: center;
     margin: 0;
     padding: 0;
+    list-style: none;
+    display: inline-flex;
     gap: 30px;
 }
 
 .navbar ul li a {
-    color: #F2E5C6; /* Champagne Beige */
     text-decoration: none;
+    color: var(--champagne-beige);
     font-weight: bold;
     text-transform: uppercase;
     font-size: 0.9rem;
     letter-spacing: 1.5px;
-    transition: all 0.3s ease;
+    transition: color 0.3s ease;
 }
 
-/* Efecto al pasar el mouse (Hover) */
 .navbar ul li a:hover {
-    color: #cb7169; /* Cambio al tono coral de la nueva paleta */
-    border-bottom: 2px solid #cb7169;
-    padding-bottom: 5px;
+    color: var(--sand-gold);
 }
 
-/* --- Ajuste para el contenido PHP incluido --- */
-header {
-    width: 100%;
-    position: relative;
-    z-index: 1000;
+/* --- CONTENEDOR UNIVERSAL (Para Grid o Flex) --- */
+/* Esto ayuda a que todos los módulos tengan el mismo ancho máximo */
+.contenedor-grid, .contenedor-secciones {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 40px 20px;
 }

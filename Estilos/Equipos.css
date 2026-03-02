@@ -1,40 +1,50 @@
-/* Contenedor principal que define la rejilla de 12 columnas */
+body {
+    background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
+                url('../Recursos/estadio.jpg') no-repeat center center fixed;
+    background-size: cover;
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* Contenedor de la rejilla */
 .contenedor-secciones {
     display: grid;
-    grid-template-columns: repeat(12, 1fr); /* Dividimos en 12 partes iguales */
-    gap: 20px;
-    padding: 20px;
+    grid-template-columns: repeat(12, 1fr); 
+    gap: 30px; /* Un poco más de espacio para que luzca el cristal */
+    padding: 40px;
     max-width: 1200px;
     margin: auto;
 }
 
-
-/* --- CLASE PARA CUADROS PEQUEÑOS (Fila Inferior) --- */
-/* Se usa en los 3 recuadros de abajo */
+/* Estilo de los bloques (Cristal/Glassmorphism) */
 .bloque-pequeno {
-    grid-column: span 4; /* Cada uno ocupa un tercio (4 de 12) */
-    background-color: #ecf0f1;
-    border: 1px solid #bdc3c7;
-    padding: 20px;
-    border-radius: 8px;
-    min-height: 150px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    text-align: center;
+    grid-column: span 4; /* 3 equipos por fila (4+4+4 = 12) */
+    background: rgba(242, 229, 198, 0.2); /* Champagne Beige translúcido */
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(242, 217, 160, 0.3); /* Borde Sand Gold suave */
+    padding: 25px;
+    border-radius: 15px;
+    min-height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
 }
 
-/* --- EFECTOS HOVER (Zoom solicitado) --- */
-.bloque-grande:hover, .bloque-mediano:hover, .bloque-pequeno:hover {
-    transform: scale(1.03); /* El pequeño zoom que pediste */
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+/* Efectos Hover */
+.bloque-pequeno:hover {
+    transform: scale(1.05); /* El zoom que pediste */
+    background: rgba(242, 229, 198, 0.35);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.7);
     cursor: pointer;
-    background-color: #e5e9ea; /* Cambio sutil para feedback visual */
 }
 
-img{
-    border: solid gray;
-    border-radius: 19px;
+/* Estilo para los logos de los equipos */
+img {
     width: 100%;
-    max-width: 300px;
+    max-width: 180px; /* Ajustado para que no se vea gigante */
+    height: auto;
+    filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5)); /* Sombra para el logo */
+    border-radius: 10px;
 }
-  
-  

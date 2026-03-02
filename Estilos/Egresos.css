@@ -1,123 +1,115 @@
-/* --- Paleta Integrada --- */
 :root {
-    --bg-main: #F2E5C6;        /* Champagne Beige */
-    --bg-sub: #F2D9A0;         /* Sand Gold */
-    --deep-black-red: #170000; /* Negro rojizo profundo */
-    --deep-wine: #350a06;      /* Vino profundo */
-    --dark-maroon: #56070c;    /* Marrón oscuro */
-    --earth-red: #8f3d38;      /* Rojo tierra */
-    --coral-accent: #cb7169;   /* Coral (acentos) */
+    --bg-cristal: rgba(242, 229, 198, 0.2); /* Champagne con transparencia premium */
+    --deep-wine: rgba(53, 10, 6, 0.9);
+    --gold-accent: #F2D9A0;
+    --text-champagne: #F2E5C6;
 }
 
 body {
-    background-color: var(--bg-main);
-    font-family: 'Segoe UI', serif;
-    color: var(--deep-black-red);
+    background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
+                url('../Recursos/estadio.jpg') no-repeat center center fixed;
+    background-size: cover;
+    font-family: 'Segoe UI', sans-serif;
+    color: var(--text-champagne);
     margin: 0;
 }
 
-/* --- Estructura de Rejilla --- */
 .contenedor-grid {
     display: grid;
-    grid-template-columns: 30% 65%; /* Ajuste de proporción */
-    gap: 25px;
-    padding: 30px;
+    grid-template-columns: 30% 65%; /* Proporción ajustada */
+    gap: 30px;
+    padding: 40px 20px;
     max-width: 1300px;
     margin: auto;
 }
 
-/* --- Columna Izquierda (Historial) --- */
-.columna-izquierda {
-    background-color: var(--bg-sub);
-    border: 3px solid var(--deep-wine);
-    padding: 20px;
-    border-radius: 4px; /* Menos redondeado para look clásico */
-    box-shadow: 6px 6px 0px var(--dark-maroon);
+/* Aplicamos el cristal a los contenedores principales */
+.columna-izquierda, .columna-derecha {
+    background: var(--bg-cristal);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(242, 217, 160, 0.3);
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
-.columna-izquierda h3 {
-    color: var(--deep-wine);
-    border-bottom: 2px solid var(--earth-red);
+h2, h3 {
+    color: var(--gold-accent);
     text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-/* --- Columna Derecha (Formulario) --- */
-.columna-derecha {
-    background-color: #fffdfa;
-    border: 1px solid var(--earth-red);
-    padding: 40px;
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(23, 0, 0, 0.1);
-}
-
-.columna-derecha h2 {
-    color: var(--dark-maroon);
-    text-transform: uppercase;
-    font-size: 1.8rem;
-    margin-bottom: 25px;
-    border-left: 8px solid var(--deep-wine);
+    border-left: 5px solid #75162D;
     padding-left: 15px;
+    margin-bottom: 25px;
 }
 
-/* --- Formulario e Inputs --- */
+/* Estilo para las filas del formulario */
 .columna-derecha-egreso {
     display: flex;
     flex-direction: column;
-    gap: 10px;
     margin-bottom: 20px;
 }
 
 label {
     font-weight: bold;
-    color: var(--deep-wine);
-    text-transform: uppercase;
     font-size: 0.85rem;
+    margin-bottom: 8px;
+    color: var(--gold-accent);
+    text-transform: uppercase;
 }
 
 input, select {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(242, 217, 160, 0.5);
+    color: white;
     padding: 12px;
-    border: 2px solid var(--bg-sub);
-    background-color: #ffffff;
-    color: var(--deep-black-red);
-    border-radius: 4px;
-    transition: all 0.3s ease;
+    border-radius: 8px;
+    outline: none;
+    transition: 0.3s;
 }
 
 input:focus, select:focus {
-    border-color: var(--coral-accent);
-    outline: none;
-    background-color: #fff9f9;
+    background: rgba(255, 255, 255, 0.2);
+    border-color: var(--gold-accent);
 }
 
-/* --- Botones --- */
-button[type="submit"] {
-    background-color: var(--deep-wine);
-    color: var(--bg-main);
+/* Botones */
+button {
+    width: 100%;
     padding: 15px;
-    border: none;
     font-weight: bold;
-    text-transform: uppercase;
     cursor: pointer;
-    border-radius: 4px;
-    transition: background 0.3s;
+    border-radius: 8px;
+    border: none;
+    text-transform: uppercase;
+    transition: 0.3s;
+}
+
+button[type="submit"] {
+    background: #75162D;
+    color: white;
 }
 
 button[type="submit"]:hover {
-    background-color: var(--dark-maroon);
-    border-bottom: 4px solid var(--coral-accent);
+    background: var(--deep-wine);
+    transform: scale(1.02);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
 
-/* Botón "Añadir nuevo proveedor" */
+/* Botón de "Añadir nuevo proveedor" */
 #boton-registrar-desplegar {
-    background-color: var(--earth-red);
-    color: white;
-    font-size: 0.9rem;
-    padding: 10px 20px;
-    margin-top: 20px;
-    border-radius: 4px;
+    background: transparent;
+    border: 1px solid var(--gold-accent);
+    color: var(--gold-accent);
+    margin-top: 10px;
+    font-size: 0.8rem;
 }
 
 #boton-registrar-desplegar:hover {
-    background-color: var(--coral-accent);
+    background: rgba(242, 217, 160, 0.1);
+}
+
+/* Estilo para el formulario oculto */
+#formulario-Provedor {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(242, 217, 160, 0.2);
 }

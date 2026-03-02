@@ -1,35 +1,51 @@
-/* Contenedor padre que activa el sistema de rejilla (Grid) */
-/* Usado por la etiqueta: <div class="contenedor-grid"> */
+/* --- LINE-UP.CSS (Versión corregida sin conflictos) --- */
+
+/* 1. NO pongas "body { background: ... }" aquí, deja que el header.css lo controle */
+
 .contenedor-grid {
     display: grid;
-    grid-template-columns: 25% 75%; /* Proporción 25/75  */
-    gap: 20px;
-    padding: 20px;
-    max-width: 1200px;
+    grid-template-columns: 25% 70%; 
+    gap: 30px;
+    padding: 50px 5%;
+    max-width: 1400px;
     margin: auto;
+    /* Asegura que el contenido flote sobre el fondo del estadio del header */
+    background: transparent; 
 }
 
-/* Estilo independiente para la columna de la izquierda line-up*/
+/* 2. Panel Izquierdo (Transparente para que se vea el estadio detrás) */
 .columna-izquierda {
-    background-color: #ecf0f1; /* Color un poco más oscuro que el body */
-    border: 1px solid #bdc3c7;
-    padding: 20px;
-    border-radius: 8px;
-    transition: transform 0.3s ease; /* Permite que el zoom sea suave */
+    background-color: rgba(59, 1, 11, 0.85); /* Dark Maroon con transparencia */
+    backdrop-filter: blur(8px); /* Efecto cristal */
+    border: 2px solid #F2D9A0; /* Sand Gold */
+    padding: 30px;
+    border-radius: 15px;
+    color: #F2E5C6;
+    text-align: center;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
 }
 
-/* Estilo independiente para la columna de la derecha pocisiones del campo*/
+.columna-izquierda h3 {
+    color: #F2D9A0;
+    text-transform: uppercase;
+    border-bottom: 2px solid #F2D9A0;
+    padding-bottom: 10px;
+}
+
+/* 3. Panel Derecho (Sólido para lectura clara, como en tu imagen) */
 .columna-derecha {
-    background-color: #ecf0f1; /* Color un poco más oscuro que el body */
-    border: 1px solid #bdc3c7;
-    padding: 20px;
-    border-radius: 8px;
-    transition: transform 0.3s ease; /* Permite que el zoom sea suave */
+    background-color: #F2E5C6 !important; /* Champagne Beige original */
+    color: #3B010B !important; /* Texto oscuro para legibilidad */
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+    min-height: 500px;
 }
 
-/* Efecto de zoom al pasar el mouse por encima de los bloques (Grips) */
-.columna-izquierda:hover, .columna-derecha:hover {
-    transform: scale(1.03); /* Pequeño zoom */
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* Sombra para resaltar el efecto */
-    cursor: pointer;
+.columna-derecha h2 {
+    color: #75162D; /* Burgundy */
+    text-transform: uppercase;
+    font-size: 2.5rem;
+    margin-top: 0;
+    border-bottom: 2px solid rgba(0,0,0,0.1);
 }

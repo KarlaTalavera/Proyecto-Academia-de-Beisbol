@@ -1,0 +1,107 @@
+body {
+    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
+                url('../Recursos/estadio.jpg') no-repeat center center fixed;
+    background-size: cover;
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.login-container {
+    /* Fondo Champagne Beige con transparencia baja para ver el estadio */
+    background: rgba(242, 229, 198, 0.4); 
+    backdrop-filter: blur(12px); /* Efecto de cristal de alta calidad */
+    width: 450px; /* Cuadro más ancho y espacioso */
+    border-radius: 15px;
+    border: 1px solid rgba(242, 217, 160, 0.3); /* Borde sutil en Sand Gold */
+    box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+    overflow: hidden;
+}
+
+.header-logo {
+    /* Deep Wine con transparencia elegante */
+    background: rgba(59, 1, 11, 0.85); 
+    color: #F2D9A0; /* Texto en Sand Gold */
+    padding: 35px;
+    text-align: center;
+    border-bottom: 3px solid #F2D9A0;
+}
+
+.header-logo h1 { font-size: 1.6rem; margin: 0; letter-spacing: 2px; }
+
+form { padding: 40px 50px; }
+
+label { 
+    color: #3B010B; 
+    font-weight: bold; 
+    font-size: 12px; 
+    display: block;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+input, select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 25px;
+    border: 1px solid rgba(59, 1, 11, 0.2);
+    background: rgba(255,255,255,0.4); /* Inputs muy transparentes */
+    border-radius: 8px;
+    color: #3B010B;
+    box-sizing: border-box;
+}
+
+button {
+    width: 100%;
+    padding: 15px;
+    background: #75162D; /* Burgundy */
+    color: #F2E5C6;
+    border: none;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: 0.3s;
+    text-transform: uppercase;
+}
+
+button:hover { 
+    background: #3B010B; 
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.info { 
+    padding: 20px 0 40px; 
+    text-align: center;
+    border-top: 1px solid rgba(59, 1, 11, 0.1); /* Separación sutil */
+}
+
+.info p {
+    color: #3B010B;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.info a { 
+    color: #1138a5; 
+    font-weight: 800; 
+    text-decoration: none; 
+    font-size: 15px;
+    text-transform: uppercase;
+    background: rgba(17, 56, 165, 0.1); /* Fondo suave para resaltar */
+    padding: 8px 15px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.info a:hover { 
+    color: #ffffff;
+    background: #1138a5;
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(17, 56, 165, 0.3);
+}

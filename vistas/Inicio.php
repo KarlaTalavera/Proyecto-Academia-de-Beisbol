@@ -6,7 +6,7 @@
     <title>Liga Diamante</title>
     <link rel="icon" type="image/x-icon" href="../Recursos/icono liga.ico">
     <link rel="stylesheet" href="../Estilos/header.css">
-    <link rel="stylesheet" href="../Estilos/Inicio.css">
+    <link rel="stylesheet" href="../Estilos/inicio.css">
 
 </head>
 <body>

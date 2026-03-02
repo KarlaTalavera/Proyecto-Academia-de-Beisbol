@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Liga Diamante</title>
-    <link rel="stylesheet" href="../Estilos/Line-UP.css">
+    <title>Liga Diamante - Line-UP</title>
     <link rel="stylesheet" href="../Estilos/header.css">
+  <link rel="stylesheet" href="../Estilos/Line-UP.css?v=1.1">
     <link rel="icon" type="image/x-icon" href="../Recursos/icono liga.ico">
-    
 </head>
 <body>
 
