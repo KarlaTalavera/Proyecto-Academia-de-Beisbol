@@ -49,3 +49,10 @@
     margin-top: 0;
     border-bottom: 2px solid rgba(0,0,0,0.1);
 }
+
+img {
+    max-width: 100%; /* Ajustado para que no se vea gigante */
+    height: auto;
+    filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5)); /* Sombra para el logo */
+    border-radius: 10px;
+}

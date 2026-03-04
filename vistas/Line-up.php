@@ -16,11 +16,20 @@
         <aside class="columna-izquierda">
             <h3>Line-UP</h3>
             <p>composición del equipo</p>
+            <p>Ramon garcia</p>
+            <p>Jorge Morales</p>
+            <p>luis Hernandez</p>
+            <p>Carlos Ruiz</p>
+            <p>Miguel Torres</p>
+            <P>Jose Ramirez</P>
+            <p>Pedro Diaz</p>
+            <p>Angel Ortiz</p>
+            <p>Juan Castro</p>
         </aside>
 
         <section class="columna-derecha">
             <h2>Panel de jugadores</h2>
-            <p>informacion del panel</p>
+            <img src="../Recursos/Line-up.png" alt="Line-up del equipo">
         </section>
     </div>
 
