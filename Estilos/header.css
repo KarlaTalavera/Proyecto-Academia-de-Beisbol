@@ -74,7 +74,7 @@ body {
 }
 
 /*responsive*/
-/* --- Añadir al final de header.css --- */
+
 @media (max-width: 768px) {
     .navbar ul {
         flex-direction: column; /* Menú vertical en móvil */
