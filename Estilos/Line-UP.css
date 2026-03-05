@@ -56,3 +56,11 @@ img {
     filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5)); /* Sombra para el logo */
     border-radius: 10px;
 }
+
+/*responsive*/
+
+@media (max-width: 1024px) {
+    .contenedor-grid {
+        grid-template-columns: 1fr; /* Una sola columna */
+    }
+}

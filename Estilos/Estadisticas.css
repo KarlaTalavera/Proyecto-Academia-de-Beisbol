@@ -118,3 +118,18 @@ tr {
     align-items: center;
     margin-left: 15px;
 }
+
+/*responsive*/
+/* --- Añadir a Estadisticas.css y Jugadores.css --- */
+.tabla-responsiva {
+    width: 100%;
+    overflow-x: auto; /* Scroll horizontal solo para la tabla */
+    margin-top: 15px;
+}
+
+@media (max-width: 768px) {
+    .bloque-grande, .bloque-mediano, .bloque-pequeno {
+        flex: 1 1 100%; /* Los bloques se apilan uno sobre otro */
+        padding: 15px;
+    }
+}

@@ -72,3 +72,17 @@ body {
     margin: 0 auto;
     padding: 40px 20px;
 }
+
+/*responsive*/
+/* --- Añadir al final de header.css --- */
+@media (max-width: 768px) {
+    .navbar ul {
+        flex-direction: column; /* Menú vertical en móvil */
+        gap: 10px;
+        padding: 15px 0;
+    }
+
+    .contenedor-grid, .contenedor-secciones {
+        padding: 20px 10px; /* Reducir márgenes laterales */
+    }
+}

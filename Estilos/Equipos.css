@@ -48,3 +48,16 @@ img {
     filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5)); /* Sombra para el logo */
     border-radius: 10px;
 }
+
+/*responsive*/
+@media (max-width: 768px) {
+    .contenedor-secciones {
+        grid-template-columns: repeat(6, 1fr); /* Menos columnas en móvil */
+        gap: 20px;
+        padding: 20px 10px;
+    }
+
+    .bloque-pequeno {
+        grid-column: span 6; /* Un equipo por fila en móvil */
+    }
+}

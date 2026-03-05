@@ -113,3 +113,11 @@ button[type="submit"]:hover {
     padding-top: 20px;
     border-top: 1px solid rgba(242, 217, 160, 0.2);
 }
+
+/*responsive*/
+
+@media (max-width: 1024px) {
+    .contenedor-grid {
+        grid-template-columns: 1fr; /* Una sola columna */
+    }
+}
