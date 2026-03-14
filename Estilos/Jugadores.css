@@ -105,7 +105,6 @@ tr {
 
 /*responsive*/
 
-/* --- Añadir a Estadisticas.css y Jugadores.css --- */
 .tabla-responsiva {
     width: 100%;
     overflow-x: auto; /* Scroll horizontal solo para la tabla */

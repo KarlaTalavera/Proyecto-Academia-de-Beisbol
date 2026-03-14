@@ -11,5 +11,6 @@
             <li><a href="#">Partidos</a></li>
             <li><a href="../vistas/Estadisticas.php">Estadísticas</a></li>
             <li><a href="../vistas/Egresos.php">Egresos</a></li>
+            <li><a href="../vistas/Registrar_jugador.php">Registrar Jugador</a></li>
         </ul>
     </nav>
