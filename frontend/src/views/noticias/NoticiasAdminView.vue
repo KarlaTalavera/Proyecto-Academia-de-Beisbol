@@ -112,11 +112,16 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import api from '@/services/api'
+import { useToast }   from '@/composables/useToast'
+import { useConfirm } from '@/composables/useConfirm'
 import {
   IconPlus, IconEdit, IconTrash, IconCamera, IconPhoto,
 } from '@tabler/icons-vue'
 
 const apiBase = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3000'
+
+const toast   = useToast()
+const confirm = useConfirm()
 
 const noticias    = ref([])
 const cargando    = ref(true)
@@ -172,7 +177,7 @@ function onFotoNueva(e) {
 }
 
 async function guardar() {
-  if (!form.value.titulo.trim()) { alert('El título es obligatorio'); return }
+  if (!form.value.titulo.trim()) { toast.warn('El título es obligatorio'); return }
   guardando.value = true
   try {
     if (editando.value) {
@@ -196,7 +201,7 @@ async function guardar() {
     cerrarModal()
     await cargar()
   } catch (e) {
-    alert(e.response?.data?.error || 'Error al guardar')
+    toast.error(e.response?.data?.error || 'Error al guardar')
   } finally {
     guardando.value = false
   }
@@ -211,7 +216,7 @@ async function cambiarFoto(noticia, e) {
     const { data } = await api.patch(`/noticias/${noticia.id_noticia}/foto`, fd)
     noticia.foto_url = data.foto_url
   } catch {
-    alert('Error al subir la foto')
+    toast.error('Error al subir la foto')
   }
 }
 
@@ -226,7 +231,8 @@ async function toggleActiva(noticia) {
 }
 
 async function eliminar(noticia) {
-  if (!confirm(`¿Eliminar "${noticia.titulo}"?`)) return
+  const ok = await confirm.pedir(`¿Eliminar "${noticia.titulo}"?`, { titulo: '¿Estás segura?', variante: 'danger' })
+  if (!ok) return
   await api.delete(`/noticias/${noticia.id_noticia}`)
   noticias.value = noticias.value.filter(n => n.id_noticia !== noticia.id_noticia)
 }

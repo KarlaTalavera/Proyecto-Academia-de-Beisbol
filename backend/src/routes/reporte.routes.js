@@ -93,11 +93,12 @@ router.get('/finanzas', verificarToken, async (req, res) => {
 
   const [ingresosPorConcepto] = await db.query(
     `SELECT
-       CASE
-         WHEN concepto LIKE '%inscripci%' THEN 'Inscripciones'
-         WHEN concepto LIKE '%patrocin%'  THEN 'Patrocinios'
-         WHEN concepto LIKE '%boleto%'    THEN 'Taquilla'
-         WHEN concepto LIKE '%donaci%'    THEN 'Donaciones'
+       CASE categoria
+         WHEN 'inscripcion'  THEN 'Inscripciones'
+         WHEN 'patrocinio'   THEN 'Patrocinios'
+         WHEN 'taquilleria'  THEN 'Taquilla'
+         WHEN 'concesion'    THEN 'Concesiones'
+         WHEN 'multa'        THEN 'Multas'
          ELSE 'Otros'
        END AS categoria,
        SUM(valor) AS total
@@ -194,19 +195,12 @@ router.get('/origen-ingresos', verificarToken, async (req, res) => {
   // Ingresos generales agrupados por categoría (tabla ingreso)
   const [porConcepto] = await db.query(
     `SELECT
-       CASE
-         WHEN LOWER(concepto) LIKE '%patrocin%'                          THEN 'Patrocinios'
-         WHEN LOWER(concepto) LIKE '%boleto%'
-           OR LOWER(concepto) LIKE '%taquill%'
-           OR LOWER(concepto) LIKE '%entrada%'                           THEN 'Taquilla'
-         WHEN LOWER(concepto) LIKE '%inscripci%'
-           OR LOWER(concepto) LIKE '%registro%'
-           OR LOWER(concepto) LIKE '%equipo%'                            THEN 'Inscripciones de Equipos'
-         WHEN LOWER(concepto) LIKE '%concesi%'
-           OR LOWER(concepto) LIKE '%comida%'
-           OR LOWER(concepto) LIKE '%bebida%'
-           OR LOWER(concepto) LIKE '%aliment%'
-           OR LOWER(concepto) LIKE '%venta%'                             THEN 'Concesiones'
+       CASE categoria
+         WHEN 'inscripcion'  THEN 'Inscripciones de Equipos'
+         WHEN 'patrocinio'   THEN 'Patrocinios'
+         WHEN 'taquilleria'  THEN 'Taquilla'
+         WHEN 'concesion'    THEN 'Concesiones'
+         WHEN 'multa'        THEN 'Multas'
          ELSE 'Otros'
        END AS categoria,
        SUM(valor) AS total,
@@ -252,8 +246,8 @@ router.get('/origen-ingresos', verificarToken, async (req, res) => {
     }
   }
 
-  // Garantizar las 4 categorías principales siempre presentes
-  const CATEGORIAS = ['Patrocinios', 'Taquilla', 'Inscripciones de Equipos', 'Concesiones']
+  // Garantizar las categorías principales siempre presentes
+  const CATEGORIAS = ['Inscripciones de Equipos', 'Patrocinios', 'Taquilla', 'Concesiones', 'Multas', 'Otros']
   for (const cat of CATEGORIAS) {
     if (!mapa[cat]) mapa[cat] = { total: 0, cantidad: 0 }
   }

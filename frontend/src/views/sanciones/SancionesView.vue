@@ -187,8 +187,11 @@
 import { ref, computed, onMounted } from 'vue'
 import api from '@/services/api'
 import { useAuthStore } from '@/store/auth'
+import { useConfirm } from '@/composables/useConfirm'
 
-const auth = useAuthStore()
+const auth    = useAuthStore()
+const confirm = useConfirm()
+
 const sanciones = ref([])
 const temporadas = ref([])
 const equipos = ref([])
@@ -256,7 +259,8 @@ async function guardar() {
 }
 
 async function eliminar(s) {
-  if (!confirm('¿Eliminar esta sanción?')) return
+  const ok = await confirm.pedir('¿Eliminar esta sanción?', { titulo: '¿Estás segura?', variante: 'danger' })
+  if (!ok) return
   await api.delete(`/sanciones/${s.id_sancion}`)
   cargar()
 }

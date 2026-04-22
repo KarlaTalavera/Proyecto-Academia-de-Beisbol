@@ -106,6 +106,9 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import api from '@/services/api'
+import { useConfirm } from '@/composables/useConfirm'
+
+const confirm = useConfirm()
 
 const proveedores = ref([])
 const busqueda = ref('')
@@ -154,7 +157,8 @@ async function guardar() {
 }
 
 async function eliminar(p) {
-  if (!confirm(`¿Eliminar proveedor "${p.nombre_proveedor}"?`)) return
+  const ok = await confirm.pedir(`¿Eliminar proveedor "${p.nombre_proveedor}"?`, { titulo: '¿Estás segura?', variante: 'danger' })
+  if (!ok) return
   await api.delete(`/proveedores/${p.id_proveedor}`)
   cargar()
 }

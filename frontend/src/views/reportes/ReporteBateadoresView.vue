@@ -118,22 +118,40 @@
           </div>
           <div v-if="mostrarGrafico" class="card-body" style="padding:8px 0 0 0;">
             <div v-if="!datos.length" class="text-center py-5 text-muted">Sin estadísticas registradas</div>
-            <div v-else style="width:100%; overflow:hidden;">
-              <svg viewBox="0 0 900 300" style="width:100%; height:300px; display:block;" xmlns="http://www.w3.org/2000/svg">
+            <div v-else class="chart-wrapper" @mouseleave="batHovered = -1; batTooltip.visible = false">
+              <svg
+                :key="top5HR.map(j=>j.HR).join()"
+                viewBox="0 0 900 300" style="width:100%; height:300px; display:block;" xmlns="http://www.w3.org/2000/svg"
+                @mousemove="onBatMove"
+              >
                 <rect x="0" y="0" width="900" height="300" fill="transparent"/>
-                <!-- Líneas guía -->
                 <g v-for="i in 5" :key="'g'+i">
                   <line :x1="70" :y1="20 + (220/4)*(4-(i-1))" :x2="880" :y2="20 + (220/4)*(4-(i-1))" stroke="#e2e8f0" stroke-width="1"/>
                   <text :x="64" :y="20 + (220/4)*(4-(i-1)) + 4" text-anchor="end" font-size="10" fill="#94a3b8" font-family="sans-serif">
                     {{ Math.round(maxTop5 * (i-1) / 4) }}
                   </text>
                 </g>
-                <!-- Barras top 5 -->
-                <g v-for="(d, i) in top5Grafico" :key="'t'+i">
+                <g v-for="(d, i) in top5Grafico" :key="'t'+i"
+                   style="cursor:pointer;"
+                   @mouseenter="batHovered = i"
+                   @mouseleave="batHovered = -1">
+                  <!-- Fondo hover -->
+                  <rect :x="d.x - 4" y="20" :width="d.w + 8" height="224" rx="6"
+                    :fill="batHovered === i ? 'rgba(99,102,241,0.05)' : 'transparent'"
+                    style="transition: fill 0.15s;"
+                  />
                   <!-- HR -->
-                  <rect :x="d.x" :y="240 - d.hHR" :width="d.w * 0.45" :height="d.hHR" fill="#f97316" rx="2"/>
+                  <rect class="chart-bar"
+                    :x="d.x" :y="240 - d.hHR" :width="d.w * 0.45" :height="d.hHR"
+                    :fill="batHovered === -1 || batHovered === i ? '#8b5cf6' : '#c4b5fd'" rx="4"
+                    :style="{ animationDelay: `${i * 0.09}s`, transition: 'fill 0.2s' }"
+                  />
                   <!-- RBI -->
-                  <rect :x="d.x + d.w * 0.48" :y="240 - d.hRBI" :width="d.w * 0.45" :height="d.hRBI" fill="#6366f1" rx="2"/>
+                  <rect class="chart-bar"
+                    :x="d.x + d.w * 0.48" :y="240 - d.hRBI" :width="d.w * 0.45" :height="d.hRBI"
+                    :fill="batHovered === -1 || batHovered === i ? '#0ea5e9' : '#bae6fd'" rx="4"
+                    :style="{ animationDelay: `${i * 0.09 + 0.05}s`, transition: 'fill 0.2s' }"
+                  />
                   <!-- Nombre jugador -->
                   <text :x="d.x + d.w / 2" y="256" text-anchor="middle" font-size="9" fill="#475569" font-family="sans-serif">
                     {{ top5HR[i].jugador.split(' ')[0] }}
@@ -141,23 +159,19 @@
                   <text :x="d.x + d.w / 2" y="268" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="sans-serif">
                     {{ top5HR[i].nombre_equipo.substring(0,8) }}
                   </text>
-                  <!-- Valor HR -->
-                  <text v-if="top5HR[i].HR > 0" :x="d.x + d.w * 0.22" :y="240 - d.hHR - 4"
-                    text-anchor="middle" font-size="9" fill="#f97316" font-weight="bold" font-family="sans-serif">
-                    {{ top5HR[i].HR }}
-                  </text>
-                  <!-- Valor RBI -->
-                  <text v-if="top5HR[i].RBI > 0" :x="d.x + d.w * 0.71" :y="240 - d.hRBI - 4"
-                    text-anchor="middle" font-size="9" fill="#6366f1" font-weight="bold" font-family="sans-serif">
-                    {{ top5HR[i].RBI }}
-                  </text>
                 </g>
-                <!-- Leyenda -->
-                <rect x="680" y="8" width="12" height="10" fill="#f97316" rx="2"/>
+                <rect x="680" y="8" width="12" height="10" fill="#8b5cf6" rx="2"/>
                 <text x="696" y="17" font-size="10" fill="#64748b" font-family="sans-serif">HR</text>
-                <rect x="720" y="8" width="12" height="10" fill="#6366f1" rx="2"/>
+                <rect x="720" y="8" width="12" height="10" fill="#0ea5e9" rx="2"/>
                 <text x="736" y="17" font-size="10" fill="#64748b" font-family="sans-serif">RBI</text>
               </svg>
+              <!-- Tooltip -->
+              <div v-if="batTooltip.visible" class="chart-tooltip" :style="{ left: batTooltip.x + 'px', top: batTooltip.y + 'px' }">
+                <div class="fw-bold mb-1" style="font-size:0.8rem;">{{ batTooltip.jugador }}</div>
+                <div style="color:#c4b5fd; font-size:0.75rem;">HR: <strong>{{ batTooltip.hr }}</strong></div>
+                <div style="color:#7dd3fc; font-size:0.75rem;">RBI: <strong>{{ batTooltip.rbi }}</strong></div>
+                <div style="color:#94a3b8; font-size:0.72rem; margin-top:2px;">AVE: .{{ batTooltip.ave }}</div>
+              </div>
             </div>
           </div>
         </div>
@@ -260,6 +274,26 @@ const datos                  = ref([])
 const equiposSeleccionados   = ref([])
 const jugadoresSeleccionados = ref([])
 const mostrarGrafico         = ref(true)
+
+// Interactividad del gráfico
+const batHovered = ref(-1)
+const batTooltip = ref({ visible: false, x: 0, y: 0, jugador: '', hr: 0, rbi: 0, ave: '' })
+
+function onBatMove(e) {
+  const i = batHovered.value
+  if (i < 0 || !top5HR.value[i]) { batTooltip.value.visible = false; return }
+  const rect = e.currentTarget.closest('.chart-wrapper').getBoundingClientRect()
+  const j = top5HR.value[i]
+  batTooltip.value = {
+    visible: true,
+    x: e.clientX - rect.left,
+    y: e.clientY - rect.top - 90,
+    jugador: j.jugador,
+    hr: j.HR,
+    rbi: j.RBI,
+    ave: aveStr(j.AVE),
+  }
+}
 
 const fechaGeneracion = computed(() =>
   new Date().toLocaleString('es-VE', { dateStyle: 'medium', timeStyle: 'short' })
@@ -554,4 +588,34 @@ onMounted(cargarTemporadas)
 .grupos-scroll::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 3px; }
 .grupos-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
 .grupos-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+/* ── Chart interactivity ── */
+.chart-wrapper {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+.chart-bar {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: growBar 0.55s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+}
+@keyframes growBar {
+  from { transform: scaleY(0); }
+  to   { transform: scaleY(1); }
+}
+.chart-tooltip {
+  position: absolute;
+  background: #1e293b;
+  color: #fff;
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 0.78rem;
+  pointer-events: none;
+  white-space: nowrap;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.22);
+  z-index: 20;
+  transform: translateX(-50%);
+  border: 1px solid rgba(255,255,255,0.08);
+}
 </style>

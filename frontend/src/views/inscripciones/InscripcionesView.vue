@@ -151,6 +151,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import api from '@/services/api'
+import { useConfirm } from '@/composables/useConfirm'
+
+const confirm = useConfirm()
 
 const inscripciones = ref([])
 const temporadas = ref([])
@@ -200,7 +203,8 @@ async function guardar() {
 }
 
 async function eliminar(ins) {
-  if (!confirm(`¿Eliminar inscripción de "${ins.nombre_equipo}"?`)) return
+  const ok = await confirm.pedir(`¿Eliminar inscripción de "${ins.nombre_equipo}"?`, { titulo: '¿Estás segura?', variante: 'danger' })
+  if (!ok) return
   await api.delete(`/inscripciones/${ins.id_inscripcion}`)
   cargar()
 }

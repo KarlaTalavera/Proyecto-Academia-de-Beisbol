@@ -47,17 +47,18 @@
     </div>
 
     <!-- Tabla -->
-    <div class="card">
-      <div class="table-responsive">
+    <div class="card" style="overflow: hidden;">
+      <div class="tabla-scroll">
         <table class="table table-vcenter card-table">
           <thead>
             <tr>
-              <th>Fecha</th>
-              <th>Concepto</th>
-              <th>Equipo</th>
-              <th>Tipo de Pago</th>
-              <th class="text-end">Monto</th>
-              <th></th>
+              <th class="th-sticky">Fecha</th>
+              <th class="th-sticky">Concepto</th>
+              <th class="th-sticky">Categoría</th>
+              <th class="th-sticky">Equipo</th>
+              <th class="th-sticky">Tipo de Pago</th>
+              <th class="th-sticky text-end">Monto</th>
+              <th class="th-sticky" style="width: 120px;"></th>
             </tr>
           </thead>
           <tbody>
@@ -70,6 +71,7 @@
             <tr v-for="ing in ingresosFiltrados" :key="ing.id_ingreso">
               <td>{{ formatFecha(ing.fecha_ingreso) }}</td>
               <td>{{ ing.concepto }}</td>
+              <td><span class="badge" :class="badgeCategoria(ing.categoria)">{{ etiquetaCategoria(ing.categoria) }}</span></td>
               <td>{{ ing.nombre_equipo }}</td>
               <td>
                 <span v-if="ing.tipo_pago" class="badge bg-blue-lt">{{ ing.tipo_pago }}</span>
@@ -87,19 +89,16 @@
               </td>
             </tr>
           </tbody>
-          <tfoot v-if="ingresosFiltrados.length">
-            <tr>
-              <td colspan="4" class="text-end fw-bold">Total filtrado:</td>
-              <td class="text-end">
-                <div class="fw-bold text-green">{{ formatBs(totalFiltrado) }}</div>
-                <div v-if="tasa.tasaDisponible" style="font-size:0.72rem; color:#16a34a;">
-                  ≈ {{ formatUsd(tasa.bsADolar(totalFiltrado)) }}
-                </div>
-              </td>
-              <td></td>
-            </tr>
-          </tfoot>
         </table>
+      </div>
+      <div v-if="ingresosFiltrados.length" class="tabla-footer">
+        <span class="fw-bold text-muted">Total filtrado:</span>
+        <div class="text-end">
+          <div class="fw-bold text-green">{{ formatBs(totalFiltrado) }}</div>
+          <div v-if="tasa.tasaDisponible" style="font-size:0.72rem; color:#16a34a;">
+            ≈ {{ formatUsd(tasa.bsADolar(totalFiltrado)) }}
+          </div>
+        </div>
       </div>
     </div>
 
@@ -177,15 +176,31 @@
                 ⚠ {{ tasa.error }} — ingresa solo el monto en Bs.
               </div>
 
-              <div class="mb-3">
-                <label class="form-label">Tipo de Pago</label>
-                <select v-model="form.tipo_pago" class="form-select">
-                  <option value="">— Seleccionar —</option>
-                  <option>Efectivo</option>
-                  <option>Transferencia</option>
-                  <option>Divisas</option>
-                  <option>Pago Móvil</option>
-                </select>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label required">Categoría</label>
+                  <select v-model="form.categoria" class="form-select" required>
+                    <option value="">— Seleccionar —</option>
+                    <option value="inscripcion">Inscripción</option>
+                    <option value="patrocinio">Patrocinio</option>
+                    <option value="taquilleria">Taquillería</option>
+                    <option value="concesion">Concesión</option>
+                    <option value="multa">Multa</option>
+                    <option value="otro">Otro</option>
+                  </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Tipo de Pago</label>
+                  <select v-model="form.tipo_pago" class="form-select">
+                    <option value="">— Seleccionar —</option>
+                    <option>Efectivo</option>
+                    <option>Transferencia</option>
+                    <option>Divisas</option>
+                    <option>Pago Móvil</option>
+                    <option>Cheque</option>
+                    <option>Zelle</option>
+                  </select>
+                </div>
               </div>
 
               <input type="hidden" v-model="form.id_temporada" />
@@ -208,8 +223,12 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import api from '@/services/api'
 import { useTasaStore } from '@/store/tasa'
+import { useToast }   from '@/composables/useToast'
+import { useConfirm } from '@/composables/useConfirm'
 
-const tasa = useTasaStore()
+const tasa    = useTasaStore()
+const toast   = useToast()
+const confirm = useConfirm()
 
 const ingresos   = ref([])
 const equipos    = ref([])
@@ -224,7 +243,7 @@ const montoUsd     = ref('')
 
 const form = ref({
   id_equipo: '', id_temporada: '', concepto: '',
-  valor: '', fecha_ingreso: '', tipo_pago: '',
+  valor: '', fecha_ingreso: '', tipo_pago: '', categoria: '',
 })
 
 const ingresosFiltrados = computed(() =>
@@ -235,6 +254,17 @@ const ingresosFiltrados = computed(() =>
 )
 const totalIngresos = computed(() => ingresos.value.reduce((s, i) => s + Number(i.valor), 0))
 const totalFiltrado = computed(() => ingresosFiltrados.value.reduce((s, i) => s + Number(i.valor), 0))
+
+const CATEGORIAS = {
+  inscripcion: { label: 'Inscripción',  clase: 'bg-blue-lt text-blue' },
+  patrocinio:  { label: 'Patrocinio',   clase: 'bg-purple-lt text-purple' },
+  taquilleria: { label: 'Taquillería',  clase: 'bg-orange-lt text-orange' },
+  concesion:   { label: 'Concesión',    clase: 'bg-teal-lt text-teal' },
+  multa:       { label: 'Multa',        clase: 'bg-red-lt text-red' },
+  otro:        { label: 'Otro',         clase: 'bg-secondary-lt text-secondary' },
+}
+function etiquetaCategoria(c) { return CATEGORIAS[c]?.label || 'Otro' }
+function badgeCategoria(c)    { return CATEGORIAS[c]?.clase  || 'bg-secondary-lt' }
 
 function formatBs(v) {
   return new Intl.NumberFormat('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v || 0) + ' Bs.'
@@ -290,7 +320,7 @@ function abrirFormulario(ingreso = null) {
       id_equipo: '', id_temporada: temporadaActiva.value || 1,
       concepto: '', valor: '',
       fecha_ingreso: new Date().toISOString().substring(0, 10),
-      tipo_pago: '',
+      tipo_pago: '', categoria: '',
     }
   }
   modalAbierto.value = true
@@ -299,8 +329,8 @@ function abrirFormulario(ingreso = null) {
 function cerrarModal() { modalAbierto.value = false }
 
 async function guardar() {
-  if (!(form.value.concepto || '').trim()) { alert('El concepto es obligatorio'); return }
-  if (!(Number(form.value.valor) > 0)) { alert('El valor debe ser mayor a 0'); return }
+  if (!(form.value.concepto || '').trim()) { toast.warn('El concepto es obligatorio'); return }
+  if (!(Number(form.value.valor) > 0)) { toast.warn('El valor debe ser mayor a 0'); return }
   guardando.value = true
   errorModal.value = ''
   try {
@@ -319,7 +349,8 @@ async function guardar() {
 }
 
 async function confirmarEliminar(ing) {
-  if (!confirm(`¿Eliminar ingreso "${ing.concepto}"?`)) return
+  const ok = await confirm.pedir(`¿Eliminar ingreso "${ing.concepto}"?`, { titulo: '¿Estás segura?', variante: 'danger' })
+  if (!ok) return
   await api.delete(`/finanzas/ingresos/${ing.id_ingreso}`)
   cargar()
 }
@@ -334,3 +365,17 @@ onMounted(() => {
   tasa.cargar()
 })
 </script>
+
+<style scoped>
+.tabla-scroll { max-height: 460px; overflow: auto; }
+.th-sticky { position: sticky; top: 0; background: #fff; z-index: 2; box-shadow: inset 0 -1px 0 #e2e8f0; }
+.tabla-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0.6rem 120px 0.6rem 1.25rem;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+</style>

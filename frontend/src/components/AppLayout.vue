@@ -27,21 +27,21 @@
               </RouterLink>
             </li>
 
-            <li class="nav-item">
+            <li v-if="auth.puedeVerGestion" class="nav-item">
               <RouterLink class="nav-link" :to="{ name: 'Equipos' }">
                 <span class="nav-link-icon"><IconShield :size="20" stroke-width="1.7" /></span>
                 <span class="nav-link-title">Equipos</span>
               </RouterLink>
             </li>
 
-            <li class="nav-item">
+            <li v-if="auth.puedeVerGestion" class="nav-item">
               <RouterLink class="nav-link" :to="{ name: 'Jugadores' }">
                 <span class="nav-link-icon"><IconUsers :size="20" stroke-width="1.7" /></span>
                 <span class="nav-link-title">Jugadores</span>
               </RouterLink>
             </li>
 
-            <li class="nav-item">
+            <li v-if="auth.puedeVerGestion || auth.puedeTaquilla" class="nav-item">
               <RouterLink class="nav-link" :to="{ name: 'Partidos' }">
                 <span class="nav-link-icon"><IconCalendarEvent :size="20" stroke-width="1.7" /></span>
                 <span class="nav-link-title">Partidos</span>
@@ -55,7 +55,7 @@
               </RouterLink>
             </li>
 
-            <li class="nav-item">
+            <li v-if="auth.puedeVerSanciones" class="nav-item">
               <RouterLink class="nav-link" :to="{ name: 'Sanciones' }">
                 <span class="nav-link-icon"><IconGavel :size="20" stroke-width="1.7" /></span>
                 <span class="nav-link-title">Sanciones</span>
@@ -141,6 +141,49 @@
           Bienvenido de vuelta, <strong>{{ auth.nombre }}</strong> 👋
         </div>
         <div class="top-user-info">
+
+          <!-- Campana de notificaciones -->
+          <div v-if="auth.puedeFinanzas || auth.esAdmin" class="notif-wrapper me-2">
+            <!-- Icono campana -->
+            <div class="notif-bell" @click="toggleNotificaciones">
+              <IconBell :size="22" stroke-width="1.7" />
+              <span v-if="noLeidas > 0" class="notif-badge">
+                {{ noLeidas > 9 ? '9+' : noLeidas }}
+              </span>
+            </div>
+
+            <!-- Dropdown -->
+            <div v-if="mostrarNotificaciones" class="notif-dropdown shadow" @click.stop>
+              <div class="d-flex align-items-center justify-content-between px-3 py-2 border-bottom">
+                <span class="fw-semibold" style="font-size:0.85rem;">Notificaciones</span>
+                <button class="btn btn-xs btn-ghost-secondary" style="font-size:0.72rem;" @click="marcarTodasLeidas">
+                  Marcar todo leído
+                </button>
+              </div>
+              <div class="notif-list">
+                <div v-if="!notificaciones.length" class="text-center text-muted py-4">
+                  <IconBell :size="28" stroke-width="1.2" style="opacity:0.3;" />
+                  <div style="font-size:0.82rem; margin-top:6px;">No tienes notificaciones por ahora</div>
+                </div>
+                <div v-for="n in notificaciones" :key="n.id"
+                  class="notif-item px-3 py-2"
+                  :class="{ 'notif-no-leida': !n.leida }"
+                  @click="marcarLeida(n)">
+                  <div class="fw-semibold" style="font-size:0.8rem;">{{ n.titulo }}</div>
+                  <div class="text-muted" style="font-size:0.75rem;">{{ n.mensaje }}</div>
+                  <div class="text-muted" style="font-size:0.68rem; margin-top:2px;">{{ formatFechaNotif(n.created_at) }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Overlay para cerrar al hacer click afuera -->
+            <div v-if="mostrarNotificaciones"
+              class="position-fixed top-0 start-0 w-100 h-100"
+              style="z-index:1000;"
+              @click="mostrarNotificaciones = false">
+            </div>
+          </div>
+
           <span class="ms-2 badge" :class="badgeRol">{{ etiquetaRol }}</span>
           <span class="top-user-name">{{ auth.nombre }}</span>
           <div class="top-user-avatar">{{ inicialNombre }}</div>
@@ -159,19 +202,66 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { RouterLink, RouterView, useRouter } from 'vue-router'
 import { useAuthStore } from '@/store/auth'
+import api from '@/services/api'
 import {
   IconLayoutDashboard, IconShield, IconUsers, IconCalendarEvent,
   IconWallet, IconChartBar, IconLogout, IconUsersGroup, IconCalendar,
-  IconGavel, IconBuildingStore, IconClipboardCheck, IconNews,
+  IconGavel, IconBuildingStore, IconClipboardCheck, IconNews, IconBell,
 } from '@tabler/icons-vue'
 
 const auth   = useAuthStore()
 const router = useRouter()
 
 const inicialNombre = computed(() => auth.nombre?.charAt(0)?.toUpperCase() || '?')
+
+// ── Notificaciones ────────────────────────────────────────────
+const notificaciones      = ref([])
+const noLeidas            = ref(0)
+const mostrarNotificaciones = ref(false)
+let intervaloNotif = null
+
+async function cargarNotificaciones() {
+  if (!auth.puedeFinanzas && !auth.esAdmin) return
+  const [resN, resC] = await Promise.all([
+    api.get('/notificaciones'),
+    api.get('/notificaciones/no-leidas'),
+  ])
+  notificaciones.value = resN.data
+  noLeidas.value       = resC.data.total
+}
+
+function toggleNotificaciones() {
+  mostrarNotificaciones.value = !mostrarNotificaciones.value
+  if (mostrarNotificaciones.value) cargarNotificaciones()
+}
+
+async function marcarLeida(n) {
+  if (n.leida) return
+  await api.patch(`/notificaciones/${n.id}/leida`).catch(() => {})
+  n.leida = true
+  noLeidas.value = Math.max(0, noLeidas.value - 1)
+}
+
+async function marcarTodasLeidas() {
+  await api.patch('/notificaciones/todas-leidas').catch(() => {})
+  notificaciones.value.forEach(n => { n.leida = true })
+  noLeidas.value = 0
+}
+
+function formatFechaNotif(f) {
+  if (!f) return ''
+  return new Date(f).toLocaleString('es-VE', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
+}
+
+onMounted(() => {
+  cargarNotificaciones()
+  // Revisar notificaciones nuevas cada 60 segundos
+  intervaloNotif = setInterval(cargarNotificaciones, 60_000)
+})
+onUnmounted(() => clearInterval(intervaloNotif))
 
 const ETIQUETAS = {
   administrador: 'Administrador',
@@ -195,3 +285,53 @@ function cerrarSesion() {
   router.push({ name: 'Login' })
 }
 </script>
+
+<style scoped>
+.notif-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.notif-bell {
+  position: relative;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 8px;
+  transition: background 0.15s;
+}
+.notif-bell:hover { background: rgba(0,0,0,0.06); }
+.notif-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 99px;
+  line-height: 1.4;
+}
+.notif-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 340px;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 12px;
+  z-index: 1001;
+  overflow: hidden;
+}
+.notif-list {
+  max-height: 360px;
+  overflow-y: auto;
+}
+.notif-item {
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.notif-item:hover { background: #f8fafc; }
+.notif-no-leida   { background: rgba(99,102,241,0.06); }
+</style>

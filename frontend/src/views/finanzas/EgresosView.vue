@@ -47,16 +47,16 @@
     </div>
 
     <!-- Tabla -->
-    <div class="card">
-      <div class="table-responsive">
+    <div class="card" style="overflow: hidden;">
+      <div class="tabla-scroll">
         <table class="table table-vcenter card-table">
           <thead>
             <tr>
-              <th>Fecha</th>
-              <th>Descripción del Gasto</th>
-              <th>Tipo de Pago</th>
-              <th class="text-end">Monto</th>
-              <th></th>
+              <th class="th-sticky">Fecha</th>
+              <th class="th-sticky">Descripción del Gasto</th>
+              <th class="th-sticky">Tipo de Pago</th>
+              <th class="th-sticky text-end">Monto</th>
+              <th class="th-sticky" style="width: 120px;"></th>
             </tr>
           </thead>
           <tbody>
@@ -85,19 +85,16 @@
               </td>
             </tr>
           </tbody>
-          <tfoot v-if="egresosFiltrados.length">
-            <tr>
-              <td colspan="3" class="text-end fw-bold">Total filtrado:</td>
-              <td class="text-end">
-                <div class="fw-bold text-red">{{ formatBs(totalFiltrado) }}</div>
-                <div v-if="tasa.tasaDisponible" style="font-size:0.72rem; color:#ef4444;">
-                  ≈ {{ formatUsd(tasa.bsADolar(totalFiltrado)) }}
-                </div>
-              </td>
-              <td></td>
-            </tr>
-          </tfoot>
         </table>
+      </div>
+      <div v-if="egresosFiltrados.length" class="tabla-footer">
+        <span class="fw-bold text-muted">Total filtrado:</span>
+        <div class="tabla-footer-monto text-end">
+          <div class="fw-bold text-red">{{ formatBs(totalFiltrado) }}</div>
+          <div v-if="tasa.tasaDisponible" style="font-size:0.72rem; color:#ef4444;">
+            ≈ {{ formatUsd(tasa.bsADolar(totalFiltrado)) }}
+          </div>
+        </div>
       </div>
     </div>
 
@@ -207,8 +204,12 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import api from '@/services/api'
 import { useTasaStore } from '@/store/tasa'
+import { useToast }   from '@/composables/useToast'
+import { useConfirm } from '@/composables/useConfirm'
 
-const tasa = useTasaStore()
+const tasa    = useTasaStore()
+const toast   = useToast()
+const confirm = useConfirm()
 
 const egresos  = ref([])
 const proveedores = ref([])
@@ -290,8 +291,8 @@ function abrirFormulario(egreso = null) {
 function cerrarModal() { modalAbierto.value = false }
 
 async function guardar() {
-  if (!(form.value.nota_gastos || '').trim()) { alert('La descripción del gasto es obligatoria'); return }
-  if (!(Number(form.value.gasto) > 0)) { alert('El gasto debe ser mayor a 0'); return }
+  if (!(form.value.nota_gastos || '').trim()) { toast.warn('La descripción del gasto es obligatoria'); return }
+  if (!(Number(form.value.gasto) > 0)) { toast.warn('El gasto debe ser mayor a 0'); return }
   guardando.value = true
   errorModal.value = ''
   try {
@@ -310,7 +311,8 @@ async function guardar() {
 }
 
 async function confirmarEliminar(eg) {
-  if (!confirm(`¿Eliminar egreso "${eg.nota_gastos}"?`)) return
+  const ok = await confirm.pedir(`¿Eliminar egreso "${eg.nota_gastos}"?`, { titulo: '¿Estás segura?', variante: 'danger' })
+  if (!ok) return
   await api.delete(`/finanzas/egresos/${eg.id_egreso}`)
   cargar()
 }
@@ -324,3 +326,17 @@ onMounted(() => {
   tasa.cargar()
 })
 </script>
+
+<style scoped>
+.tabla-scroll { max-height: 460px; overflow: auto; }
+.th-sticky { position: sticky; top: 0; background: #fff; z-index: 2; box-shadow: inset 0 -1px 0 #e2e8f0; }
+.tabla-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0.6rem 120px 0.6rem 1.25rem;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+</style>

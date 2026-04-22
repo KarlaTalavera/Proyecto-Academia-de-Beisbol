@@ -126,6 +126,33 @@ const PartidoController = {
     await DesempenoModel.upsertPitcher({ ...req.body, id_partido: req.params.id })
     res.json({ ok: true })
   },
+
+  async getTaquilla(req, res) {
+    const [rows] = await db.query(
+      `SELECT boletos_general, precio_general, boletos_vip, precio_vip, capacidad_estadio
+       FROM partido WHERE id_partido = ?`,
+      [req.params.id]
+    )
+    if (!rows[0]) return res.status(404).json({ error: 'Partido no encontrado' })
+    res.json(rows[0])
+  },
+
+  async guardarTaquilla(req, res) {
+    const { boletos_general, precio_general, boletos_vip, precio_vip, capacidad_estadio } = req.body
+    const [result] = await db.query(
+      `UPDATE partido SET
+         boletos_general=?, precio_general=?, boletos_vip=?, precio_vip=?, capacidad_estadio=?
+       WHERE id_partido=?`,
+      [
+        boletos_general || 0, precio_general || 0,
+        boletos_vip || 0,     precio_vip || 0,
+        capacidad_estadio || 0,
+        req.params.id,
+      ]
+    )
+    if (!result.affectedRows) return res.status(404).json({ error: 'Partido no encontrado' })
+    res.json({ ok: true })
+  },
 }
 
 module.exports = PartidoController

@@ -10,20 +10,30 @@
       </button>
     </div>
 
-    <!-- Filtros de estado -->
-    <div class="d-flex gap-2 mb-3 flex-wrap">
-      <button
-        v-for="f in filtrosEstado" :key="f.valor"
-        class="btn btn-sm"
-        :class="filtroEstado === f.valor ? 'btn-primary' : 'btn-ghost-secondary'"
-        style="border-radius:20px; font-size:0.8rem;"
-        @click="filtroEstado = f.valor"
-      >
-        {{ f.label }}
-        <span class="ms-1 badge" style="background:rgba(255,255,255,0.25); font-size:0.65rem;">
-          {{ contarEstado(f.valor) }}
-        </span>
-      </button>
+    <!-- Filtros de estado + buscador -->
+    <div class="d-flex align-items-center justify-content-between gap-3 mb-3 flex-wrap">
+      <div class="d-flex gap-2 flex-wrap">
+        <button
+          v-for="f in filtrosEstado" :key="f.valor"
+          class="btn btn-sm"
+          :class="filtroEstado === f.valor ? 'btn-primary' : 'btn-ghost-secondary'"
+          style="border-radius:20px; font-size:0.8rem;"
+          @click="filtroEstado = f.valor"
+        >
+          {{ f.label }}
+          <span class="ms-1 badge" style="background:rgba(255,255,255,0.25); font-size:0.65rem;">
+            {{ contarEstado(f.valor) }}
+          </span>
+        </button>
+      </div>
+      <div class="partido-search-wrapper">
+        <IconSearch :size="15" class="partido-search-icon" />
+        <input
+          v-model="busqueda"
+          class="form-control form-control-sm partido-search"
+          placeholder="Buscar equipo, lugar..."
+        />
+      </div>
     </div>
 
     <!-- Lista de partidos -->
@@ -34,7 +44,7 @@
     <div v-else-if="!partidosFiltrados.length" class="card">
       <div class="card-body text-center py-5 text-muted">
         <IconCalendarEvent :size="40" stroke-width="1.2" class="mb-2" style="opacity:0.3;" />
-        <p class="mb-0">No hay partidos{{ filtroEstado ? ' con estado "' + filtroEstado + '"' : '' }}</p>
+        <p class="mb-0">No se encontraron partidos{{ busqueda ? ' para "' + busqueda + '"' : (filtroEstado ? ' con estado "' + filtroEstado + '"' : '') }}</p>
       </div>
     </div>
 
@@ -555,6 +565,54 @@
                 </div>
 
               </div>
+              <!-- TAB: TAQUILLA -->
+              <div v-if="tabActual === 'taquilla'">
+                <div class="card p-4">
+                  <h6 class="fw-bold mb-4" style="font-size:0.875rem; color:#1e293b;">Datos de Taquilla</h6>
+                  <div class="row g-3">
+                    <div class="col-md-4 mb-2">
+                      <label class="form-label" style="font-size:0.78rem;">Capacidad del estadio</label>
+                      <input v-model.number="taquillaForm.capacidad_estadio" type="number" min="0" class="form-control form-control-sm" />
+                    </div>
+                  </div>
+                  <div class="row g-3 mt-1">
+                    <div class="col-12"><p class="fw-semibold mb-1" style="font-size:0.82rem; color:#64748b;">ZONA GENERAL</p></div>
+                    <div class="col-md-6">
+                      <label class="form-label" style="font-size:0.78rem;">Boletos vendidos</label>
+                      <input v-model.number="taquillaForm.boletos_general" type="number" min="0" class="form-control form-control-sm" />
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label" style="font-size:0.78rem;">Precio unitario (Bs.)</label>
+                      <input v-model.number="taquillaForm.precio_general" type="number" min="0" step="0.01" class="form-control form-control-sm" />
+                    </div>
+                  </div>
+                  <div class="row g-3 mt-1">
+                    <div class="col-12"><p class="fw-semibold mb-1" style="font-size:0.82rem; color:#64748b;">ZONA VIP</p></div>
+                    <div class="col-md-6">
+                      <label class="form-label" style="font-size:0.78rem;">Boletos vendidos</label>
+                      <input v-model.number="taquillaForm.boletos_vip" type="number" min="0" class="form-control form-control-sm" />
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label" style="font-size:0.78rem;">Precio unitario (Bs.)</label>
+                      <input v-model.number="taquillaForm.precio_vip" type="number" min="0" step="0.01" class="form-control form-control-sm" />
+                    </div>
+                  </div>
+                  <div class="mt-3 p-3 rounded" style="background:rgba(99,102,241,0.06);">
+                    <div class="fw-semibold" style="font-size:0.82rem; color:#64748b;">RECAUDACIÓN TOTAL ESTIMADA</div>
+                    <div class="fw-bold" style="font-size:1.4rem; color:#1e293b;">
+                      {{ recaudadoTaquilla.toLocaleString('es-VE', { minimumFractionDigits: 2 }) }} Bs.
+                    </div>
+                  </div>
+                  <div class="text-end mt-3">
+                    <button class="btn btn-primary d-inline-flex align-items-center gap-2" :disabled="guardandoTaquilla" @click="guardarTaquilla">
+                      <span v-if="guardandoTaquilla" class="spinner-border spinner-border-sm"></span>
+                      <IconDeviceFloppy v-else :size="16" />
+                      Guardar Taquilla
+                    </button>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
@@ -569,12 +627,17 @@
 import { ref, computed, watch, onMounted, markRaw } from 'vue'
 import api from '@/services/api'
 import { useAuthStore } from '@/store/auth'
+import { useToast }   from '@/composables/useToast'
+import { useConfirm } from '@/composables/useConfirm'
 import AbrevTooltip from '@/components/AbrevTooltip.vue'
 import {
   IconPlus, IconCalendarEvent, IconEye, IconTrash, IconMapPin,
   IconLock, IconDeviceFloppy, IconInfoCircle, IconListDetails,
-  IconTrophy, IconChartBar,
+  IconTrophy, IconChartBar, IconTicket, IconSearch,
 } from '@tabler/icons-vue'
+
+const toast   = useToast()
+const confirm = useConfirm()
 
 const auth    = useAuthStore()
 const partidos   = ref([])
@@ -583,6 +646,7 @@ const jugadores  = ref([])
 const temporadas = ref([])
 const cargando   = ref(false)
 const filtroEstado = ref('')
+const busqueda     = ref('')
 
 const filtrosEstado = [
   { valor: '', label: 'Todos' },
@@ -620,19 +684,40 @@ const lineupInput = ref({})
 const nuevoBateador = ref('')
 const nuevoPitcher  = ref('')
 
-const tabsDisponibles = computed(() => [
-  { id: 'info',         label: 'Info & Estado',   icon: markRaw(IconInfoCircle) },
-  { id: 'lineup',       label: 'Lineup',          icon: markRaw(IconListDetails) },
-  { id: 'resultado',    label: 'Resultado',       icon: markRaw(IconTrophy) },
-  { id: 'estadisticas', label: 'Estadísticas',    icon: markRaw(IconChartBar) },
-])
+// Taquilla
+const taquillaForm = ref({ boletos_general: 0, precio_general: 0, boletos_vip: 0, precio_vip: 0, capacidad_estadio: 0 })
+const guardandoTaquilla = ref(false)
+const recaudadoTaquilla = computed(() =>
+  (taquillaForm.value.boletos_general * taquillaForm.value.precio_general) +
+  (taquillaForm.value.boletos_vip     * taquillaForm.value.precio_vip)
+)
+
+const tabsDisponibles = computed(() => {
+  const tabs = [
+    { id: 'info',         label: 'Info & Estado',   icon: markRaw(IconInfoCircle) },
+    { id: 'lineup',       label: 'Lineup',          icon: markRaw(IconListDetails) },
+    { id: 'resultado',    label: 'Resultado',       icon: markRaw(IconTrophy) },
+    { id: 'estadisticas', label: 'Estadísticas',    icon: markRaw(IconChartBar) },
+  ]
+  if (auth.puedeTaquilla) tabs.push({ id: 'taquilla', label: 'Taquilla', icon: markRaw(IconTicket) })
+  return tabs
+})
 
 const paginaActual   = ref(1)
 const porPagina      = 8
 
-const partidosFiltrados = computed(() =>
-  partidos.value.filter(p => !filtroEstado.value || p.estado === filtroEstado.value)
-)
+const partidosFiltrados = computed(() => {
+  const q = busqueda.value.toLowerCase().trim()
+  return partidos.value.filter(p => {
+    if (filtroEstado.value && p.estado !== filtroEstado.value) return false
+    if (!q) return true
+    return (
+      p.equipo_casa?.toLowerCase().includes(q) ||
+      p.equipo_visitante?.toLowerCase().includes(q) ||
+      p.lugar?.toLowerCase().includes(q)
+    )
+  })
+})
 
 const totalPaginas = computed(() => Math.max(1, Math.ceil(partidosFiltrados.value.length / porPagina)))
 
@@ -642,7 +727,7 @@ const partidosPagina = computed(() => {
 })
 
 // Resetear página al cambiar filtro
-watch(filtroEstado, () => { paginaActual.value = 1 })
+watch([filtroEstado, busqueda], () => { paginaActual.value = 1 })
 
 function contarEstado(estado) {
   if (!estado) return partidos.value.length
@@ -730,10 +815,11 @@ async function verDetalle(partido) {
     [partido.id_equipo_visitante]:  { id_jugador: '', orden_bateo: 1, posicion_juego: '', es_titular: true },
   }
 
-  const [resL, resD, resR] = await Promise.all([
+  const [resL, resD, resR, resT] = await Promise.all([
     api.get(`/partidos/${partido.id_partido}/lineup`),
     api.get(`/partidos/${partido.id_partido}/desempeno`),
     api.get(`/partidos/${partido.id_partido}/resultado`),
+    auth.puedeTaquilla ? api.get(`/partidos/${partido.id_partido}/taquilla`) : Promise.resolve({ data: null }),
   ])
   lineup.value = resL.data
   desempeno.value = resD.data
@@ -747,6 +833,9 @@ async function verDetalle(partido) {
 
   // Guardar resultado en partidoActual para mostrar el marcador
   partidoActual.value.resultado = resR.data
+
+  if (resT.data) Object.assign(taquillaForm.value, resT.data)
+  else taquillaForm.value = { boletos_general: 0, precio_general: 0, boletos_vip: 0, precio_vip: 0, capacidad_estadio: 0 }
 }
 
 function abrirNuevoPartido() {
@@ -778,7 +867,8 @@ async function crearPartido() {
 }
 
 async function confirmarEliminar(p) {
-  if (!confirm(`¿Eliminar el partido ${p.equipo_casa} vs ${p.equipo_visitante}?`)) return
+  const ok = await confirm.pedir(`¿Eliminar el partido ${p.equipo_casa} vs ${p.equipo_visitante}?`, { titulo: '¿Estás segura?', variante: 'danger' })
+  if (!ok) return
   await api.delete(`/partidos/${p.id_partido}`)
   cargar()
 }
@@ -793,7 +883,7 @@ async function cambiarEstado(estado) {
 async function reprogramarPartido() {
   const { fecha, hora } = reprogramarForm.value
   if (new Date(`${fecha}T${hora}`) <= new Date()) {
-    alert('La nueva fecha y hora debe ser futura'); return
+    toast.warn('La nueva fecha y hora debe ser futura'); return
   }
   try {
     await api.patch(`/partidos/${partidoActual.value.id_partido}/reprogramar`, { fecha_juego: fecha, hora_juego: hora })
@@ -807,7 +897,7 @@ async function reprogramarPartido() {
       partidos.value[idx].estado = 'programado'
     }
   } catch (e) {
-    alert(e.response?.data?.error || 'Error al reprogramar el partido')
+    toast.error(e.response?.data?.error || 'Error al reprogramar el partido')
   }
 }
 
@@ -817,29 +907,29 @@ async function agregarLineup(id_equipo) {
 
   // Validar posición seleccionada
   if (!inp.posicion_juego) {
-    alert('Selecciona una posición en juego.'); return
+    toast.warn('Selecciona una posición en juego.'); return
   }
 
   // Validar orden al bate positivo
   if (!inp.orden_bateo || inp.orden_bateo < 1) {
-    alert('El orden al bate debe ser mayor a 0.'); return
+    toast.warn('El orden al bate debe ser mayor a 0.'); return
   }
 
   const lineupDelEquipo = lineupEquipo(id_equipo)
 
   // Validar orden al bate no duplicado dentro del equipo
   if (lineupDelEquipo.some(l => l.orden_bateo === inp.orden_bateo)) {
-    alert(`Ya existe un jugador con el orden al bate #${inp.orden_bateo} en este equipo.`); return
+    toast.warn(`Ya existe un jugador con el orden al bate #${inp.orden_bateo} en este equipo.`); return
   }
 
   // Validar posición no duplicada dentro del equipo (excepto DH que podría no tener posición defensiva)
   if (lineupDelEquipo.some(l => l.posicion_juego === inp.posicion_juego)) {
-    alert(`Ya existe un jugador en la posición ${inp.posicion_juego} en este equipo.`); return
+    toast.warn(`Ya existe un jugador en la posición ${inp.posicion_juego} en este equipo.`); return
   }
 
   // Validar que el jugador no esté ya en el lineup
   if (lineupDelEquipo.some(l => l.id_jugador === inp.id_jugador)) {
-    alert('Este jugador ya está en el lineup.'); return
+    toast.warn('Este jugador ya está en el lineup.'); return
   }
 
   const entry = { id_partido: partidoActual.value.id_partido, id_equipo, ...inp }
@@ -860,7 +950,7 @@ async function guardarResultado() {
     const idx = partidos.value.findIndex(p => p.id_partido === partidoActual.value.id_partido)
     if (idx >= 0) partidos.value[idx].estado = 'finalizado'
   } catch (e) {
-    alert(e.response?.data?.error || 'Error al guardar resultado')
+    toast.error(e.response?.data?.error || 'Error al guardar resultado')
   } finally { guardandoResultado.value = false }
 }
 
@@ -891,17 +981,46 @@ function agregarPitcher() {
 
 async function guardarStatBateador(b) {
   if (b.hits > b.turnos_al_bate) {
-    alert('Los hits no pueden superar los turnos al bate'); return
+    toast.warn('Los hits no pueden superar los turnos al bate'); return
   }
   await api.post(`/partidos/${partidoActual.value.id_partido}/desempeno/bateador`, { ...b, id_partido: partidoActual.value.id_partido })
 }
 
 async function guardarStatPitcher(pt) {
   if (pt.carreras_limpias > pt.carreras_permitidas) {
-    alert('Las carreras limpias no pueden superar las carreras permitidas'); return
+    toast.warn('Las carreras limpias no pueden superar las carreras permitidas'); return
   }
   await api.post(`/partidos/${partidoActual.value.id_partido}/desempeno/pitcher`, { ...pt, id_partido: partidoActual.value.id_partido })
 }
 
+async function guardarTaquilla() {
+  guardandoTaquilla.value = true
+  try {
+    await api.patch(`/partidos/${partidoActual.value.id_partido}/taquilla`, taquillaForm.value)
+    toast.success('Datos de taquilla guardados correctamente.')
+  } catch (e) {
+    toast.error(e.response?.data?.error || 'Error al guardar taquilla')
+  } finally { guardandoTaquilla.value = false }
+}
+
 onMounted(cargar)
 </script>
+
+<style scoped>
+.partido-search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.partido-search-icon {
+  position: absolute;
+  left: 9px;
+  color: #94a3b8;
+  pointer-events: none;
+}
+.partido-search {
+  padding-left: 28px;
+  min-width: 220px;
+  border-radius: 20px;
+}
+</style>

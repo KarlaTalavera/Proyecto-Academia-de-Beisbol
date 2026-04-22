@@ -151,12 +151,17 @@
 import { ref, computed, onMounted } from 'vue'
 import api from '@/services/api'
 import { useAuthStore } from '@/store/auth'
+import { useToast }   from '@/composables/useToast'
+import { useConfirm } from '@/composables/useConfirm'
 import {
   IconPlus, IconSearch, IconPencil, IconTrash,
   IconShield, IconMail, IconPhone, IconDeviceFloppy, IconCamera,
 } from '@tabler/icons-vue'
 
 const apiBase = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3000'
+
+const toast   = useToast()
+const confirm = useConfirm()
 
 const auth     = useAuthStore()
 const equipos  = ref([])
@@ -204,14 +209,14 @@ async function guardar() {
   const nombre = (form.value.nombre_equipo || '').trim()
   const entrenador = (form.value.entrenador || '').trim()
   const responsable = (form.value.responsable || '').trim()
-  if (!nombre) { alert('El nombre del equipo es obligatorio'); return }
-  if (!entrenador) { alert('El entrenador es obligatorio'); return }
-  if (!responsable) { alert('El responsable es obligatorio'); return }
+  if (!nombre) { toast.warn('El nombre del equipo es obligatorio'); return }
+  if (!entrenador) { toast.warn('El entrenador es obligatorio'); return }
+  if (!responsable) { toast.warn('El responsable es obligatorio'); return }
   if (form.value.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.value.email)) {
-    alert('El formato del email no es válido'); return
+    toast.warn('El formato del email no es válido'); return
   }
   if (form.value.telefono && !/^0\d{3}-\d{3}-\d{4}$/.test(form.value.telefono)) {
-    alert('El teléfono debe tener el formato 0414-000-0000'); return
+    toast.warn('El teléfono debe tener el formato 0414-000-0000'); return
   }
   guardando.value  = true
   errorModal.value = ''
@@ -241,13 +246,14 @@ async function subirLogo(equipo, event) {
     })
     equipo.logo_url = data.logo_url
   } catch (e) {
-    alert(e.response?.data?.error || 'Error al subir el logo')
+    toast.error(e.response?.data?.error || 'Error al subir el logo')
   }
   event.target.value = ''
 }
 
 async function confirmarEliminar(equipo) {
-  if (!confirm(`¿Eliminar el equipo "${equipo.nombre_equipo}"?`)) return
+  const ok = await confirm.pedir(`¿Eliminar el equipo "${equipo.nombre_equipo}"?`, { titulo: '¿Estás segura?', variante: 'danger' })
+  if (!ok) return
   await api.delete(`/equipos/${equipo.id_equipo}`)
   cargarEquipos()
 }

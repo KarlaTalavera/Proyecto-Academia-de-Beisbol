@@ -205,7 +205,12 @@
 import { ref, computed, onMounted } from 'vue'
 import api from '@/services/api'
 import { useAuthStore } from '@/store/auth'
+import { useToast }   from '@/composables/useToast'
+import { useConfirm } from '@/composables/useConfirm'
 import { IconSearch, IconTrash, IconToggleLeft, IconToggleRight, IconKey, IconUserPlus } from '@tabler/icons-vue'
+
+const toast   = useToast()
+const confirm = useConfirm()
 
 const auth    = useAuthStore()
 const miId    = computed(() => {
@@ -301,7 +306,7 @@ async function cambiarRol(usuario, rol) {
     await api.patch(`/usuarios/${usuario.id_usuario}/rol`, { rol })
     usuario.rol = rol
   } catch (e) {
-    alert(e.response?.data?.error || 'Error al cambiar rol')
+    toast.error(e.response?.data?.error || 'Error al cambiar rol')
     await cargar()
   }
 }
@@ -311,7 +316,7 @@ async function toggleActivo(usuario) {
     const { data } = await api.patch(`/usuarios/${usuario.id_usuario}/activo`)
     usuario.activo = data.activo ? 1 : 0
   } catch (e) {
-    alert(e.response?.data?.error || 'Error')
+    toast.error(e.response?.data?.error || 'Error')
   }
 }
 
@@ -340,12 +345,13 @@ async function resetPassword() {
 }
 
 async function confirmarEliminar(usuario) {
-  if (!confirm(`¿Eliminar al usuario "${usuario.nombre}"? Esta acción no se puede deshacer.`)) return
+  const ok = await confirm.pedir(`¿Eliminar al usuario "${usuario.nombre}"? Esta acción no se puede deshacer.`, { titulo: '¿Estás segura?', variante: 'danger' })
+  if (!ok) return
   try {
     await api.delete(`/usuarios/${usuario.id_usuario}`)
     await cargar()
   } catch (e) {
-    alert(e.response?.data?.error || 'Error al eliminar')
+    toast.error(e.response?.data?.error || 'Error al eliminar')
   }
 }
 

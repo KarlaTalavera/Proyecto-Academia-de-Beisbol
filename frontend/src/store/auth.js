@@ -33,6 +33,12 @@ actions: {
     puedeSancionar: s => ['administrador', 'dueno', 'anotador'].includes(s.rol),
     // solo el anotador carga lineup, resultado y estadísticas de un partido
     puedeAnotar:   s => s.rol === 'anotador',
+    // caja, admin y dueno pueden ver sanciones (lectura)
+    puedeVerSanciones: s => ['administrador', 'dueno', 'anotador', 'caja'].includes(s.rol),
+    // solo admin y dueno ven equipos/jugadores en el panel
+    puedeVerGestion: s => ['administrador', 'dueno', 'anotador'].includes(s.rol),
+    // taquilla: solo admin y caja
+    puedeTaquilla: s => ['administrador', 'caja'].includes(s.rol),
   },
 
   actions: {

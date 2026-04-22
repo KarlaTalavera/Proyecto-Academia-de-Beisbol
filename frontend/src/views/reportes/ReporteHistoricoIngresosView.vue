@@ -139,63 +139,77 @@
             <div v-if="!datos.length" class="text-center py-5 text-muted">
               Sin ingresos registrados para esta temporada
             </div>
-            <div v-else style="width:100%; overflow:hidden;">
-              <svg :viewBox="`0 0 900 320`" style="width:100%; height:320px; display:block;" xmlns="http://www.w3.org/2000/svg">
-                <!-- Fondo -->
+            <div v-else class="chart-wrapper" @mouseleave="histHovered = -1; histTooltip.visible = false">
+              <svg
+                :key="datos.map(d=>d.total).join()"
+                :viewBox="`0 0 900 320`" style="width:100%; height:320px; display:block;" xmlns="http://www.w3.org/2000/svg"
+                @mousemove="onHistMove"
+              >
                 <rect x="0" y="0" width="900" height="320" fill="transparent"/>
-                <!-- Líneas guía horizontales -->
                 <g v-for="i in 6" :key="'g'+i">
-                  <line
-                    :x1="72" :y1="24 + (248/5)*(5-(i-1))"
-                    :x2="876" :y2="24 + (248/5)*(5-(i-1))"
-                    stroke="#e2e8f0" stroke-width="1"
-                  />
-                  <text
-                    :x="66" :y="24 + (248/5)*(5-(i-1)) + 4"
-                    text-anchor="end" font-size="11" fill="#94a3b8" font-family="sans-serif"
-                  >{{ formatCompacto(maxValor * (i-1) / 5) }}</text>
+                  <line :x1="72" :y1="24 + (248/5)*(5-(i-1))" :x2="876" :y2="24 + (248/5)*(5-(i-1))" stroke="#e2e8f0" stroke-width="1"/>
+                  <text :x="66" :y="24 + (248/5)*(5-(i-1)) + 4" text-anchor="end" font-size="11" fill="#94a3b8" font-family="sans-serif">{{ formatCompacto(maxValor * (i-1) / 5) }}</text>
                 </g>
-                <!-- Área bajo la curva -->
                 <defs>
                   <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stop-color="#6366f1" stop-opacity="0.22"/>
-                    <stop offset="100%" stop-color="#6366f1" stop-opacity="0.02"/>
+                    <stop offset="0%" stop-color="#6366f1" stop-opacity="0.18"/>
+                    <stop offset="100%" stop-color="#6366f1" stop-opacity="0.01"/>
                   </linearGradient>
                 </defs>
+                <!-- Área (fade in) -->
                 <polygon v-if="puntosGrafico.length > 1"
                   :points="areaPoligono"
                   fill="url(#areaGrad)"
+                  class="chart-area"
                 />
-                <!-- Línea principal -->
+                <!-- Línea animada -->
                 <polyline v-if="puntosGrafico.length > 1"
                   :points="puntosGrafico.map(p => p.x+','+p.y).join(' ')"
-                  fill="none" stroke="#6366f1" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"
+                  fill="none" stroke="#6366f1" stroke-width="2.5"
+                  stroke-linejoin="round" stroke-linecap="round"
+                  stroke-dasharray="3000" stroke-dashoffset="3000"
+                  class="chart-line"
                 />
-                <!-- Puntos, valores y etiquetas X -->
-                <g v-for="(p, i) in puntosGrafico" :key="'p'+i">
-                  <!-- Valor encima del punto -->
-                  <text
-                    :x="p.x" :y="p.y - 12"
-                    text-anchor="middle"
-                    :font-size="p.isMax ? 12 : 10"
-                    :font-weight="p.isMax ? 'bold' : 'normal'"
-                    :fill="p.isMax ? '#10b981' : '#475569'"
-                    font-family="sans-serif"
-                  >{{ formatCompacto(p.valor) }}</text>
-                  <!-- Círculo -->
+                <!-- Puntos interactivos -->
+                <g v-for="(p, i) in puntosGrafico" :key="'p'+i"
+                   style="cursor:pointer;"
+                   @mouseenter="histHovered = i"
+                   @mouseleave="histHovered = -1">
+                  <!-- Zona de click amplia (invisible) -->
+                  <circle :cx="p.x" :cy="p.y" r="18" fill="transparent"/>
+                  <!-- Halo al hover -->
+                  <circle v-if="histHovered === i"
+                    :cx="p.x" :cy="p.y" r="14"
+                    :fill="p.isMax ? 'rgba(20,184,166,0.15)' : 'rgba(99,102,241,0.12)'"
+                  />
+                  <!-- Círculo principal -->
                   <circle
                     :cx="p.x" :cy="p.y"
-                    :r="p.isMax ? 7 : 5"
-                    :fill="p.isMax ? '#10b981' : '#6366f1'"
-                    stroke="white" stroke-width="2"
+                    :r="histHovered === i ? 8 : (p.isMax ? 7 : 5)"
+                    :fill="p.isMax ? '#14b8a6' : '#6366f1'"
+                    stroke="white" :stroke-width="histHovered === i ? 3 : 2"
+                    class="chart-point"
+                    :style="{ animationDelay: `${0.6 + i * 0.06}s` }"
                   />
+                  <!-- Valor (siempre visible para max, solo al hover para otros) -->
+                  <text v-if="p.isMax || histHovered === i"
+                    :x="p.x" :y="p.y - 14"
+                    text-anchor="middle"
+                    :font-size="p.isMax ? 12 : 11"
+                    :font-weight="p.isMax ? 'bold' : 'normal'"
+                    :fill="p.isMax ? '#14b8a6' : '#6366f1'"
+                    font-family="sans-serif"
+                  >{{ formatCompacto(p.valor) }}</text>
                   <!-- Etiqueta eje X -->
-                  <text
-                    :x="p.x" :y="288"
-                    text-anchor="middle" font-size="11" fill="#64748b" font-family="sans-serif"
-                  >{{ datos[i].periodo }}</text>
+                  <text :x="p.x" :y="288" text-anchor="middle" font-size="11" fill="#64748b" font-family="sans-serif">{{ datos[i].periodo }}</text>
                 </g>
               </svg>
+              <!-- Tooltip flotante -->
+              <div v-if="histTooltip.visible" class="chart-tooltip" :style="{ left: histTooltip.x + 'px', top: histTooltip.y + 'px' }">
+                <div class="fw-bold mb-1" style="font-size:0.78rem; color:#a5b4fc;">{{ histTooltip.periodo }}</div>
+                <div style="font-size:0.8rem;">{{ histTooltip.monto }}</div>
+                <div style="color:#94a3b8; font-size:0.72rem; margin-top:2px;">{{ histTooltip.cantidad }} registro(s)</div>
+              </div>
             </div>
           </div>
         </div>
@@ -284,6 +298,25 @@ const datos          = ref([])
 const mostrarGrafico = ref(true)
 const fechaDesde     = ref('')
 const fechaHasta     = ref('')
+
+// Interactividad
+const histHovered = ref(-1)
+const histTooltip = ref({ visible: false, x: 0, y: 0, periodo: '', monto: '', cantidad: 0 })
+
+function onHistMove(e) {
+  const i = histHovered.value
+  if (i < 0 || !datos.value[i]) { histTooltip.value.visible = false; return }
+  const rect = e.currentTarget.closest('.chart-wrapper').getBoundingClientRect()
+  const d = datos.value[i]
+  histTooltip.value = {
+    visible:  true,
+    x:        e.clientX - rect.left,
+    y:        e.clientY - rect.top - 90,
+    periodo:  d.periodo,
+    monto:    formatBs(d.total),
+    cantidad: d.cantidad,
+  }
+}
 
 const fechaGeneracion = computed(() =>
   new Date().toLocaleString('es-VE', { dateStyle: 'medium', timeStyle: 'short' })
@@ -540,9 +573,9 @@ async function exportPDF() {
     pts.forEach((p, i) => {
       const isMax = values[i] === Math.max(...values)
       octx.beginPath(); octx.arc(p.x, p.y, isMax ? 8 : 5, 0, 2 * Math.PI)
-      octx.fillStyle = isMax ? '#10b981' : '#6366f1'; octx.fill()
+      octx.fillStyle = isMax ? '#14b8a6' : '#6366f1'; octx.fill()
       octx.strokeStyle = '#fff'; octx.lineWidth = 2; octx.stroke()
-      octx.fillStyle = isMax ? '#10b981' : '#475569'
+      octx.fillStyle = isMax ? '#14b8a6' : '#475569'
       octx.font = isMax ? 'bold 13px sans-serif' : '12px sans-serif'
       octx.textAlign = 'center'
       octx.fillText(
@@ -661,3 +694,52 @@ function exportExcel() {
 
 onMounted(cargarTemporadas)
 </script>
+
+<style scoped>
+.chart-wrapper {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+/* Línea que se dibuja de izquierda a derecha */
+.chart-line {
+  animation: drawLine 1s ease-out forwards;
+}
+@keyframes drawLine {
+  to { stroke-dashoffset: 0; }
+}
+/* Área que aparece con fade */
+.chart-area {
+  opacity: 0;
+  animation: fadeIn 0.9s ease-out 0.3s forwards;
+}
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+/* Puntos que aparecen escalando */
+.chart-point {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  animation: popPoint 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  transition: r 0.15s ease;
+}
+@keyframes popPoint {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+.chart-tooltip {
+  position: absolute;
+  background: #1e293b;
+  color: #fff;
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 0.78rem;
+  pointer-events: none;
+  white-space: nowrap;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.22);
+  z-index: 20;
+  transform: translateX(-50%);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+</style>

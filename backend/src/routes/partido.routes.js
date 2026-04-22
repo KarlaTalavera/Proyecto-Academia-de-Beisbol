@@ -4,11 +4,13 @@ const { verificarToken } = require('../middlewares/auth')
 const { soloRoles }      = require('../middlewares/roles')
 
 // Administrador o dueño pueden crear/eliminar partidos
-const dueno   = soloRoles('administrador', 'dueno')
+const dueno    = soloRoles('administrador', 'dueno')
 // Admin, dueño y anotador pueden cambiar estado y reprogramar
-const gestion = soloRoles('administrador', 'dueno', 'anotador')
+const gestion  = soloRoles('administrador', 'dueno', 'anotador')
 // Anotador es el ÚNICO que puede cargar lineup, resultado y estadísticas
 const anotador = soloRoles('anotador')
+// Taquilla: admin, dueño y caja
+const taquilla = soloRoles('administrador', 'dueno', 'caja')
 
 // ── Partidos ────────────────────────────────────────────────
 router.get('/',    verificarToken, PartidoController.listar)
@@ -30,5 +32,9 @@ router.post('/:id/resultado', verificarToken, anotador, PartidoController.guarda
 router.get('/:id/desempeno',           verificarToken, PartidoController.getDesempeno)
 router.post('/:id/desempeno/bateador', verificarToken, anotador, PartidoController.guardarDesempenoBateador)
 router.post('/:id/desempeno/pitcher',  verificarToken, anotador, PartidoController.guardarDesempenoPitcher)
+
+// ── Taquilla (solo admin y dueño) ────────────────────────────
+router.get('/:id/taquilla',   verificarToken, PartidoController.getTaquilla)
+router.patch('/:id/taquilla', verificarToken, taquilla, PartidoController.guardarTaquilla)
 
 module.exports = router
