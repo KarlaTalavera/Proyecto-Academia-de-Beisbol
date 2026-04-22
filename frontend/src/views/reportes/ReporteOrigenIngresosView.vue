@@ -255,10 +255,11 @@ const temporadaNombre = computed(() => {
 })
 
 const COLORES = {
-  'Patrocinios':             '#6366f1',
-  'Taquilla':                '#f59e0b',
-  'Inscripciones de Equipos':'#10b981',
-  'Concesiones':             '#f97316',
+  'Patrocinios':             '#8b5cf6',
+  'Taquilla':                '#0ea5e9',
+  'Inscripciones de Equipos':'#14b8a6',
+  'Concesiones':             '#6366f1',
+  'Multas':                  '#fb7185',
   'Otros':                   '#94a3b8',
 }
 
@@ -269,8 +270,9 @@ function colorPorCategoria(cat) {
 const ICONOS = {
   'Patrocinios':             IconCoin,
   'Taquilla':                IconTag,
-  'Inscripciones de Equipos': IconClipboard,
+  'Inscripciones de Equipos':IconClipboard,
   'Concesiones':             IconShoppingCart,
+  'Multas':                  IconPackage,
   'Otros':                   IconPackage,
 }
 
@@ -398,7 +400,7 @@ function dibujarPie() {
   ctx.textBaseline = 'middle'
   ctx.fillText('TOTAL', cx, cy - 9)
   ctx.font = 'bold 13px sans-serif'
-  ctx.fillStyle = '#10b981'
+  ctx.fillStyle = '#6366f1'
   const totalStr = new Intl.NumberFormat('es-VE', {
     notation: 'compact', maximumFractionDigits: 1,
   }).format(datos.value.total_general || 0)
@@ -598,7 +600,7 @@ async function exportPDF() {
     octx.fillStyle = '#1e293b'; octx.font = 'bold 12px sans-serif'
     octx.textAlign = 'center'; octx.textBaseline = 'middle'
     octx.fillText('TOTAL', cx, cy - 10)
-    octx.font = 'bold 14px sans-serif'; octx.fillStyle = '#10b981'
+    octx.font = 'bold 14px sans-serif'; octx.fillStyle = '#6366f1'
     const totalStr = new Intl.NumberFormat('es-VE', { notation: 'compact', maximumFractionDigits: 1 }).format(datos.value.total_general || 0)
     octx.fillText(totalStr + ' Bs.', cx, cy + 10)
     const imgData = oc.toDataURL('image/png')

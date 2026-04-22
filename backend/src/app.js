@@ -1,7 +1,10 @@
 require('dotenv').config()
-const express = require('express')
-const cors    = require('cors')
-const path    = require('path')
+const express    = require('express')
+const cors       = require('cors')
+const path       = require('path')
+const runMigrations        = require('./migrations')
+const { iniciarJobAnotador } = require('./jobs/anotador.job')
+const { iniciarJobFans }     = require('./jobs/fans.job')
 
 const app = express()
 
@@ -28,8 +31,9 @@ app.use('/api/fan',           require('./routes/fan.routes'))
 app.use('/api/tasa',          require('./routes/tasa.routes'))
 app.use('/api/inscripciones', require('./routes/inscripcion.routes'))
 app.use('/api/proveedores',   require('./routes/proveedor.routes'))
-app.use('/api/sanciones',     require('./routes/sancion.routes'))
-app.use('/api/noticias',      require('./routes/noticia.routes'))
+app.use('/api/sanciones',       require('./routes/sancion.routes'))
+app.use('/api/noticias',        require('./routes/noticia.routes'))
+app.use('/api/notificaciones',  require('./routes/notificacion.routes'))
 
 // ── Manejo global de errores ─────────────────────────────────
 app.use((err, req, res, next) => {
@@ -42,4 +46,9 @@ app.use((err, req, res, next) => {
 })
 
 const PORT = process.env.PORT || 3000
-app.listen(PORT, () => console.log(`API Liga Diamante escuchando en http://localhost:${PORT}`))
+app.listen(PORT, async () => {
+  console.log(`API Liga Diamante escuchando en http://localhost:${PORT}`)
+  await runMigrations().catch(e => console.error('Migrations error:', e.message))
+  iniciarJobAnotador()
+  iniciarJobFans()
+})

@@ -123,7 +123,12 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import api from '@/services/api'
+import { useToast }   from '@/composables/useToast'
+import { useConfirm } from '@/composables/useConfirm'
 import { IconPlus, IconEdit, IconTrash } from '@tabler/icons-vue'
+
+const toast   = useToast()
+const confirm = useConfirm()
 
 const temporadas   = ref([])
 const cargando     = ref(false)
@@ -163,10 +168,10 @@ function abrirFormulario(t = null) {
 function cerrarModal() { modalAbierto.value = false }
 
 async function guardar() {
-  if (!(form.value.nombre || '').trim()) { alert('El nombre de la temporada es obligatorio'); return }
+  if (!(form.value.nombre || '').trim()) { toast.warn('El nombre de la temporada es obligatorio'); return }
   const anio = Number(form.value.anio)
-  if (anio < 2000 || anio > 2100) { alert('El año debe estar entre 2000 y 2100'); return }
-  if (Number(form.value.costo_inscripcion) < 0) { alert('El costo de inscripción no puede ser negativo'); return }
+  if (anio < 2000 || anio > 2100) { toast.warn('El año debe estar entre 2000 y 2100'); return }
+  if (Number(form.value.costo_inscripcion) < 0) { toast.warn('El costo de inscripción no puede ser negativo'); return }
   guardando.value = true
   errorModal.value = ''
   try {
@@ -190,12 +195,13 @@ async function toggleActiva(t) {
 }
 
 async function confirmarEliminar(t) {
-  if (!confirm(`¿Eliminar la temporada "${t.nombre}"? Esta acción no se puede deshacer.`)) return
+  const ok = await confirm.pedir(`¿Eliminar la temporada "${t.nombre}"? Esta acción no se puede deshacer.`, { titulo: '¿Estás segura?', variante: 'danger' })
+  if (!ok) return
   try {
     await api.delete(`/temporadas/${t.id_temporada}`)
     cargar()
   } catch (e) {
-    alert(e.response?.data?.error || 'No se puede eliminar — tiene datos asociados')
+    toast.error(e.response?.data?.error || 'No se puede eliminar — tiene datos asociados')
   }
 }
 

@@ -1,4 +1,5 @@
 const SancionModel = require('../models/sancion.model')
+const { notificarAdmin, notificarCaja } = require('../services/notificacion.service')
 
 const SancionController = {
   async listar(req, res) {
@@ -18,12 +19,36 @@ const SancionController = {
       return res.status(400).json({ error: 'id_temporada, tipo, descripcion y fecha_sancion son requeridos' })
     }
     const id = await SancionModel.create(req.body)
+    notificarAdmin({
+      titulo: 'Nueva sanción registrada',
+      mensaje: `Se registró una sanción de tipo "${tipo}": ${descripcion}`,
+    }).catch(console.error)
     res.status(201).json({ id_sancion: id })
   },
 
   async actualizar(req, res) {
+    const sancionAntes = await SancionModel.findById(req.params.id)
     const affected = await SancionModel.update(req.params.id, req.body)
     if (!affected) return res.status(404).json({ error: 'Sanción no encontrada' })
+
+    // Notificar a caja cuando una multa queda cumplida
+    const ahora = req.body
+    if (
+      sancionAntes?.tipo === 'multa' &&
+      sancionAntes?.estado !== 'cumplida' &&
+      ahora.estado === 'cumplida'
+    ) {
+      const monto = sancionAntes.monto_multa
+      notificarCaja({
+        titulo: '💰 Multa cumplida — registrar ingreso',
+        mensaje: `La multa de ${monto} Bs. (${sancionAntes.descripcion}) fue marcada como cumplida. Registra el ingreso en el módulo de Finanzas con categoría "Multa".`,
+      }).catch(console.error)
+      notificarAdmin({
+        titulo: 'Multa cumplida',
+        mensaje: `Multa de ${monto} Bs. marcada como cumplida: ${sancionAntes.descripcion}`,
+      }).catch(console.error)
+    }
+
     res.json({ ok: true })
   },
 

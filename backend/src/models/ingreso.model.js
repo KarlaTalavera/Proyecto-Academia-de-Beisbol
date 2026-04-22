@@ -27,20 +27,20 @@ const IngresoModel = {
     return rows[0] || null
   },
 
-  async create({ id_equipo, id_temporada, concepto, valor, fecha_ingreso, tipo_pago }) {
+  async create({ id_equipo, id_temporada, concepto, valor, fecha_ingreso, tipo_pago, categoria }) {
     const [result] = await db.query(
-      `INSERT INTO ingreso (id_equipo, id_temporada, concepto, valor, fecha_ingreso, tipo_pago)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [id_equipo, id_temporada, concepto, valor, fecha_ingreso, tipo_pago || null]
+      `INSERT INTO ingreso (id_equipo, id_temporada, concepto, valor, fecha_ingreso, tipo_pago, categoria)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [id_equipo, id_temporada, concepto, valor, fecha_ingreso, tipo_pago || null, categoria || 'otro']
     )
     return result.insertId
   },
 
-  async update(id, { id_equipo, id_temporada, concepto, valor, fecha_ingreso, tipo_pago }) {
+  async update(id, { id_equipo, id_temporada, concepto, valor, fecha_ingreso, tipo_pago, categoria }) {
     const [result] = await db.query(
-      `UPDATE ingreso SET id_equipo=?, id_temporada=?, concepto=?, valor=?, fecha_ingreso=?, tipo_pago=?
+      `UPDATE ingreso SET id_equipo=?, id_temporada=?, concepto=?, valor=?, fecha_ingreso=?, tipo_pago=?, categoria=?
        WHERE id_ingreso=?`,
-      [id_equipo, id_temporada, concepto, valor, fecha_ingreso, tipo_pago || null, id]
+      [id_equipo, id_temporada, concepto, valor, fecha_ingreso, tipo_pago || null, categoria || 'otro', id]
     )
     return result.affectedRows
   },

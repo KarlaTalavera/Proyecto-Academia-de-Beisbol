@@ -139,30 +139,53 @@
           </div>
           <div v-if="mostrarGrafico" class="card-body" style="padding:8px 0 0 0;">
             <div v-if="!datosFiltrados.length" class="text-center py-5 text-muted">Sin partidos finalizados con datos de taquilla</div>
-            <div v-else style="width:100%; overflow:hidden;">
-              <svg viewBox="0 0 900 320" style="width:100%; height:320px; display:block;" xmlns="http://www.w3.org/2000/svg">
+            <div v-else class="chart-wrapper" @mouseleave="taqHovered = -1; taqTooltip.visible = false">
+              <svg
+                :key="datosFiltrados.length"
+                viewBox="0 0 900 320" style="width:100%; height:320px; display:block;" xmlns="http://www.w3.org/2000/svg"
+                @mousemove="onTaqMove"
+              >
                 <rect x="0" y="0" width="900" height="320" fill="transparent"/>
                 <g v-for="i in 5" :key="'g'+i">
                   <line :x1="70" :y1="20 + (240/4)*(4-(i-1))" :x2="880" :y2="20 + (240/4)*(4-(i-1))" stroke="#e2e8f0" stroke-width="1"/>
                   <text :x="64" :y="20 + (240/4)*(4-(i-1)) + 4" text-anchor="end" font-size="10" fill="#94a3b8" font-family="sans-serif">{{ formatCompacto(maxBarra * (i-1) / 4) }}</text>
                 </g>
-                <g v-for="(d, i) in datosGrafico" :key="'b'+i">
-                  <rect :x="d.x" :y="260 - d.hGeneral" :width="d.w * 0.45" :height="d.hGeneral" fill="#10b981" rx="2"/>
-                  <rect :x="d.x + d.w * 0.48" :y="260 - d.hVip" :width="d.w * 0.45" :height="d.hVip" fill="#f59e0b" rx="2"/>
+                <g v-for="(d, i) in datosGrafico" :key="'b'+i"
+                   style="cursor:pointer;"
+                   @mouseenter="taqHovered = i"
+                   @mouseleave="taqHovered = -1">
+                  <!-- Fondo hover -->
+                  <rect :x="d.x - 4" y="20" :width="d.w + 8" height="244" rx="6"
+                    :fill="taqHovered === i ? 'rgba(20,184,166,0.06)' : 'transparent'"
+                    style="transition: fill 0.15s;"
+                  />
+                  <!-- General -->
+                  <rect class="chart-bar"
+                    :x="d.x" :y="260 - d.hGeneral" :width="d.w * 0.45" :height="d.hGeneral"
+                    :fill="taqHovered === -1 || taqHovered === i ? '#14b8a6' : '#99f6e4'" rx="4"
+                    :style="{ animationDelay: `${i * 0.07}s`, transition: 'fill 0.2s' }"
+                  />
+                  <!-- VIP -->
+                  <rect class="chart-bar"
+                    :x="d.x + d.w * 0.48" :y="260 - d.hVip" :width="d.w * 0.45" :height="d.hVip"
+                    :fill="taqHovered === -1 || taqHovered === i ? '#6366f1' : '#c7d2fe'" rx="4"
+                    :style="{ animationDelay: `${i * 0.07 + 0.04}s`, transition: 'fill 0.2s' }"
+                  />
                   <text :x="d.x + d.w / 2" y="276" text-anchor="middle" font-size="9" fill="#64748b" font-family="sans-serif">{{ formatFechaCorta(datosFiltrados[i].fecha_juego) }}</text>
                   <text :x="d.x + d.w / 2" y="288" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="sans-serif">{{ datosFiltrados[i].equipo_casa.substring(0,5) }} vs {{ datosFiltrados[i].equipo_visitante.substring(0,5) }}</text>
-                  <text v-if="datosFiltrados[i].recaudado_total > 0"
-                    :x="d.x + d.w / 2" :y="260 - Math.max(d.hGeneral, d.hVip) - 4"
-                    text-anchor="middle" font-size="9"
-                    :fill="Number(datosFiltrados[i].recaudado_total) === maxRecaudado ? '#6366f1' : '#475569'"
-                    :font-weight="Number(datosFiltrados[i].recaudado_total) === maxRecaudado ? 'bold' : 'normal'"
-                    font-family="sans-serif">{{ formatCompacto(datosFiltrados[i].recaudado_total) }}</text>
                 </g>
-                <rect x="680" y="8" width="12" height="10" fill="#10b981" rx="2"/>
+                <rect x="680" y="8" width="12" height="10" fill="#14b8a6" rx="2"/>
                 <text x="696" y="17" font-size="10" fill="#64748b" font-family="sans-serif">General</text>
-                <rect x="748" y="8" width="12" height="10" fill="#f59e0b" rx="2"/>
+                <rect x="748" y="8" width="12" height="10" fill="#6366f1" rx="2"/>
                 <text x="764" y="17" font-size="10" fill="#64748b" font-family="sans-serif">VIP</text>
               </svg>
+              <!-- Tooltip -->
+              <div v-if="taqTooltip.visible" class="chart-tooltip" :style="{ left: taqTooltip.x + 'px', top: taqTooltip.y + 'px' }">
+                <div class="fw-bold mb-1" style="font-size:0.78rem;">{{ taqTooltip.partido }}</div>
+                <div style="color:#5eead4; font-size:0.74rem;">General: <strong>{{ taqTooltip.general }}</strong></div>
+                <div style="color:#a5b4fc; font-size:0.74rem;">VIP: <strong>{{ taqTooltip.vip }}</strong></div>
+                <div style="color:#94a3b8; font-size:0.72rem; margin-top:2px; border-top:1px solid rgba(255,255,255,0.1); padding-top:4px;">Total: {{ taqTooltip.total }}</div>
+              </div>
             </div>
           </div>
         </div>
@@ -254,6 +277,26 @@ const limite         = ref(10)
 const cargando       = ref(false)
 const datos          = ref([])
 const mostrarGrafico = ref(true)
+
+// Interactividad
+const taqHovered = ref(-1)
+const taqTooltip = ref({ visible: false, x: 0, y: 0, partido: '', general: '', vip: '', total: '' })
+
+function onTaqMove(e) {
+  const i = taqHovered.value
+  if (i < 0 || !datosFiltrados.value[i]) { taqTooltip.value.visible = false; return }
+  const rect = e.currentTarget.closest('.chart-wrapper').getBoundingClientRect()
+  const d = datosFiltrados.value[i]
+  taqTooltip.value = {
+    visible: true,
+    x: e.clientX - rect.left,
+    y: e.clientY - rect.top - 100,
+    partido: `${d.equipo_casa} vs ${d.equipo_visitante}`,
+    general: formatBs(d.recaudado_general),
+    vip:     formatBs(d.recaudado_vip),
+    total:   formatBs(d.recaudado_total),
+  }
+}
 const fechaDesde           = ref('')
 const fechaHasta           = ref('')
 const equiposSeleccionados = ref([])
@@ -550,3 +593,34 @@ function exportExcel() {
 
 onMounted(cargarTemporadas)
 </script>
+
+<style scoped>
+.chart-wrapper {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+.chart-bar {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: growBar 0.55s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+}
+@keyframes growBar {
+  from { transform: scaleY(0); }
+  to   { transform: scaleY(1); }
+}
+.chart-tooltip {
+  position: absolute;
+  background: #1e293b;
+  color: #fff;
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 0.78rem;
+  pointer-events: none;
+  white-space: nowrap;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.22);
+  z-index: 20;
+  transform: translateX(-50%);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+</style>

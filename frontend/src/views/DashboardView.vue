@@ -85,7 +85,66 @@
 
     </div>
 
-    <!-- Row 2: Posiciones + KPI cards -->
+    <!-- Row 2: Gráficos rápidos -->
+    <div class="row g-3 mb-3">
+
+      <!-- Top Bateadores -->
+      <div :class="auth.puedeFinanzas ? 'col-lg-7' : 'col-12'">
+        <div class="dash-card h-100">
+          <div class="dash-card-header">
+            <span class="dash-card-title">Top Bateadores — Home Runs</span>
+            <RouterLink :to="{ name: 'Reportes' }" class="dash-link">Ver reporte</RouterLink>
+          </div>
+          <div v-if="!top5Bateadores.length" class="text-center py-3 text-muted" style="font-size:0.85rem;">Sin estadísticas registradas</div>
+          <div v-else class="chart-hbar">
+            <div v-for="(b, i) in top5Bateadores" :key="i"
+                 class="hbar-row"
+                 :class="{ 'hbar-row--active': hbarHovered === i, 'hbar-row--dim': hbarHovered !== -1 && hbarHovered !== i }"
+                 @mouseenter="hbarHovered = i"
+                 @mouseleave="hbarHovered = -1">
+              <div class="hbar-rank">{{ i + 1 }}</div>
+              <div class="hbar-label">{{ b.jugador?.split(' ')[0] || '—' }}</div>
+              <div class="hbar-track">
+                <div class="hbar-fill" :style="{ width: (b.HR / top5Bateadores[0].HR * 100) + '%', background: hbarColor(i) }"></div>
+              </div>
+              <div class="hbar-val" :style="{ color: hbarColor(i) }">{{ b.HR }} HR</div>
+              <!-- Mini tooltip al hover -->
+              <div v-if="hbarHovered === i" class="hbar-tooltip">
+                <span class="fw-bold">{{ b.jugador }}</span>
+                <span class="ms-2 text-muted" style="font-size:0.72rem;">{{ b.nombre_equipo }}</span>
+                <div style="font-size:0.72rem; margin-top:2px;">
+                  HR: <strong>{{ b.HR }}</strong> · RBI: <strong>{{ b.RBI }}</strong> · AVE: <strong>.{{ aveStr(b.AVE) }}</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Origen de Ingresos (solo finanzas/admin) -->
+      <div v-if="auth.puedeFinanzas" class="col-lg-5">
+        <div class="dash-card h-100">
+          <div class="dash-card-header">
+            <span class="dash-card-title">Origen de Ingresos</span>
+            <RouterLink :to="{ name: 'Reportes' }" class="dash-link">Ver reporte</RouterLink>
+          </div>
+          <div v-if="!origenCategorias.length" class="text-center py-3 text-muted" style="font-size:0.85rem;">Sin ingresos registrados</div>
+          <div v-else class="origen-chart">
+            <canvas ref="canvasDashPie" width="180" height="180" style="display:block; margin: 0 auto;"></canvas>
+            <div class="origen-legend">
+              <div v-for="c in origenCategorias" :key="c.categoria" class="origen-legend-item">
+                <span class="origen-dot" :style="{ background: colorOrigen(c.categoria) }"></span>
+                <span class="origen-name">{{ c.categoria }}</span>
+                <span class="origen-pct">{{ c.porcentaje }}%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Row 3: Posiciones + KPI cards -->
     <div class="row g-3">
 
       <!-- Tabla de Posiciones -->
@@ -206,7 +265,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { RouterLink } from 'vue-router'
 import api from '@/services/api'
 import { useAuthStore } from '@/store/auth'
@@ -226,6 +285,158 @@ const posiciones = ref([])
 const partidos = ref([])
 const temporadaNombre = ref('')
 const stats = ref({ equipos: 0, jugadores: 0, partidosTotal: 0, finalizados: 0, programados: 0, balance: 0 })
+
+// Charts
+const top5Bateadores = ref([])
+const origenCategorias = ref([])
+const canvasDashPie = ref(null)
+
+const HBAR_COLORS = ['#6366f1', '#8b5cf6', '#0ea5e9', '#14b8a6', '#fb7185']
+function hbarColor(i) { return HBAR_COLORS[i % HBAR_COLORS.length] }
+const hbarHovered = ref(-1)
+function aveStr(v) { return v != null ? Number(v).toFixed(3).replace('0.', '').padStart(3, '0') : '000' }
+
+const ORIGEN_COLORES = {
+  'Patrocinios':             '#8b5cf6',
+  'Taquilla':                '#0ea5e9',
+  'Inscripciones de Equipos':'#14b8a6',
+  'Concesiones':             '#6366f1',
+  'Multas':                  '#fb7185',
+  'Otros':                   '#94a3b8',
+}
+function colorOrigen(cat) { return ORIGEN_COLORES[cat] || '#94a3b8' }
+
+function _renderPie(progress, hoveredIdx) {
+  const canvas = canvasDashPie.value
+  if (!canvas) return
+  const cats = origenCategorias.value.filter(c => c.total > 0)
+  if (!cats.length) return
+
+  const ctx = canvas.getContext('2d')
+  const W = canvas.width, H = canvas.height
+  const cx = W / 2, cy = H / 2
+  const rBase = Math.min(W, H) / 2 - 10
+  ctx.clearRect(0, 0, W, H)
+
+  const total = cats.reduce((s, c) => s + c.total, 0)
+  let ang = -Math.PI / 2
+
+  cats.forEach((cat, idx) => {
+    const fullSlice = (cat.total / total) * 2 * Math.PI
+    const slice = fullSlice * progress
+    const isHov = idx === hoveredIdx
+    const r = isHov ? rBase + 7 : rBase
+    const midAngle = ang + slice / 2
+    const ox = isHov ? Math.cos(midAngle) * 5 : 0
+    const oy = isHov ? Math.sin(midAngle) * 5 : 0
+
+    if (isHov) { ctx.shadowColor = colorOrigen(cat.categoria); ctx.shadowBlur = 12 }
+    else { ctx.shadowBlur = 0 }
+
+    ctx.beginPath()
+    ctx.moveTo(cx + ox, cy + oy)
+    ctx.arc(cx + ox, cy + oy, r, ang, ang + slice)
+    ctx.closePath()
+    ctx.fillStyle = colorOrigen(cat.categoria)
+    ctx.fill()
+    ctx.shadowBlur = 0
+    ctx.strokeStyle = '#fff'
+    ctx.lineWidth = 2
+    ctx.stroke()
+
+    // Porcentaje encima del segmento (midAngle ya es el centro del arco)
+    if (fullSlice > 0.28 && progress > 0.85) {
+      const lx = cx + ox + (r * 0.68) * Math.cos(midAngle)
+      const ly = cy + oy + (r * 0.68) * Math.sin(midAngle)
+      ctx.fillStyle = '#fff'
+      ctx.font = isHov ? 'bold 12px sans-serif' : 'bold 11px sans-serif'
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillText(cat.porcentaje + '%', lx, ly)
+    }
+
+    ang += slice
+  })
+
+  // agujero del donut
+  ctx.beginPath()
+  ctx.arc(cx, cy, rBase * 0.48, 0, 2 * Math.PI)
+  ctx.fillStyle = 'rgba(255,255,255,0.96)'
+  ctx.fill()
+
+  // Texto central
+  const totalGeneral = origenCategorias.value.reduce((s, c) => s + c.total, 0)
+  const totalStr = new Intl.NumberFormat('es-VE', { notation: 'compact', maximumFractionDigits: 1 }).format(totalGeneral)
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillStyle = '#94a3b8'
+  ctx.font = 'bold 11px sans-serif'
+  ctx.fillText('TOTAL', cx, cy - 10)
+  ctx.fillStyle = '#6366f1'
+  ctx.font = 'bold 13px sans-serif'
+  ctx.fillText(totalStr + ' Bs.', cx, cy + 9)
+}
+
+let _pieHoverIdx = -1
+let _pieListenersAdded = false
+
+function _addPieHover() {
+  const canvas = canvasDashPie.value
+  if (!canvas || _pieListenersAdded) return
+  _pieListenersAdded = true
+  canvas.style.cursor = 'default'
+
+  canvas.addEventListener('mousemove', (e) => {
+    const cats = origenCategorias.value.filter(c => c.total > 0)
+    const rect = canvas.getBoundingClientRect()
+    const scaleX = canvas.width / rect.width
+    const scaleY = canvas.height / rect.height
+    const mx = (e.clientX - rect.left) * scaleX
+    const my = (e.clientY - rect.top) * scaleY
+    const cx = canvas.width / 2, cy = canvas.height / 2
+    const rBase = Math.min(canvas.width, canvas.height) / 2 - 10
+    const dx = mx - cx, dy = my - cy
+    const dist = Math.sqrt(dx * dx + dy * dy)
+
+    let newHov = -1
+    if (dist >= rBase * 0.48 && dist <= rBase + 10) {
+      const total = cats.reduce((s, c) => s + c.total, 0)
+      let mouseAng = Math.atan2(dy, dx)
+      if (mouseAng < -Math.PI / 2) mouseAng += 2 * Math.PI
+      let startAng = -Math.PI / 2
+      for (let i = 0; i < cats.length; i++) {
+        const slice = (cats[i].total / total) * 2 * Math.PI
+        if (mouseAng >= startAng && mouseAng < startAng + slice) { newHov = i; break }
+        startAng += slice
+      }
+    }
+    if (newHov !== _pieHoverIdx) {
+      _pieHoverIdx = newHov
+      canvas.style.cursor = newHov >= 0 ? 'pointer' : 'default'
+      _renderPie(1, _pieHoverIdx)
+    }
+  })
+  canvas.addEventListener('mouseleave', () => {
+    _pieHoverIdx = -1
+    canvas.style.cursor = 'default'
+    _renderPie(1, -1)
+  })
+}
+
+function dibujarMiniPie() {
+  _pieListenersAdded = false
+  _pieHoverIdx = -1
+  const DURATION = 900
+  const start = performance.now()
+  function frame(now) {
+    const t = Math.min((now - start) / DURATION, 1)
+    const eased = 1 - Math.pow(1 - t, 3)   // ease-out cubic
+    _renderPie(eased, -1)
+    if (t < 1) requestAnimationFrame(frame)
+    else _addPieHover()
+  }
+  requestAnimationFrame(frame)
+}
 
 const coloresEquipo = [
   'linear-gradient(135deg,#f59e0b,#f97316)',
@@ -336,6 +547,23 @@ async function cargar() {
     if (auth.puedeFinanzas && res[idTemp ? 4 : 3]) {
       const balRes = res[idTemp ? 4 : 3]
       stats.value.balance = balRes?.data?.balance || 0
+    }
+
+    // Cargar datos de gráficos del dashboard
+    if (idTemp) {
+      const [resBat, resOrigen] = await Promise.all([
+        api.get('/reportes/estadisticas-bateadores', { params: { temporada: idTemp } }).catch(() => ({ data: [] })),
+        auth.puedeFinanzas
+          ? api.get('/reportes/origen-ingresos', { params: { temporada: idTemp } }).catch(() => ({ data: { categorias: [] } }))
+          : Promise.resolve({ data: { categorias: [] } }),
+      ])
+      const bateadores = Array.isArray(resBat.data) ? resBat.data : []
+      top5Bateadores.value = [...bateadores].sort((a, b) => b.HR - a.HR).slice(0, 5).filter(b => b.HR > 0)
+      origenCategorias.value = resOrigen.data?.categorias || []
+      if (origenCategorias.value.length) {
+        await nextTick()
+        requestAnimationFrame(dibujarMiniPie)
+      }
     }
   } finally {
     cargando.value = false
@@ -618,6 +846,121 @@ onMounted(cargar)
 .score-sep {
   font-size: 1rem;
   color: rgba(255,255,255,0.3);
+  font-weight: 700;
+}
+
+/* ── Horizontal Bar Chart ── */
+.chart-hbar {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 4px 0;
+}
+.hbar-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 8px;
+  border-radius: 10px;
+  transition: background 0.15s;
+  position: relative;
+  cursor: default;
+}
+.hbar-row--active { background: rgba(0,0,0,0.04); }
+.hbar-row--dim .hbar-fill { opacity: 0.3; }
+.hbar-row--dim .hbar-label,
+.hbar-row--dim .hbar-val  { opacity: 0.45; }
+.hbar-rank {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #94a3b8;
+  width: 14px;
+  flex-shrink: 0;
+  text-align: center;
+}
+.hbar-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #334155;
+  width: 72px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
+  transition: opacity 0.15s;
+}
+.hbar-track {
+  flex: 1;
+  height: 10px;
+  background: rgba(0,0,0,0.05);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.hbar-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.7s cubic-bezier(0.34, 1.2, 0.64, 1), opacity 0.2s;
+}
+.hbar-val {
+  font-size: 0.72rem;
+  font-weight: 700;
+  width: 42px;
+  text-align: right;
+  flex-shrink: 0;
+  transition: opacity 0.15s;
+}
+.hbar-tooltip {
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 6px);
+  transform: translateX(-50%);
+  background: #1e293b;
+  color: #fff;
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 0.76rem;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 30;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+/* ── Origen Ingresos Mini ── */
+.origen-chart {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 4px 0;
+}
+.origen-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+.origen-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.76rem;
+}
+.origen-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.origen-name {
+  flex: 1;
+  color: #334155;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.origen-pct {
+  color: #64748b;
   font-weight: 700;
 }
 

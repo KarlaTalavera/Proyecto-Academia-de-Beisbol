@@ -45,9 +45,9 @@ const routes = [
     meta: { requiereAuth: true, bloqueaPublico: true },
     children: [
       { path: '',          name: 'Dashboard', component: () => import('@/views/DashboardView.vue') },
-      { path: 'equipos',   name: 'Equipos',   component: () => import('@/views/equipos/EquiposView.vue') },
-      { path: 'jugadores', name: 'Jugadores', component: () => import('@/views/jugadores/JugadoresView.vue') },
-      { path: 'partidos',  name: 'Partidos',  component: () => import('@/views/partidos/PartidosView.vue') },
+      { path: 'equipos',   name: 'Equipos',   component: () => import('@/views/equipos/EquiposView.vue'),   meta: { soloGestion: true } },
+      { path: 'jugadores', name: 'Jugadores', component: () => import('@/views/jugadores/JugadoresView.vue'), meta: { soloGestion: true } },
+      { path: 'partidos',  name: 'Partidos',  component: () => import('@/views/partidos/PartidosView.vue'),  meta: { soloGestion: true } },
       { path: 'reportes', name: 'Reportes', component: () => import('@/views/reportes/ReportesView.vue'), meta: { soloReportes: true } },
       { path: 'reportes/origen-ingresos',    redirect: '/app/reportes' },
       { path: 'reportes/historico-ingresos', redirect: '/app/reportes' },
@@ -110,6 +110,17 @@ router.beforeEach((to) => {
   // Usuario no-público intenta acceder a zona fan → dashboard admin
   if (auth.token && auth.rol !== 'publico' && soloPublico) {
     return { name: 'Dashboard' }
+  }
+
+  // Equipos y Jugadores: solo admin, dueno y anotador (no caja)
+  // Partidos: también caja (para taquilla)
+  const soloGestion = to.matched.some(r => r.meta.soloGestion)
+  if (soloGestion) {
+    const nombre = to.name
+    const permitidos = nombre === 'Partidos'
+      ? ['administrador', 'dueno', 'anotador', 'caja']
+      : ['administrador', 'dueno', 'anotador']
+    if (!permitidos.includes(auth.rol)) return { name: 'Dashboard' }
   }
 
   // Solo admin puede ver ciertas vistas

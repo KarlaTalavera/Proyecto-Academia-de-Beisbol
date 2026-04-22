@@ -212,9 +212,14 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import api from '@/services/api'
 import { useAuthStore } from '@/store/auth'
+import { useToast }   from '@/composables/useToast'
+import { useConfirm } from '@/composables/useConfirm'
 import { IconPlus, IconSearch, IconPencil, IconTrash, IconUsers, IconDeviceFloppy, IconCamera } from '@tabler/icons-vue'
 
 const apiBase = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3000'
+
+const toast   = useToast()
+const confirm = useConfirm()
 
 const auth     = useAuthStore()
 const jugadores  = ref([])
@@ -284,16 +289,16 @@ function cerrarModal() { modalAbierto.value = false }
 async function guardar() {
   const nombre = (form.value.nombre || '').trim()
   const apellido = (form.value.apellido || '').trim()
-  if (nombre.length < 2) { alert('El nombre debe tener al menos 2 caracteres'); return }
-  if (apellido.length < 2) { alert('El apellido debe tener al menos 2 caracteres'); return }
+  if (nombre.length < 2) { toast.warn('El nombre debe tener al menos 2 caracteres'); return }
+  if (apellido.length < 2) { toast.warn('El apellido debe tener al menos 2 caracteres'); return }
   if (form.value.cedula) {
     const cedula = form.value.cedula.toUpperCase()
     if (!/^[VE]-\d{1,8}$/.test(cedula)) {
-      alert('La cédula debe tener el formato V-00000000 o E-00000000'); return
+      toast.warn('La cédula debe tener el formato V-00000000 o E-00000000'); return
     }
     const num = parseInt(cedula.split('-')[1], 10)
     if (num < 1 || num > 34000000) {
-      alert('El número de cédula debe estar entre 1 y 34.000.000'); return
+      toast.warn('El número de cédula debe estar entre 1 y 34.000.000'); return
     }
     form.value.cedula = cedula
   }
@@ -301,7 +306,7 @@ async function guardar() {
     const hoy = new Date()
     const nacimiento = new Date(form.value.fecha_nacimiento)
     const edad = (hoy - nacimiento) / (1000 * 60 * 60 * 24 * 365.25)
-    if (edad < 10 || edad > 60) { alert('La edad del jugador debe estar entre 10 y 60 años'); return }
+    if (edad < 10 || edad > 60) { toast.warn('La edad del jugador debe estar entre 10 y 60 años'); return }
   }
   guardando.value = true
   errorModal.value = ''
@@ -326,13 +331,14 @@ async function subirFoto(jugador, event) {
     })
     jugador.foto_url = data.foto_url
   } catch (e) {
-    alert(e.response?.data?.error || 'Error al subir la foto')
+    toast.error(e.response?.data?.error || 'Error al subir la foto')
   }
   event.target.value = ''
 }
 
 async function confirmarEliminar(j) {
-  if (!confirm(`¿Eliminar a "${j.nombre} ${j.apellido}"?`)) return
+  const ok = await confirm.pedir(`¿Eliminar a "${j.nombre} ${j.apellido}"?`, { titulo: '¿Estás segura?', variante: 'danger' })
+  if (!ok) return
   await api.delete(`/jugadores/${j.id_jugador}`)
   cargar()
 }
