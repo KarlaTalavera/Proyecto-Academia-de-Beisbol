@@ -71,6 +71,17 @@ const PartidoModel = {
     return result.affectedRows
   },
 
+  async findByEquipo(id_equipo) {
+    const [rows] = await db.query(
+      `SELECT * FROM partido 
+      WHERE (id_equipo_casa = ? OR id_equipo_visitante = ?) 
+      AND estado = 'programado' 
+      ORDER BY fecha_juego ASC`, 
+      [id_equipo, id_equipo]
+    )
+    return rows
+  },
+
   async findLineup(id_partido) {
     const [rows] = await db.query(
       `SELECT l.*, j.nombre, j.apellido, j.posicion, e.nombre_equipo

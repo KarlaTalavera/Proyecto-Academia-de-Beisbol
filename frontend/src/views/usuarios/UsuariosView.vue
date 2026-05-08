@@ -149,6 +149,15 @@
                     <option v-for="r in rolesDisponibles" :key="r.value" :value="r.value">{{ r.label }}</option>
                   </select>
                 </div>
+                <div class="mb-3" v-if="crearForm.rol === 'dueno' || crearForm.rol === 'anotador'">
+                  <label class="form-label required">Asignar Equipo</label>
+                  <select v-model="crearForm.id_equipo" class="form-select" :required="crearForm.rol === 'dueno' || crearForm.rol === 'anotador'">
+                    <option value="">— Seleccionar Equipo —</option>
+                    <option v-for="eq in equiposDisponibles" :key="eq.id_equipo" :value="eq.id_equipo">
+                      {{ eq.nombre_equipo }}
+                    </option>
+                  </select>
+                </div>
               </div>
             </div>
             <div class="modal-footer">
@@ -228,13 +237,14 @@ const modalPassword = ref(false)
 const errorModal  = ref('')
 const nuevaPassword = ref('')
 const usuarioSeleccionado = ref(null)
+const equiposDisponibles = ref([])
 
 const modalCrear  = ref(false)
 const errorCrear  = ref('')
-const crearForm   = ref({ nombre: '', email: '', password: '', rol: '' })
+const crearForm   = ref({ nombre: '', email: '', password: '', rol: '', id_equipo: '' })
 
 function abrirCrear() {
-  crearForm.value = { nombre: '', email: '', password: '', rol: '' }
+  crearForm.value = { nombre: '', email: '', password: '', rol: '', id_equipo: '' }
   errorCrear.value = ''
   modalCrear.value = true
 }
@@ -300,6 +310,19 @@ async function cargar() {
     cargando.value = false
   }
 }
+
+async function cargarEquipos() {
+      try {
+        const { data } = await api.get('/equipos')
+        equiposDisponibles.value = data
+      } catch (e) {
+        console.error("Error cargando equipos:", e)
+      }
+    }
+    onMounted(() => {
+      cargar()
+      cargarEquipos() 
+    })
 
 async function cambiarRol(usuario, rol) {
   try {

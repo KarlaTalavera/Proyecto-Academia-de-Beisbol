@@ -21,12 +21,19 @@ const JugadorModel = {
     )
     return rows[0] || null
   },
+  async findByEquipo(id_equipo) {
+    const [rows] = await db.query(
+      'SELECT j.*, e.nombre_equipo FROM jugador j JOIN equipo e ON j.id_equipo = e.id_equipo WHERE j.id_equipo = ? ORDER BY apellido, nombre',
+      [id_equipo]
+    );
+    return rows;
+  },
 
   async create({ id_equipo, cedula, nombre, apellido, fecha_nacimiento, rol, posicion, brazo_dominante }) {
     const [result] = await db.query(
       `INSERT INTO jugador (id_equipo, cedula, nombre, apellido, fecha_nacimiento, rol, posicion, brazo_dominante)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [id_equipo, cedula || null, nombre, apellido, fecha_nacimiento, rol, posicion, brazo_dominante || null]
+      [id_equipo, cedula || null, nombre, apellido, fecha_nacimiento, rol, posicion || 'Sin asignar', brazo_dominante || null]
     )
     return result.insertId
   },
@@ -35,7 +42,7 @@ const JugadorModel = {
     const [result] = await db.query(
       `UPDATE jugador SET id_equipo=?, cedula=?, nombre=?, apellido=?, fecha_nacimiento=?,
        rol=?, posicion=?, brazo_dominante=?, activo=? WHERE id_jugador=?`,
-      [id_equipo, cedula || null, nombre, apellido, fecha_nacimiento, rol, posicion, brazo_dominante || null, activo ?? 1, id]
+      [id_equipo, cedula || null, nombre, apellido, fecha_nacimiento, rol, posicion || 'Sin asignar', brazo_dominante || null, activo ?? 1, id]
     )
     return result.affectedRows
   },

@@ -2,7 +2,12 @@ const EquipoModel = require('../models/equipo.model')
 
 const EquipoController = {
   async listar(req, res) {
+    const { rol, id_equipo } = req.usuario
     const equipos = await EquipoModel.findAll()
+    if (rol === 'dueno') {
+      const filtered = equipos.filter(e => e.id_equipo === id_equipo)
+      return res.json(filtered)
+    }
     res.json(equipos)
   },
 

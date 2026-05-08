@@ -83,13 +83,13 @@
             </template>
 
             <template v-if="auth.puedeEditar">
-              <li class="nav-item">
+              <li v-if="!auth.esDueno" class="nav-item">
                 <RouterLink class="nav-link" :to="{ name: 'Inscripciones' }">
                   <span class="nav-link-icon"><IconClipboardCheck :size="20" stroke-width="1.7" /></span>
                   <span class="nav-link-title">Inscripciones</span>
                 </RouterLink>
               </li>
-              <li class="nav-item">
+              <li v-if="!auth.esDueno" class="nav-item">
                 <RouterLink class="nav-link" :to="{ name: 'NoticiasAdmin' }">
                   <span class="nav-link-icon"><IconNews :size="20" stroke-width="1.7" /></span>
                   <span class="nav-link-title">Noticias</span>

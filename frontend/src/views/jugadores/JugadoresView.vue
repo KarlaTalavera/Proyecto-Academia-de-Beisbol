@@ -79,7 +79,7 @@
                   <span class="text-muted" style="font-size:0.82rem;">{{ j.nombre_equipo }}</span>
                 </div>
               </td>
-              <td class="text-muted" style="font-size:0.82rem;">{{ j.posicion }}</td>
+              <td class="text-muted" style="font-size:0.82rem;">{{ posicionesMap[j.posicion] || 'Sin posición' }}</td>
               <td>
                 <span class="badge" :class="badgeRol(j.rol)">{{ j.rol }}</span>
               </td>
@@ -168,10 +168,19 @@
               </div>
               <div class="row">
                 <div class="col-md-6 mb-3">
-                  <label class="form-label fw-semibold" style="font-size:0.82rem;">Posición <span class="text-danger">*</span></label>
-                  <select v-model="form.posicion" class="form-select" required>
+                  <label class="form-label fw-semibold" style="font-size:0.82rem;">Posición</label>
+                  <select v-model="form.posicion" class="form-select">
                     <option value="">— Seleccionar —</option>
-                    <option v-for="p in posiciones" :key="p">{{ p }}</option>
+                    <option value="P">Lanzador (P)</option>
+                    <option value="C">Receptor (C)</option>
+                    <option value="1B">Primera Base (1B)</option>
+                    <option value="2B">Segunda Base (2B)</option>
+                    <option value="3B">Tercera Base (3B)</option>
+                    <option value="SS">Shortstop (SS)</option>
+                    <option value="LF">Jardinero Izquierdo (LF)</option>
+                    <option value="CF">Jardinero Central (CF)</option>
+                    <option value="RF">Jardinero Derecho (RF)</option>
+                    <option value="DH">Bateador Designado (DH)</option>
                   </select>
                 </div>
                 <div class="col-md-6 mb-3">
@@ -232,11 +241,18 @@ const editando   = ref(false)
 const guardando  = ref(false)
 const errorModal = ref('')
 
-const posiciones = [
-  'Lanzador (P)', 'Receptor (C)', 'Primera Base (1B)', 'Segunda Base (2B)',
-  'Tercera Base (3B)', 'Shortstop (SS)', 'Jardinero Izquierdo (LF)',
-  'Jardinero Central (CF)', 'Jardinero Derecho (RF)', 'Bateador Designado (DH)',
-]
+const posicionesMap = {
+  'P': 'Lanzador (P)',
+  'C': 'Receptor (C)',
+  '1B': 'Primera Base (1B)',
+  '2B': 'Segunda Base (2B)',
+  '3B': 'Tercera Base (3B)',
+  'SS': 'Shortstop (SS)',
+  'LF': 'Jardinero Izquierdo (LF)',
+  'CF': 'Jardinero Central (CF)',
+  'RF': 'Jardinero Derecho (RF)',
+  'DH': 'Bateador Designado (DH)',
+}
 
 const form = ref({ id_equipo: '', cedula: '', nombre: '', apellido: '', fecha_nacimiento: '', rol: 'bateador', posicion: '', brazo_dominante: '', activo: 1 })
 
@@ -267,8 +283,8 @@ async function cargar() {
   cargando.value = true
   try {
     const [resJ, resE] = await Promise.all([api.get('/jugadores'), api.get('/equipos')])
-    jugadores.value = resJ.data
-    equipos.value   = resE.data
+    jugadores.value = [...resJ.data]
+    equipos.value   = [...resE.data]
   } finally { cargando.value = false }
 }
 
@@ -279,7 +295,7 @@ function abrirFormulario(jugador = null) {
     form.value = { ...jugador, fecha_nacimiento: jugador.fecha_nacimiento?.substring(0, 10) }
   } else {
     editando.value = false
-    form.value = { id_equipo: '', cedula: '', nombre: '', apellido: '', fecha_nacimiento: '', rol: 'bateador', posicion: '', brazo_dominante: '', activo: 1 }
+    form.value = { id_equipo: auth.rol === 'dueno' ? auth.id_equipo : '', cedula: '', nombre: '', apellido: '', fecha_nacimiento: '', rol: 'bateador', posicion: '', brazo_dominante: '', activo: 1 }
   }
   modalAbierto.value = true
 }
@@ -308,6 +324,7 @@ async function guardar() {
     const edad = (hoy - nacimiento) / (1000 * 60 * 60 * 24 * 365.25)
     if (edad < 10 || edad > 60) { toast.warn('La edad del jugador debe estar entre 10 y 60 años'); return }
   }
+  if (!form.value.posicion) { toast.warn('Selecciona una posición para el jugador'); return }
   guardando.value = true
   errorModal.value = ''
   try {

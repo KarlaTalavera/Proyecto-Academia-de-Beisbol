@@ -7,9 +7,10 @@ const { soloRoles } = require('../middlewares/roles')
 //  eta tabla de posiciones extendida
 router.get('/posiciones', verificarToken, async (req, res) => {
   const { temporada } = req.query
+  const { rol, id_equipo } = req.usuario
   if (!temporada) return res.status(400).json({ error: 'Parámetro temporada requerido' })
-  const [rows] = await db.query(
-    `SELECT * FROM (
+  let query = `
+    SELECT * FROM (
        SELECT
          e.id_equipo,
          e.nombre_equipo,
@@ -33,9 +34,13 @@ router.get('/posiciones', verificarToken, async (req, res) => {
        GROUP BY e.id_equipo, e.nombre_equipo
      ) AS t
      WHERE jugados > 0
-     ORDER BY ganados DESC, (carreras_favor - carreras_contra) DESC`,
-    [temporada]
-  )
+     ORDER BY ganados DESC, (carreras_favor - carreras_contra) DESC`
+  let params = [temporada]
+  if (rol === 'dueno') {
+    query = query.replace('FROM equipo e', 'FROM equipo e WHERE e.id_equipo = ?')
+    params.unshift(id_equipo)
+  }
+  const [rows] = await db.query(query, params)
   res.json(rows)
 })
 
@@ -50,9 +55,10 @@ router.get('/promedios-bateo', verificarToken, async (req, res) => {
 //Líderes de pitcheo
 router.get('/promedios-pitcheo', verificarToken, async (req, res) => {
   const { temporada } = req.query
+  const { rol, id_equipo } = req.usuario
   if (!temporada) return res.status(400).json({ error: 'Parámetro temporada requerido' })
-  const [rows] = await db.query(
-    `SELECT
+  let query = `
+    SELECT
        j.id_jugador,
        CONCAT(j.nombre, ' ', j.apellido) AS jugador,
        e.nombre_equipo,
@@ -73,9 +79,13 @@ router.get('/promedios-pitcheo', verificarToken, async (req, res) => {
      JOIN partido p ON d.id_partido = p.id_partido
      WHERE p.id_temporada = ?
      GROUP BY j.id_jugador, j.nombre, j.apellido, e.nombre_equipo
-     ORDER BY ERA ASC`,
-    [temporada]
-  )
+     ORDER BY ERA ASC`
+  let params = [temporada]
+  if (rol === 'dueno') {
+    query = query.replace('WHERE p.id_temporada = ?', 'WHERE p.id_temporada = ? AND d.id_equipo = ?')
+    params.push(id_equipo)
+  }
+  const [rows] = await db.query(query, params)
   res.json(rows)
 })
 
@@ -348,9 +358,10 @@ router.get('/taquilla', verificarToken, async (req, res) => {
 // ── Estadísticas Ofensivas (Bateadores) ──────────────────────────────────────
 router.get('/estadisticas-bateadores', verificarToken, async (req, res) => {
   const { temporada } = req.query
+  const { rol, id_equipo } = req.usuario
   if (!temporada) return res.status(400).json({ error: 'Parámetro temporada requerido' })
-  const [rows] = await db.query(
-    `SELECT
+  let query = `
+    SELECT
        j.id_jugador,
        CONCAT(j.nombre, ' ', j.apellido)                                   AS jugador,
        e.nombre_equipo,
@@ -369,9 +380,13 @@ router.get('/estadisticas-bateadores', verificarToken, async (req, res) => {
      JOIN partido p ON d.id_partido = p.id_partido
      WHERE p.id_temporada = ?
      GROUP BY j.id_jugador, j.nombre, j.apellido, e.nombre_equipo
-     ORDER BY AVE DESC`,
-    [temporada]
-  )
+     ORDER BY AVE DESC`
+  let params = [temporada]
+  if (rol === 'dueno') {
+    query = query.replace('WHERE p.id_temporada = ?', 'WHERE p.id_temporada = ? AND d.id_equipo = ?')
+    params.push(id_equipo)
+  }
+  const [rows] = await db.query(query, params)
   res.json(rows)
 })
 

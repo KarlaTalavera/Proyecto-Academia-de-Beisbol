@@ -95,8 +95,8 @@
                   <button class="btn btn-sm btn-ghost-primary" @click="verDetalle(p)">
                     <IconEye :size="15" /> Detalle
                   </button>
-                  <button v-if="auth.usuario?.rol === 'admin'" class="btn btn-sm btn-ghost-danger" @click="confirmarEliminar(p)">
-  <IconTrash :size="15" />
+                  <button v-if="auth.esAdmin" class="btn btn-sm btn-ghost-danger" @click="confirmarEliminar(p)">
+                    <IconTrash :size="15" />
                   </button>
                 </div>
               </div>
@@ -274,7 +274,7 @@
               <!-- TAB: LINEUP -->
               <div v-if="tabActual === 'lineup'">
                 <div v-if="!auth.puedeAnotar" class="alert alert-warning py-2 mb-3" style="font-size:0.82rem;">
-                  <IconLock :size="15" class="me-1" /> Solo el <strong>Anotador</strong> puede cargar el lineup.
+                  <IconLock :size="15" class="me-1" /> Solo el <strong>Administrador, Dueño o Anotador</strong> puede cargar el lineup.
                 </div>
 
                 <div class="row g-3">
@@ -297,7 +297,7 @@
                             <tr v-for="row in lineupEquipo(equipo.id)" :key="row.id_jugador" style="font-size:0.8rem;">
                               <td>{{ row.orden_bateo }}</td>
                               <td>{{ row.nombre }} {{ row.apellido }}</td>
-                              <td>{{ row.posicion_juego }}</td>
+                              <td>{{ row.posicion_juego || '—' }}</td>
                               <td><span :class="row.es_titular ? 'text-success' : 'text-muted'">{{ row.es_titular ? '✓' : '—' }}</span></td>
                             </tr>
                             <tr v-if="!lineupEquipo(equipo.id).length">
@@ -307,7 +307,7 @@
                         </table>
                       </div>
 
-                      <!-- Formulario agregar al lineup (solo anotador) -->
+                      <!-- Formulario agregar al lineup (admin, dueno y anotador) -->
                       <div v-if="auth.puedeAnotar">
                         <hr class="my-2" />
                         <p style="font-size:0.75rem; color:#64748b; font-weight:600;" class="mb-2">Agregar jugador al lineup</p>
@@ -708,7 +708,13 @@ const porPagina      = 8
 
 const partidosFiltrados = computed(() => {
   const q = busqueda.value.toLowerCase().trim()
+  const equipoId = auth.id_equipo ? Number(auth.id_equipo) : null
   return partidos.value.filter(p => {
+    if (auth.esDueno && equipoId) {
+      if (Number(p.id_equipo_casa) !== equipoId && Number(p.id_equipo_visitante) !== equipoId) {
+        return false
+      }
+    }
     if (filtroEstado.value && p.estado !== filtroEstado.value) return false
     if (!q) return true
     return (

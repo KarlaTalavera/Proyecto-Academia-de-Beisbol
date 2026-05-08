@@ -4,7 +4,7 @@ const { verificarToken } = require('../middlewares/auth')
 const { soloRoles } = require('../middlewares/roles')
 
 const gestion   = soloRoles('administrador', 'dueno')
-const sancionar = soloRoles('administrador', 'dueno', 'anotador')
+const sancionar = soloRoles('administrador', 'anotador')
 
 router.get('/',    verificarToken, ctrl.listar)
 router.get('/:id', verificarToken, ctrl.obtener)

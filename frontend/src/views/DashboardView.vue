@@ -462,9 +462,16 @@ const proximoPartido = computed(() => {
 })
 
 const ultimoResultado = computed(() => {
-  return partidos.value
+  const finalizados = partidos.value
     .filter(p => p.estado === 'finalizado' && p.carreras_casa != null)
-    .sort((a, b) => extraerFecha(b.fecha_juego).localeCompare(extraerFecha(a.fecha_juego)) || (b.hora_juego || '').localeCompare(a.hora_juego || ''))[0] || null
+    .filter(p => {
+      if (auth.rol === 'dueno' && auth.id_equipo) {
+        return p.id_equipo_casa === Number(auth.id_equipo) || p.id_equipo_visitante === Number(auth.id_equipo)
+      }
+      return true
+    })
+    .sort((a, b) => extraerFecha(b.fecha_juego).localeCompare(extraerFecha(a.fecha_juego)) || (b.hora_juego || '').localeCompare(a.hora_juego || ''))
+  return finalizados[0] || null
 })
 
 const liderNombre = computed(() => {

@@ -10,10 +10,19 @@ const UsuarioModel = {
 
   async findById(id) {
     const [rows] = await db.query(
-      'SELECT id_usuario, nombre, email, rol, activo, created_at FROM usuario WHERE id_usuario = ?',
+      'SELECT id_usuario, nombre, email, rol, activo, id_equipo, created_at FROM usuario WHERE id_usuario = ?',
       [id]
     )
     return rows[0] || null
+  },
+
+  async create({ nombre, email, password_hash, rol, id_equipo }) {
+    if (rol && !ROLES_VALIDOS.includes(rol)) rol = 'publico'
+    const [result] = await db.query(
+      'INSERT INTO usuario (nombre, email, password_hash, rol, id_equipo) VALUES (?, ?, ?, ?, ?)',
+      [nombre, email, password_hash, rol || 'publico', id_equipo || null]
+    )
+    return result.insertId
   },
 
   async findAll() {
@@ -25,18 +34,9 @@ const UsuarioModel = {
 
   async findAllNonPublico() {
     const [rows] = await db.query(
-      "SELECT id_usuario, nombre, email, rol, activo, created_at FROM usuario WHERE rol != 'publico' ORDER BY created_at DESC"
+      "SELECT id_usuario, nombre, email, rol, activo, id_equipo, created_at FROM usuario WHERE rol != 'publico' ORDER BY created_at DESC"
     )
     return rows
-  },
-
-  async create({ nombre, email, password_hash, rol }) {
-    if (rol && !ROLES_VALIDOS.includes(rol)) rol = 'publico'
-    const [result] = await db.query(
-      'INSERT INTO usuario (nombre, email, password_hash, rol) VALUES (?, ?, ?, ?)',
-      [nombre, email, password_hash, rol || 'publico']
-    )
-    return result.insertId
   },
 
   async updateRol(id, rol) {

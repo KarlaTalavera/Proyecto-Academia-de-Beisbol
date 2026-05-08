@@ -55,8 +55,8 @@ const routes = [
       { path: 'reportes/taquilla',           redirect: '/app/reportes' },
       { path: 'reportes/bateadores',         redirect: '/app/reportes' },
       { path: 'sanciones',     name: 'Sanciones',     component: () => import('@/views/sanciones/SancionesView.vue') },
-      { path: 'noticias',      name: 'NoticiasAdmin', component: () => import('@/views/noticias/NoticiasAdminView.vue'), meta: { soloDueno: true } },
-      { path: 'inscripciones', name: 'Inscripciones', component: () => import('@/views/inscripciones/InscripcionesView.vue') },
+      { path: 'noticias',      name: 'NoticiasAdmin', component: () => import('@/views/noticias/NoticiasAdminView.vue'), meta: { bloqueaDueno: true } },
+      { path: 'inscripciones', name: 'Inscripciones', component: () => import('@/views/inscripciones/InscripcionesView.vue'), meta: { bloqueaDueno: true } },
       { path: 'proveedores',   name: 'Proveedores',   component: () => import('@/views/proveedores/ProveedoresView.vue') },
       { path: 'temporadas',    name: 'Temporadas',    component: () => import('@/views/temporadas/TemporadasView.vue'), meta: { soloAdmin: true } },
       { path: 'usuarios',      name: 'Usuarios',      component: () => import('@/views/usuarios/UsuariosView.vue'), meta: { soloAdmin: true } },
@@ -93,6 +93,7 @@ router.beforeEach((to) => {
   const soloPublico     = to.matched.some(r => r.meta.soloPublico)
   const soloAdmin       = to.matched.some(r => r.meta.soloAdmin)
   const soloReportes    = to.matched.some(r => r.meta.soloReportes)
+  const bloqueaDueno    = to.matched.some(r => r.meta.bloqueaDueno)
 
   // Sin sesión intentando acceder a zona protegida → landing
   if (!esPublico && !auth.token) return { name: 'LandingInicio' }
@@ -111,6 +112,9 @@ router.beforeEach((to) => {
   if (auth.token && auth.rol !== 'publico' && soloPublico) {
     return { name: 'Dashboard' }
   }
+
+  // Bloquear dueno de ciertas rutas
+  if (bloqueaDueno && auth.rol === 'dueno') return { name: 'Dashboard' }
 
   // Equipos y Jugadores: solo admin, dueno y anotador (no caja)
   // Partidos: también caja (para taquilla)

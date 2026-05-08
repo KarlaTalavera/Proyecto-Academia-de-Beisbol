@@ -3,7 +3,13 @@ const { notificarAdmin, notificarCaja } = require('../services/notificacion.serv
 
 const SancionController = {
   async listar(req, res) {
+    const { rol, id_equipo } = req.usuario
     const data = await SancionModel.findAll(req.query.temporada || null)
+    if (rol === 'dueno') {
+      // Filtrar sanciones solo para su equipo o jugadores de su equipo
+      const filtered = data.filter(s => s.id_equipo === id_equipo || s.jugador_id_equipo === id_equipo)
+      return res.json(filtered)
+    }
     res.json(data)
   },
 

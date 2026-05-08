@@ -6,6 +6,7 @@ const SancionModel = {
       SELECT s.*,
              CONCAT(j.nombre, ' ', j.apellido) AS jugador_nombre,
              e.nombre_equipo,
+             j.id_equipo AS jugador_id_equipo,
              t.nombre AS temporada
       FROM sancion s
       LEFT JOIN jugador   j ON s.id_jugador   = j.id_jugador
@@ -23,7 +24,7 @@ const SancionModel = {
     const [rows] = await db.query(
       `SELECT s.*,
               CONCAT(j.nombre, ' ', j.apellido) AS jugador_nombre,
-              e.nombre_equipo, t.nombre AS temporada
+              e.nombre_equipo, j.id_equipo AS jugador_id_equipo, t.nombre AS temporada
        FROM sancion s
        LEFT JOIN jugador   j ON s.id_jugador   = j.id_jugador
        LEFT JOIN equipo    e ON s.id_equipo    = e.id_equipo
