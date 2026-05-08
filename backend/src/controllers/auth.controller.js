@@ -16,11 +16,11 @@ const AuthController = {
     if (!ok) return res.status(401).json({ error: 'Credenciales inválidas' })
 
     const token = jwt.sign(
-      { id: usuario.id_usuario, rol: usuario.rol, nombre: usuario.nombre },
+      { id: usuario.id_usuario, rol: usuario.rol, nombre: usuario.nombre, id_equipo: usuario.id_equipo || null },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN || '8h' }
     )
-    res.json({ token, rol: usuario.rol, nombre: usuario.nombre })
+    res.json({ token, rol: usuario.rol, nombre: usuario.nombre, id_equipo: usuario.id_equipo || null })
   },
 
   //verificar credenciales en resgistro

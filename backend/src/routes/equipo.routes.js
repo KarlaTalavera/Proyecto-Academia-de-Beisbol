@@ -7,20 +7,28 @@ const { soloRoles }  = require('../middlewares/roles')
 const upload         = require('../middlewares/upload')
 const db             = require('../config/database')
 
+function validarDuenoEquipo(req, res, next) {
+  if (req.usuario.rol === 'dueno' && Number(req.usuario.id_equipo) !== Number(req.params.id)) {
+    return res.status(403).json({ error: 'No autorizado para este equipo' })
+  }
+  next()
+}
+
 // Lectura — cualquier autenticado
 router.get('/',              verificarToken, EquipoController.listar)
 router.get('/:id',           verificarToken, EquipoController.obtener)
 router.get('/:id/jugadores', verificarToken, EquipoController.jugadores)
 
-// Escritura — dueno o administrador
-router.post('/',    verificarToken, soloRoles('administrador', 'dueno'), EquipoController.crear)
-router.put('/:id',  verificarToken, soloRoles('administrador', 'dueno'), EquipoController.actualizar)
-router.delete('/:id', verificarToken, soloRoles('administrador', 'dueno'), EquipoController.eliminar)
+// Escritura
+router.post('/',    verificarToken, soloRoles('administrador'), EquipoController.crear)
+router.put('/:id',  verificarToken, soloRoles('administrador', 'dueno'), validarDuenoEquipo, EquipoController.actualizar)
+router.delete('/:id', verificarToken, soloRoles('administrador'), EquipoController.eliminar)
 
 // ── Logo del equipo ───────────────────────────────────────────
 router.post('/:id/logo',
   verificarToken,
   soloRoles('administrador', 'dueno'),
+  validarDuenoEquipo,
   (req, _res, next) => { req.uploadPrefix = 'equipo'; next() },
   upload.single('logo'),
   async (req, res) => {
@@ -42,6 +50,7 @@ router.post('/:id/logo',
 router.delete('/:id/logo',
   verificarToken,
   soloRoles('administrador', 'dueno'),
+  validarDuenoEquipo,
   async (req, res) => {
     const [[equipo]] = await db.query('SELECT logo_url FROM equipo WHERE id_equipo = ?', [req.params.id])
     if (equipo?.logo_url) {

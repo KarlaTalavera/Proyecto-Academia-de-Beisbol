@@ -7,16 +7,8 @@ export const useAuthStore = defineStore('auth', {
     token:  localStorage.getItem('token')  || null,
     rol:    localStorage.getItem('rol')    || null,
     nombre: localStorage.getItem('nombre') || null,
+    id_equipo: localStorage.getItem('id_equipo') || null,
   }),
-actions: {
-  async login(email, password) {
-    const res = await api.post('/auth/login', { email, password })
-    this.token = res.data.token
-    this.user = res.data.user
-    this.rol = res.data.user.rol
-    localStorage.setItem('token', this.token)
-  }
-},
 
   getters: {
     esAdmin:       s => s.rol === 'administrador',
@@ -29,10 +21,10 @@ actions: {
     puedeEditar:   s => ['administrador', 'dueno'].includes(s.rol),
     // admin, dueno y anotador pueden cambiar estado y reprogramar partidos
     puedeGestionarPartido: s => ['administrador', 'dueno', 'anotador'].includes(s.rol),
-    // admin, dueno y anotador pueden gestionar sanciones
-    puedeSancionar: s => ['administrador', 'dueno', 'anotador'].includes(s.rol),
-    // solo el anotador carga lineup, resultado y estadísticas de un partido
-    puedeAnotar:   s => s.rol === 'anotador',
+    // admin y anotador pueden gestionar sanciones
+    puedeSancionar: s => ['administrador', 'anotador'].includes(s.rol),
+    // admin, dueno y anotador pueden cargar lineup, resultado y estadísticas de un partido
+    puedeAnotar:   s => ['administrador', 'dueno', 'anotador'].includes(s.rol),
     // caja, admin y dueno pueden ver sanciones (lectura)
     puedeVerSanciones: s => ['administrador', 'dueno', 'anotador', 'caja'].includes(s.rol),
     // solo admin y dueno ven equipos/jugadores en el panel
@@ -44,18 +36,22 @@ actions: {
   actions: {
     async login(email, password) {
       const { data } = await api.post('/auth/login', { email, password })
-      this.token  = data.token
-      this.rol    = data.rol
-      this.nombre = data.nombre
+      this.token     = data.token
+      this.rol       = data.rol
+      this.nombre    = data.nombre
+      this.id_equipo = data.id_equipo // Viene del backend
+      
       localStorage.setItem('token',  data.token)
       localStorage.setItem('rol',    data.rol)
       localStorage.setItem('nombre', data.nombre)
+      if (data.id_equipo) localStorage.setItem('id_equipo', data.id_equipo)
     },
     logout() {
       this.token = this.rol = this.nombre = null
       localStorage.removeItem('token')
       localStorage.removeItem('rol')
       localStorage.removeItem('nombre')
+      localStorage.removeItem('id_equipo')
     },
   },
 })

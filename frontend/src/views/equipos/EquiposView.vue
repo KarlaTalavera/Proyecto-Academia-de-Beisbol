@@ -7,7 +7,7 @@
         <h2 class="page-title">Equipos</h2>
         <p class="page-subtitle">Gestión de equipos de la liga</p>
       </div>
-      <button v-if="auth.puedeEditar" class="btn btn-primary d-flex align-items-center gap-2" @click="abrirFormulario()">
+      <button v-if="auth.esAdmin" class="btn btn-primary d-flex align-items-center gap-2" @click="abrirFormulario()">
         <IconPlus :size="18" stroke-width="2" />
         Nuevo Equipo
       </button>
@@ -80,7 +80,7 @@
                 <button class="btn btn-sm btn-ghost-primary me-1" @click="abrirFormulario(eq)" title="Editar">
                   <IconPencil :size="15" />
                 </button>
-                <button class="btn btn-sm btn-ghost-danger" @click="confirmarEliminar(eq)" title="Eliminar">
+                <button v-if="auth.esAdmin" class="btn btn-sm btn-ghost-danger" @click="confirmarEliminar(eq)" title="Eliminar">
                   <IconTrash :size="15" />
                 </button>
               </td>
@@ -174,12 +174,18 @@ const guardando    = ref(false)
 const errorModal   = ref('')
 const form = ref({ nombre_equipo: '', entrenador: '', responsable: '', email: '', telefono: '' })
 
-const equiposFiltrados = computed(() =>
-  equipos.value.filter(e =>
-    e.nombre_equipo.toLowerCase().includes(busqueda.value.toLowerCase()) ||
-    e.entrenador.toLowerCase().includes(busqueda.value.toLowerCase())
+const equiposFiltrados = computed(() => {
+  let filtrados = equipos.value
+
+  // Si el usuario es dueño, solo permitimos ver su equipo asignado
+  if (auth.esDueno && auth.id_equipo) {
+    filtrados = filtrados.filter(e => e.id_equipo === Number(auth.id_equipo))
+  }
+
+  return filtrados.filter(e =>
+    e.nombre_equipo.toLowerCase().includes(busqueda.value.toLowerCase())
   )
-)
+})
 
 async function cargarEquipos() {
   cargando.value = true

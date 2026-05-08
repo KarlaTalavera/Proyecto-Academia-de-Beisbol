@@ -12,6 +12,11 @@ const anotador = soloRoles('anotador')
 // Taquilla: admin, dueño y caja
 const taquilla = soloRoles('administrador', 'dueno', 'caja')
 
+const puedeAlinear = soloRoles('administrador', 'dueno', 'anotador');
+
+// Cambiamos 'anotador' por 'puedeAlinear'
+router.post('/:id/lineup', verificarToken, puedeAlinear, PartidoController.setLineup);
+
 // ── Partidos ────────────────────────────────────────────────
 router.get('/',    verificarToken, PartidoController.listar)
 router.get('/:id', verificarToken, PartidoController.obtener)
@@ -20,9 +25,9 @@ router.patch('/:id/estado',   verificarToken, gestion, PartidoController.actuali
 router.patch('/:id/reprogramar', verificarToken, gestion, PartidoController.reprogramar)
 router.delete('/:id',         verificarToken, dueno,   PartidoController.eliminar)
 
-// ── Lineup (solo anotador) ───────────────────────────────────
+// ── Lineup (admin, dueño y anotador) ───────────────────────────────────
 router.get('/:id/lineup',  verificarToken, PartidoController.getLineup)
-router.post('/:id/lineup', verificarToken, anotador, PartidoController.setLineup)
+router.post('/:id/lineup', verificarToken, puedeAlinear, PartidoController.setLineup)
 
 // ── Resultado (solo anotador) ────────────────────────────────
 router.get('/:id/resultado',  verificarToken, PartidoController.getResultado)
