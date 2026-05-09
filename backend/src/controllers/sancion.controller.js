@@ -3,7 +3,8 @@ const { notificarAdmin, notificarCaja } = require('../services/notificacion.serv
 
 const SancionController = {
   async listar(req, res) {
-    const data = await SancionModel.findAll(req.query.temporada || null)
+    const idEquipo = req.usuario?.rol === 'dueno' ? req.usuario.id_equipo : null
+    const data = await SancionModel.findAll(req.query.temporada || null, idEquipo)
     res.json(data)
   },
 

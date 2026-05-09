@@ -1,8 +1,8 @@
 const db = require('../config/database')
 
 const PartidoModel = {
-  async findAll(id_temporada) {
-    const base = `
+  async findAll(id_temporada, id_equipo = null) {
+    let base = `
       SELECT p.*,
              ec.nombre_equipo AS equipo_casa,
              ev.nombre_equipo AS equipo_visitante,
@@ -14,11 +14,18 @@ const PartidoModel = {
       JOIN equipo ev    ON p.id_equipo_visitante  = ev.id_equipo
       JOIN temporada t  ON p.id_temporada         = t.id_temporada
       LEFT JOIN resultado r ON p.id_partido       = r.id_partido`
+    const params = []
     if (id_temporada) {
-      const [rows] = await db.query(base + ' WHERE p.id_temporada = ? ORDER BY p.fecha_juego, p.hora_juego', [id_temporada])
-      return rows
+      base += ' WHERE p.id_temporada = ?'
+      params.push(id_temporada)
     }
-    const [rows] = await db.query(base + ' ORDER BY p.fecha_juego, p.hora_juego')
+    if (id_equipo) {
+      base += params.length ? ' AND' : ' WHERE'
+      base += ' (p.id_equipo_casa = ? OR p.id_equipo_visitante = ?)' 
+      params.push(id_equipo, id_equipo)
+    }
+    base += ' ORDER BY p.fecha_juego, p.hora_juego'
+    const [rows] = await db.query(base, params)
     return rows
   },
 

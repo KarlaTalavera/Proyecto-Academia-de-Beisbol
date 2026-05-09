@@ -24,17 +24,18 @@ const routes = [
     ],
   },
 
-  // Zona Fanático (rol: publico)
+  // Zona Dueño (rol: dueno)
   {
-    path: '/fan',
-    component: () => import('@/components/FanLayout.vue'),
-    meta: { requiereAuth: true, soloPublico: true },
+    path: '/dueno',
+    component: () => import('@/components/DuenoLayout.vue'),
+    meta: { requiereAuth: true, soloDueno: true },
     children: [
-      { path: '',          name: 'FanInicio',      component: () => import('@/views/fan/FanDashboardView.vue') },
-      { path: 'equipos',  name: 'MisEquipos',      component: () => import('@/views/fan/MisEquiposView.vue') },
-      { path: 'partidos', name: 'FanPartidos',     component: () => import('@/views/fan/FanPartidosView.vue') },
-      { path: 'posiciones', name: 'FanPosiciones', component: () => import('@/views/fan/FanPosicionesView.vue') },
-      { path: 'estadisticas', name: 'FanEstadisticas', component: () => import('@/views/fan/FanEstadisticasView.vue') },
+      { path: '', name: 'DuenoDashboard', component: () => import('@/views/dueno/DuenoDashboardView.vue') },
+      { path: 'equipo', name: 'DuenoEquipo', component: () => import('@/views/dueno/DuenoEquipoView.vue') },
+      { path: 'jugadores', name: 'DuenoJugadores', component: () => import('@/views/dueno/DuenoJugadoresView.vue') },
+      { path: 'partidos', name: 'DuenoPartidos', component: () => import('@/views/dueno/DuenoPartidosView.vue') },
+      { path: 'reportes', name: 'DuenoReportes', component: () => import('@/views/dueno/DuenoReportesView.vue') },
+      { path: 'sanciones', name: 'DuenoSanciones', component: () => import('@/views/dueno/DuenoSancionesView.vue') },
     ],
   },
 
@@ -93,13 +94,16 @@ router.beforeEach((to) => {
   const soloPublico     = to.matched.some(r => r.meta.soloPublico)
   const soloAdmin       = to.matched.some(r => r.meta.soloAdmin)
   const soloReportes    = to.matched.some(r => r.meta.soloReportes)
+  const soloDueno       = to.matched.some(r => r.meta.soloDueno)
 
   // Sin sesión intentando acceder a zona protegida → landing
   if (!esPublico && !auth.token) return { name: 'LandingInicio' }
 
   // Ya autenticado intenta ir al login → redirigir a su zona
   if (auth.token && to.name === 'Login') {
-    return auth.rol === 'publico' ? { name: 'FanInicio' } : { name: 'Dashboard' }
+    if (auth.rol === 'publico') return { name: 'FanInicio' }
+    if (auth.rol === 'dueno') return { name: 'DuenoDashboard' }
+    return { name: 'Dashboard' }
   }
 
   // Usuario público intenta acceder a zona administrativa → zona fan
@@ -107,9 +111,14 @@ router.beforeEach((to) => {
     return { name: 'FanInicio' }
   }
 
-  // Usuario no-público intenta acceder a zona fan → dashboard admin
-  if (auth.token && auth.rol !== 'publico' && soloPublico) {
+  // Usuario no-público intenta acceder a zona admin pero no es dueno → dashboard admin
+  if (auth.token && auth.rol !== 'publico' && auth.rol !== 'dueno' && bloqueaPublico) {
     return { name: 'Dashboard' }
+  }
+
+  // Usuario dueno intenta acceder a zona admin → zona dueno
+  if (auth.token && auth.rol === 'dueno' && bloqueaPublico) {
+    return { name: 'DuenoDashboard' }
   }
 
   // Equipos y Jugadores: solo admin, dueno y anotador (no caja)
@@ -127,11 +136,15 @@ router.beforeEach((to) => {
   if (soloAdmin && auth.rol !== 'administrador') return { name: 'Dashboard' }
 
   // Noticias: solo administrador y dueno
-  const soloDueno = to.matched.some(r => r.meta.soloDueno)
   if (soloDueno && !['administrador', 'dueno'].includes(auth.rol)) return { name: 'Dashboard' }
 
   // Reportes: solo administrador, dueno y caja (no anotador)
   if (soloReportes && !['administrador', 'dueno', 'caja'].includes(auth.rol)) {
+    return { name: 'Dashboard' }
+  }
+
+  // Zona dueno: solo dueños
+  if (soloDueno && auth.rol !== 'dueno') {
     return { name: 'Dashboard' }
   }
 })

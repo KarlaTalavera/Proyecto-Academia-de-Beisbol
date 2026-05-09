@@ -11,7 +11,8 @@ function validarCedula(cedula) {
 
 const JugadorController = {
   async listar(req, res) {
-    const jugadores = await JugadorModel.findAll()
+    const idEquipo = req.usuario?.rol === 'dueno' ? req.usuario.id_equipo : null
+    const jugadores = await JugadorModel.findAll(idEquipo)
     res.json(jugadores)
   },
 
@@ -22,19 +23,32 @@ const JugadorController = {
   },
 
   async crear(req, res) {
-    const { id_equipo, nombre, apellido, fecha_nacimiento, rol, posicion } = req.body
-    if (!id_equipo || !nombre || !apellido || !fecha_nacimiento || !posicion) {
-      return res.status(400).json({ error: 'id_equipo, nombre, apellido, fecha_nacimiento y posicion son requeridos' })
+    let { id_equipo, nombre, apellido, fecha_nacimiento, rol, posicion } = req.body
+    if (!nombre || !apellido || !fecha_nacimiento || !posicion) {
+      return res.status(400).json({ error: 'nombre, apellido, fecha_nacimiento y posicion son requeridos' })
+    }
+    // Si es dueno, forzar su id_equipo
+    if (req.usuario.rol === 'dueno') {
+      id_equipo = req.usuario.id_equipo
+    } else if (!id_equipo) {
+      return res.status(400).json({ error: 'id_equipo es requerido' })
     }
     const err = validarCedula(req.body.cedula)
     if (err) return res.status(400).json({ error: err })
-    const id = await JugadorModel.create(req.body)
+    const id = await JugadorModel.create({ ...req.body, id_equipo })
     res.status(201).json({ id_jugador: id })
   },
 
   async actualizar(req, res) {
     const err = validarCedula(req.body.cedula)
     if (err) return res.status(400).json({ error: err })
+    // Si es dueno, verificar que el jugador pertenezca a su equipo
+    if (req.usuario.rol === 'dueno') {
+      const [[jugador]] = await db.query('SELECT id_equipo FROM jugador WHERE id_jugador = ?', [req.params.id])
+      if (!jugador || jugador.id_equipo !== req.usuario.id_equipo) {
+        return res.status(403).json({ error: 'No tienes permiso para editar este jugador' })
+      }
+    }
     const affected = await JugadorModel.update(req.params.id, req.body)
     if (!affected) return res.status(404).json({ error: 'Jugador no encontrado' })
     res.json({ ok: true })

@@ -60,7 +60,7 @@ const UsuariosController = {
   },
 
   async crear(req, res) {
-    const { nombre, email, password, rol } = req.body
+    const { nombre, email, password, rol, id_equipo } = req.body
     if (!nombre || !email || !password) {
       return res.status(400).json({ error: 'nombre, email y password son requeridos' })
     }
@@ -69,12 +69,15 @@ const UsuariosController = {
     if (!ROLES_ADMIN.includes(rol)) {
       return res.status(400).json({ error: 'Rol inválido. Use: administrador, dueno, caja, anotador' })
     }
+    if (rol === 'dueno' && !id_equipo) {
+      return res.status(400).json({ error: 'id_equipo es requerido para rol dueno' })
+    }
     const existe = await UsuarioModel.findByEmail(email)
     if (existe) return res.status(409).json({ error: 'Email ya registrado' })
 
     const bcrypt = require('bcryptjs')
     const password_hash = await bcrypt.hash(password, 10)
-    const id = await UsuarioModel.create({ nombre, email, password_hash, rol })
+    const id = await UsuarioModel.create({ nombre, email, password_hash, rol, id_equipo })
     res.status(201).json({ id_usuario: id })
   },
 }

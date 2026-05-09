@@ -43,7 +43,8 @@ router.get('/posiciones', verificarToken, async (req, res) => {
 router.get('/promedios-bateo', verificarToken, async (req, res) => {
   const { temporada } = req.query
   if (!temporada) return res.status(400).json({ error: 'Parámetro temporada requerido' })
-  const data = await DesempenoModel.promediosBateo(temporada)
+  const idEquipo = req.usuario?.rol === 'dueno' ? req.usuario.id_equipo : null
+  const data = await DesempenoModel.promediosBateo(temporada, idEquipo)
   res.json(data)
 })
 
@@ -51,8 +52,8 @@ router.get('/promedios-bateo', verificarToken, async (req, res) => {
 router.get('/promedios-pitcheo', verificarToken, async (req, res) => {
   const { temporada } = req.query
   if (!temporada) return res.status(400).json({ error: 'Parámetro temporada requerido' })
-  const [rows] = await db.query(
-    `SELECT
+  const idEquipo = req.usuario?.rol === 'dueno' ? req.usuario.id_equipo : null
+  let sql = `SELECT
        j.id_jugador,
        CONCAT(j.nombre, ' ', j.apellido) AS jugador,
        e.nombre_equipo,
@@ -71,11 +72,16 @@ router.get('/promedios-pitcheo', verificarToken, async (req, res) => {
      JOIN jugador j ON d.id_jugador = j.id_jugador
      JOIN equipo  e ON d.id_equipo  = e.id_equipo
      JOIN partido p ON d.id_partido = p.id_partido
-     WHERE p.id_temporada = ?
+     WHERE p.id_temporada = ?`
+  const params = [temporada]
+  if (idEquipo) {
+    sql += ' AND e.id_equipo = ?'
+    params.push(idEquipo)
+  }
+  sql += `
      GROUP BY j.id_jugador, j.nombre, j.apellido, e.nombre_equipo
-     ORDER BY ERA ASC`,
-    [temporada]
-  )
+     ORDER BY ERA ASC`
+  const [rows] = await db.query(sql, params)
   res.json(rows)
 })
 

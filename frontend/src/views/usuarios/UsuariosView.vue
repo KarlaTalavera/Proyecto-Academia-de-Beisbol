@@ -150,6 +150,13 @@
                   </select>
                 </div>
               </div>
+              <div v-if="crearForm.rol === 'dueno'" class="mb-3">
+                <label class="form-label required">Equipo</label>
+                <select v-model="crearForm.id_equipo" class="form-select" required>
+                  <option value="">— Seleccionar equipo —</option>
+                  <option v-for="e in equipos" :key="e.id_equipo" :value="e.id_equipo">{{ e.nombre_equipo }}</option>
+                </select>
+              </div>
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-ghost-secondary me-auto" @click="modalCrear = false">Cancelar</button>
@@ -231,10 +238,11 @@ const usuarioSeleccionado = ref(null)
 
 const modalCrear  = ref(false)
 const errorCrear  = ref('')
-const crearForm   = ref({ nombre: '', email: '', password: '', rol: '' })
+const crearForm   = ref({ nombre: '', email: '', password: '', rol: '', id_equipo: null })
+const equipos     = ref([])
 
 function abrirCrear() {
-  crearForm.value = { nombre: '', email: '', password: '', rol: '' }
+  crearForm.value = { nombre: '', email: '', password: '', rol: '', id_equipo: null }
   errorCrear.value = ''
   modalCrear.value = true
 }
@@ -301,6 +309,15 @@ async function cargar() {
   }
 }
 
+async function cargarEquipos() {
+  try {
+    const { data } = await api.get('/equipos')
+    equipos.value = data
+  } catch (e) {
+    console.error('Error cargando equipos:', e)
+  }
+}
+
 async function cambiarRol(usuario, rol) {
   try {
     await api.patch(`/usuarios/${usuario.id_usuario}/rol`, { rol })
@@ -355,5 +372,8 @@ async function confirmarEliminar(usuario) {
   }
 }
 
-onMounted(cargar)
+onMounted(async () => {
+  await cargar()
+  await cargarEquipos()
+})
 </script>
