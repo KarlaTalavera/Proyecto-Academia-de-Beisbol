@@ -77,7 +77,10 @@ const DesempenoModel = {
   },
 
   // ── ESTADÍSTICAS ACUMULADAS (promedio de bateo) ───────────
-  async promediosBateo(id_temporada) {
+  async promediosBateo(id_temporada, id_equipo = null) {
+    const params = [id_temporada]
+    const equipoFiltro = id_equipo ? ' AND d.id_equipo = ?' : ''
+
     const [rows] = await db.query(
       `SELECT
          j.id_jugador,
@@ -95,10 +98,10 @@ const DesempenoModel = {
        JOIN jugador j ON d.id_jugador = j.id_jugador
        JOIN equipo  e ON d.id_equipo  = e.id_equipo
        JOIN partido p ON d.id_partido = p.id_partido
-       WHERE p.id_temporada = ?
+       WHERE p.id_temporada = ?${equipoFiltro}
        GROUP BY j.id_jugador, j.nombre, j.apellido, e.nombre_equipo
        ORDER BY AVG DESC`,
-      [id_temporada]
+      id_equipo ? params.concat(id_equipo) : params
     )
     return rows
   },

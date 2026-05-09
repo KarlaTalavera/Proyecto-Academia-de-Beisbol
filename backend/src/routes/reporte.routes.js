@@ -41,15 +41,15 @@ router.get('/posiciones', verificarToken, async (req, res) => {
 
 //  Líderes de bateo
 router.get('/promedios-bateo', verificarToken, async (req, res) => {
-  const { temporada } = req.query
+  const { temporada, equipo } = req.query
   if (!temporada) return res.status(400).json({ error: 'Parámetro temporada requerido' })
-  const data = await DesempenoModel.promediosBateo(temporada)
+  const data = await DesempenoModel.promediosBateo(temporada, equipo)
   res.json(data)
 })
 
 //Líderes de pitcheo
 router.get('/promedios-pitcheo', verificarToken, async (req, res) => {
-  const { temporada } = req.query
+  const { temporada, equipo } = req.query
   if (!temporada) return res.status(400).json({ error: 'Parámetro temporada requerido' })
   const [rows] = await db.query(
     `SELECT
@@ -71,10 +71,10 @@ router.get('/promedios-pitcheo', verificarToken, async (req, res) => {
      JOIN jugador j ON d.id_jugador = j.id_jugador
      JOIN equipo  e ON d.id_equipo  = e.id_equipo
      JOIN partido p ON d.id_partido = p.id_partido
-     WHERE p.id_temporada = ?
+     WHERE p.id_temporada = ? ${equipo ? 'AND e.id_equipo = ?' : ''}
      GROUP BY j.id_jugador, j.nombre, j.apellido, e.nombre_equipo
      ORDER BY ERA ASC`,
-    [temporada]
+    [temporada, ...(equipo ? [equipo] : [])]
   )
   res.json(rows)
 })
@@ -347,7 +347,7 @@ router.get('/taquilla', verificarToken, async (req, res) => {
 
 // ── Estadísticas Ofensivas (Bateadores) ──────────────────────────────────────
 router.get('/estadisticas-bateadores', verificarToken, async (req, res) => {
-  const { temporada } = req.query
+  const { temporada, equipo } = req.query
   if (!temporada) return res.status(400).json({ error: 'Parámetro temporada requerido' })
   const [rows] = await db.query(
     `SELECT
@@ -367,10 +367,10 @@ router.get('/estadisticas-bateadores', verificarToken, async (req, res) => {
      JOIN jugador j ON d.id_jugador = j.id_jugador
      JOIN equipo  e ON d.id_equipo  = e.id_equipo
      JOIN partido p ON d.id_partido = p.id_partido
-     WHERE p.id_temporada = ?
+     WHERE p.id_temporada = ? ${equipo ? 'AND e.id_equipo = ?' : ''}
      GROUP BY j.id_jugador, j.nombre, j.apellido, e.nombre_equipo
      ORDER BY AVE DESC`,
-    [temporada]
+    [temporada, ...(equipo ? [equipo] : [])]
   )
   res.json(rows)
 })

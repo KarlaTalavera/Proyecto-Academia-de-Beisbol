@@ -295,6 +295,19 @@ function onBatMove(e) {
   }
 }
 
+import { useAuthStore } from '@/store/auth'
+
+// 1. Extraer info del JWT
+const auth = useAuthStore()
+const tokenPayload = computed(() => {
+  try {
+    return JSON.parse(atob(auth.token.split('.')[1]))
+  } catch { return {} }
+})
+
+const esDueno = computed(() => tokenPayload.value.rol === 'dueno')
+const miEquipoId = computed(() => tokenPayload.value.id_equipo)
+
 const fechaGeneracion = computed(() =>
   new Date().toLocaleString('es-VE', { dateStyle: 'medium', timeStyle: 'short' })
 )
@@ -362,9 +375,9 @@ async function cargar() {
   if (!temporadaId.value) return
   cargando.value = true
   try {
-    const { data } = await api.get('/reportes/estadisticas-bateadores', {
-      params: { temporada: temporadaId.value },
-    })
+    const params = { temporada: temporadaId.value }
+    if (esDueno.value) params.equipo = miEquipoId.value
+    const { data } = await api.get('/reportes/estadisticas-bateadores', { params })
     datos.value = data
   } finally { cargando.value = false }
 }
