@@ -3,9 +3,7 @@ const PartidoController  = require('../controllers/partido.controller')
 const { verificarToken } = require('../middlewares/auth')
 const { soloRoles }      = require('../middlewares/roles')
 
-// Administrador o dueño pueden crear/eliminar partidos
-const dueno    = soloRoles('administrador', 'dueno')
-// Admin, dueño y anotador pueden cambiar estado y reprogramar
+// Administrador o dueño pueden cambiar estado y reprogramar
 const gestion  = soloRoles('administrador', 'dueno', 'anotador')
 // Anotador es el ÚNICO que puede cargar lineup, resultado y estadísticas
 const anotador = soloRoles('anotador')
@@ -20,10 +18,10 @@ router.post('/:id/lineup', verificarToken, puedeAlinear, PartidoController.setLi
 // ── Partidos ────────────────────────────────────────────────
 router.get('/',    verificarToken, PartidoController.listar)
 router.get('/:id', verificarToken, PartidoController.obtener)
-router.post('/',              verificarToken, dueno,   PartidoController.crear)
+router.post('/',              verificarToken, soloRoles('administrador'), PartidoController.crear)
 router.patch('/:id/estado',   verificarToken, gestion, PartidoController.actualizarEstado)
 router.patch('/:id/reprogramar', verificarToken, gestion, PartidoController.reprogramar)
-router.delete('/:id',         verificarToken, dueno,   PartidoController.eliminar)
+router.delete('/:id',         verificarToken, soloRoles('administrador'), PartidoController.eliminar)
 
 // ── Lineup (admin, dueño y anotador) ───────────────────────────────────
 router.get('/:id/lineup',  verificarToken, PartidoController.getLineup)

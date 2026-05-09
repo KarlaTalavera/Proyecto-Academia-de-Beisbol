@@ -61,7 +61,6 @@ const UsuariosController = {
 
   async crear(req, res) {
     const { nombre, email, password, rol, id_equipo } = req.body
-
     if (!nombre || !email || !password) {
       return res.status(400).json({ error: 'nombre, email y password son requeridos' })
     }

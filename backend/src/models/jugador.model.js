@@ -1,13 +1,17 @@
 const db = require('../config/database')
 
 const JugadorModel = {
-  async findAll() {
-    const [rows] = await db.query(
-      `SELECT j.*, e.nombre_equipo
+  async findAll(id_equipo = null) {
+    let sql = `SELECT j.*, e.nombre_equipo
        FROM jugador j
-       JOIN equipo e ON j.id_equipo = e.id_equipo
-       ORDER BY j.apellido, j.nombre`
-    )
+       JOIN equipo e ON j.id_equipo = e.id_equipo`
+    const params = []
+    if (id_equipo) {
+      sql += ' WHERE j.id_equipo = ?'
+      params.push(id_equipo)
+    }
+    sql += ' ORDER BY j.apellido, j.nombre'
+    const [rows] = await db.query(sql, params)
     return rows
   },
 

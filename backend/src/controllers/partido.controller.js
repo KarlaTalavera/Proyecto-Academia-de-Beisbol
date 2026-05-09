@@ -6,7 +6,8 @@ const PartidoController = {
   async listar(req, res) {
     await PartidoModel.autoFinalizarVencidos()
     const { temporada } = req.query
-    const data = await PartidoModel.findAll(temporada || null)
+    const idEquipo = req.usuario?.rol === 'dueno' ? req.usuario.id_equipo : null
+    const data = await PartidoModel.findAll(temporada || null, idEquipo)
     res.json(data)
   },
 

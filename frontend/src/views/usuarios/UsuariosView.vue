@@ -159,6 +159,13 @@
                   </select>
                 </div>
               </div>
+              <div v-if="crearForm.rol === 'dueno'" class="mb-3">
+                <label class="form-label required">Equipo</label>
+                <select v-model="crearForm.id_equipo" class="form-select" required>
+                  <option value="">— Seleccionar equipo —</option>
+                  <option v-for="e in equipos" :key="e.id_equipo" :value="e.id_equipo">{{ e.nombre_equipo }}</option>
+                </select>
+              </div>
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-ghost-secondary me-auto" @click="modalCrear = false">Cancelar</button>
@@ -378,5 +385,8 @@ async function confirmarEliminar(usuario) {
   }
 }
 
-onMounted(cargar)
+onMounted(async () => {
+  await cargar()
+  await cargarEquipos()
+})
 </script>

@@ -20,4 +20,20 @@ function soloRoles(...roles) {
   }
 }
 
-module.exports = { soloRoles }
+/**
+ * Middleware para dueños que tienen equipo asignado.
+ */
+function duenoConEquipo(req, res, next) {
+  if (!req.usuario) {
+    return res.status(401).json({ error: 'No autenticado' })
+  }
+  if (req.usuario.rol !== 'dueno') {
+    return res.status(403).json({ error: 'Solo dueños pueden acceder' })
+  }
+  if (!req.usuario.id_equipo) {
+    return res.status(403).json({ error: 'Dueño sin equipo asignado' })
+  }
+  next()
+}
+
+module.exports = { soloRoles, duenoConEquipo }

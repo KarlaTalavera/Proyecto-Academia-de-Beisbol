@@ -27,7 +27,7 @@ const UsuarioModel = {
 
   async findAll() {
     const [rows] = await db.query(
-      'SELECT id_usuario, nombre, email, rol, activo, created_at FROM usuario ORDER BY created_at DESC'
+      'SELECT id_usuario, nombre, email, rol, id_equipo, activo, created_at FROM usuario ORDER BY created_at DESC'
     )
     return rows
   },

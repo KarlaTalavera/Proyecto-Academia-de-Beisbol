@@ -9,7 +9,7 @@ const sancionar = soloRoles('administrador', 'anotador')
 router.get('/',    verificarToken, ctrl.listar)
 router.get('/:id', verificarToken, ctrl.obtener)
 router.post('/',   verificarToken, sancionar, ctrl.crear)
-router.put('/:id', verificarToken, sancionar, ctrl.actualizar)
+router.put('/:id',  verificarToken, sancionar, ctrl.actualizar)
 router.delete('/:id', verificarToken, soloRoles('administrador'), ctrl.eliminar)
 
 module.exports = router

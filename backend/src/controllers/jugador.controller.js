@@ -28,41 +28,24 @@ const JugadorController = {
     const jugador = await JugadorModel.findById(req.params.id)
     
     if (!jugador) return res.status(404).json({ error: 'Jugador no encontrado' })
-
-    // Validación de seguridad: si es dueño, solo puede ver el detalle si el jugador es de su equipo
-    if (rol === 'dueno' && jugador.id_equipo !== id_equipo) {
-      return res.status(403).json({ error: 'No tienes permiso para ver este jugador' })
-    }
-
     res.json(jugador)
   },
 
   async crear(req, res) {
-    const { rol, id_equipo: idEquipoToken } = req.usuario;
-    const { id_equipo, nombre, apellido, fecha_nacimiento, posicion } = req.body
-
-    console.log('Creando jugador req.body:', req.body)
-
-    // Si es dueño, forzamos que el id_equipo sea el suyo, ignorando lo que venga en el body
-    let idEquipoFinal = id_equipo;
-    if (rol === 'dueno') {
-      idEquipoFinal = idEquipoToken;
+    let { id_equipo, nombre, apellido, fecha_nacimiento, rol, posicion } = req.body
+    if (!nombre || !apellido || !fecha_nacimiento || !posicion) {
+      return res.status(400).json({ error: 'nombre, apellido, fecha_nacimiento y posicion son requeridos' })
     }
-
-    if (!idEquipoFinal || !nombre || !apellido || !fecha_nacimiento || !posicion) {
-      return res.status(400).json({ error: 'Datos incompletos para crear el jugador' })
+    // Si es dueno, forzar su id_equipo
+    if (req.usuario.rol === 'dueno') {
+      id_equipo = req.usuario.id_equipo
+    } else if (!id_equipo) {
+      return res.status(400).json({ error: 'id_equipo es requerido' })
     }
 
     const err = validarCedula(req.body.cedula)
     if (err) return res.status(400).json({ error: err })
-
-    // Creamos el objeto limpio para el modelo
-    const nuevoJugador = {
-      ...req.body,
-      id_equipo: idEquipoFinal
-    }
-
-    const id = await JugadorModel.create(nuevoJugador)
+    const id = await JugadorModel.create({ ...req.body, id_equipo })
     res.status(201).json({ id_jugador: id })
   },
 

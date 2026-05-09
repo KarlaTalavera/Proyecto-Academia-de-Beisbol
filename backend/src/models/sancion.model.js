@@ -1,8 +1,8 @@
 const db = require('../config/database')
 
 const SancionModel = {
-  async findAll(id_temporada) {
-    const base = `
+  async findAll(id_temporada, id_equipo = null) {
+    let base = `
       SELECT s.*,
              CONCAT(j.nombre, ' ', j.apellido) AS jugador_nombre,
              e.nombre_equipo,
@@ -12,11 +12,19 @@ const SancionModel = {
       LEFT JOIN jugador   j ON s.id_jugador   = j.id_jugador
       LEFT JOIN equipo    e ON s.id_equipo    = e.id_equipo
       JOIN      temporada t ON s.id_temporada = t.id_temporada`
+    const params = []
+    const conditions = []
     if (id_temporada) {
-      const [rows] = await db.query(base + ' WHERE s.id_temporada=? ORDER BY s.fecha_sancion DESC', [id_temporada])
-      return rows
+      conditions.push('s.id_temporada = ?')
+      params.push(id_temporada)
     }
-    const [rows] = await db.query(base + ' ORDER BY s.fecha_sancion DESC')
+    if (id_equipo) {
+      conditions.push('(s.id_equipo = ? OR j.id_equipo = ?)')
+      params.push(id_equipo, id_equipo)
+    }
+    if (conditions.length) base += ' WHERE ' + conditions.join(' AND ')
+    base += ' ORDER BY s.fecha_sancion DESC'
+    const [rows] = await db.query(base, params)
     return rows
   },
 
