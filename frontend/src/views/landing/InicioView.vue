@@ -2,12 +2,9 @@
   <div class="iv-page">
     <LandingHeader />
 
-
-    <!-- Section 01 – Información General -->
     <section class="iv-section">
       <div class="iv-container">
         <div class="iv-row">
-          <!-- Text -->
           <div class="iv-text-col">
             <span class="iv-section-num">01.</span>
             <div class="iv-divider" />
@@ -22,7 +19,6 @@
             </p>
             <router-link to="/informacion" class="iv-btn">LEER MÁS</router-link>
           </div>
-          <!-- Image -->
           <div class="iv-img-col">
             <div class="iv-img-wrapper">
               <div class="iv-dot-pattern iv-dot-pattern--tl" />
@@ -33,17 +29,14 @@
       </div>
     </section>
 
-    <!-- Section 02 – Equipos -->
     <section class="iv-section iv-section--alt">
       <div class="iv-container">
         <div class="iv-row iv-row--reversed">
-          <!-- Image -->
           <div class="iv-img-col">
             <div class="iv-img-wrapper">
               <img src="/recursos/5.jpg" alt="Equipos" class="iv-img" />
             </div>
           </div>
-          <!-- Text -->
           <div class="iv-text-col">
             <span class="iv-section-num">02.</span>
             <div class="iv-divider" />
@@ -61,17 +54,14 @@
       </div>
     </section>
 
-    <!-- Section 03 – Alineación -->
     <section class="iv-section">
       <div class="iv-container">
         <div class="iv-row iv-row--reversed">
-          <!-- Image -->
           <div class="iv-img-col">
             <div class="iv-img-wrapper">
               <img src="/recursos/6.jpg" alt="Alineación" class="iv-img" />
             </div>
           </div>
-          <!-- Text -->
           <div class="iv-text-col">
             <span class="iv-section-num">03.</span>
             <div class="iv-divider" />
@@ -89,11 +79,9 @@
       </div>
     </section>
 
-    <!-- Section 04 – Jugadores -->
     <section class="iv-section iv-section--alt">
       <div class="iv-container">
         <div class="iv-row">
-          <!-- Text -->
           <div class="iv-text-col">
             <span class="iv-section-num">04.</span>
             <div class="iv-divider" />
@@ -107,7 +95,6 @@
             </p>
             <router-link to="/jugadores" class="iv-btn">LEER MÁS</router-link>
           </div>
-          <!-- Image -->
           <div class="iv-img-col">
             <div class="iv-img-wrapper">
               <div class="iv-dot-pattern iv-dot-pattern--br" />
@@ -117,20 +104,24 @@
         </div>
       </div>
     </section>
+
+
   </div>
 </template>
 
 <script setup>
 import LandingHeader from '@/components/landing/LandingHeader.vue'
+
 </script>
 
 <style scoped>
 /* ─── Page wrapper ─── */
 .iv-page {
-  background: #1a0d0a;
+  /* Degradado semi-oscuro: mezcla el azul índigo con el azul marino de tu paleta */
+  background: linear-gradient(180deg, #3B4269 0%, #1B2431 100%);
   min-height: 100vh;
-  font-family: Arial, sans-serif;
-  color: white;
+  font-family: 'Inter', 'Arial', sans-serif;
+  color: #E4E3F1; /* Tono lavanda muy claro para buena lectura */
 }
 
 /* ─── Container ─── */
@@ -158,7 +149,8 @@ import LandingHeader from '@/components/landing/LandingHeader.vue'
 }
 
 .iv-section--alt {
-  background: rgba(0, 0, 0, 0.2);
+  /* Fondo alternativo con el azul claro sutil */
+  background: rgba(135, 176, 212, 0.05); 
 }
 
 /* ─── Row ─── */
@@ -188,7 +180,7 @@ import LandingHeader from '@/components/landing/LandingHeader.vue'
 }
 
 .iv-section-num {
-  color: #E6A341;
+  color: #C874C4; /* Orquídea/Rosado vibrante */
   font-size: 14px;
   font-weight: 900;
   letter-spacing: 3px;
@@ -197,9 +189,9 @@ import LandingHeader from '@/components/landing/LandingHeader.vue'
 }
 
 .iv-divider {
-  width: 48px;
-  height: 3px;
-  background: #8C0902;
+  width: 56px;
+  height: 4px;
+  background: #87B0D4; /* Azul cielo suave */
   margin-bottom: 20px;
   border-radius: 2px;
 }
@@ -210,7 +202,7 @@ import LandingHeader from '@/components/landing/LandingHeader.vue'
 }
 
 .iv-title-main {
-  color: #D4AF37;
+  color: #FFFFFF; /* Blanco para máximo contraste en el título */
   font-size: 40px;
   font-weight: 900;
   font-style: italic;
@@ -222,14 +214,13 @@ import LandingHeader from '@/components/landing/LandingHeader.vue'
 }
 
 .iv-title-ghost {
-  color: white;
-  opacity: 0.06;
+  color: #87B0D4; /* Azul cielo */
+  opacity: 0.15; /* Lo hacemos sutil de fondo */
   font-size: 52px;
   font-weight: 900;
   font-style: italic;
   text-transform: uppercase;
   letter-spacing: 2px;
-  margin: -6px 0 0 0;
   padding: 0;
   line-height: 1;
   user-select: none;
@@ -245,32 +236,39 @@ import LandingHeader from '@/components/landing/LandingHeader.vue'
 }
 
 .iv-subtitle {
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 15px;
+  color: #E4E3F1; /* Lavanda claro */
+  opacity: 0.9;
+  font-size: 16px;
   line-height: 1.75;
   margin: 0 0 28px 0;
   padding: 0;
   max-width: 480px;
 }
 
+/* ─── Botones ─── */
 .iv-btn {
   display: inline-flex;
   align-items: center;
   align-self: flex-start;
-  color: #D4AF37;
-  border: 2px solid #D4AF37;
+  color: #C874C4; /* Orquídea/Rosado */
+  border: 2px solid #C874C4;
   text-decoration: none;
   font-size: 13px;
   font-weight: 900;
   letter-spacing: 2px;
   padding: 12px 28px;
-  border-radius: 999px;
-  transition: background 0.2s, color 0.2s;
+  border-radius: 40px;
+  transition: all 0.3s ease;
+  background: transparent;
+  cursor: pointer;
 }
 
 .iv-btn:hover {
-  background: #D4AF37;
-  color: #1a0d0a;
+  background: #C874C4;
+  border-color: #C874C4;
+  color: #1B2431; /* Azul marino oscuro para el texto al hacer hover */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(200, 116, 196, 0.4); /* Sombra rosada */
 }
 
 /* ─── Image column ─── */
@@ -286,39 +284,158 @@ import LandingHeader from '@/components/landing/LandingHeader.vue'
   width: 100%;
   height: 320px;
   object-fit: cover;
-  border-radius: 4rem;
+  border-radius: 32px;
   display: block;
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.3); /* Sombra más oscura para fondo semi-oscuro */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba(135, 176, 212, 0.2); /* Borde sutil azul claro */
+}
+
+.iv-img:hover {
+  transform: scale(1.02);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
 }
 
 @media (min-width: 1024px) {
   .iv-img {
     height: 420px;
+    border-radius: 48px;
   }
+}
+
+/* Fallback para imágenes que no cargan */
+.iv-img:not([src]),
+.iv-img[src=""],
+.iv-img[src="#"] {
+  background: linear-gradient(135deg, #676C9F, #1B2431);
+  position: relative;
+}
+
+.iv-img:not([src])::after,
+.iv-img[src=""]::after,
+.iv-img[src="#"]::after {
+  content: "⚾";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 4rem;
+  color: rgba(255, 255, 255, 0.2);
 }
 
 /* ─── Dot pattern decoration ─── */
 .iv-dot-pattern {
   position: absolute;
-  width: 120px;
-  height: 120px;
-  background-image: radial-gradient(circle, rgba(212, 175, 55, 0.4) 1.5px, transparent 1.5px);
-  background-size: 14px 14px;
+  width: 140px;
+  height: 140px;
+  /* Puntos azul cielo */
+  background-image: radial-gradient(circle, rgba(135, 176, 212, 0.5) 2px, transparent 2px);
+  background-size: 16px 16px;
   z-index: 0;
   pointer-events: none;
 }
 
 .iv-dot-pattern--tl {
-  top: -20px;
-  left: -20px;
+  top: -24px;
+  left: -24px;
 }
 
 .iv-dot-pattern--br {
-  bottom: -20px;
-  right: -20px;
+  bottom: -24px;
+  right: -24px;
 }
 
 .iv-img-wrapper .iv-img {
   position: relative;
   z-index: 1;
+}
+
+/* ===== RESPONSIVE (vista celular) ===== */
+@media (max-width: 768px) {
+  .iv-section {
+    padding: 48px 0;
+  }
+  
+  .iv-title-main {
+    font-size: 32px;
+  }
+  
+  .iv-title-ghost {
+    font-size: 44px;
+  }
+  
+  .iv-subtitle {
+    font-size: 14px;
+  }
+  
+  .iv-img {
+    height: 220px !important;
+    border-radius: 24px !important;
+  }
+  
+  .iv-row {
+    gap: 32px;
+  }
+  
+  .iv-btn {
+    padding: 10px 24px;
+    font-size: 12px;
+  }
+  
+  .iv-container {
+    padding: 0 20px;
+  }
+  
+  .iv-divider {
+    width: 40px;
+  }
+  
+  .iv-section-num {
+    font-size: 12px;
+  }
+  
+  .iv-dot-pattern {
+    width: 80px;
+    height: 80px;
+    background-size: 12px 12px;
+  }
+  
+  .iv-dot-pattern--tl {
+    top: -12px;
+    left: -12px;
+  }
+  
+  .iv-dot-pattern--br {
+    bottom: -12px;
+    right: -12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .iv-section {
+    padding: 32px 0;
+  }
+  
+  .iv-title-main {
+    font-size: 28px;
+  }
+  
+  .iv-title-ghost {
+    font-size: 36px;
+  }
+  
+  .iv-img {
+    height: 180px !important;
+    border-radius: 20px !important;
+  }
+  
+  .iv-subtitle {
+    font-size: 13px;
+  }
+  
+  .iv-btn {
+    padding: 8px 20px;
+    font-size: 11px;
+  }
 }
 </style>

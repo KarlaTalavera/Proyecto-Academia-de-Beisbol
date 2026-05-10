@@ -1,6 +1,5 @@
 <template>
   <header class="ld-hero">
-    <!-- Background carousel -->
     <div class="ld-hero-bg">
       <img
         v-for="(img, i) in heroImages"
@@ -12,11 +11,9 @@
       <div class="ld-hero-gradient" />
     </div>
 
-    <!-- Navbar -->
     <nav class="ld-nav">
       <RouterLink :to="{ name: 'LandingInicio' }" class="ld-nav-logo">LIGA DIAMANTE</RouterLink>
 
-      <!-- Desktop links -->
       <div class="ld-nav-links">
         <RouterLink :to="{ name: 'LandingInicio' }" :class="['ld-nav-link', { 'ld-nav-link--active': route.name === 'LandingInicio' }]">Inicio</RouterLink>
         <RouterLink :to="{ name: 'LandingResultados' }" :class="['ld-nav-link', { 'ld-nav-link--active': route.name === 'LandingResultados' }]">Resultados</RouterLink>
@@ -28,20 +25,17 @@
         <RouterLink :to="{ name: 'Login' }" class="ld-nav-btn">INICIAR SESIÓN</RouterLink>
       </div>
 
-      <!-- Hamburger -->
       <button class="ld-hamburger" @click="mobileOpen = true" aria-label="Abrir menú">
         <span /><span /><span />
       </button>
     </nav>
 
-    <!-- Hero title -->
     <div class="ld-hero-title">
       <div class="ld-hero-title-bar" />
       <p class="ld-hero-title-top">DONDE NACEN</p>
       <p class="ld-hero-title-bottom">LAS LEYENDAS</p>
     </div>
 
-    <!-- Mobile menu (teleported) -->
     <Teleport to="body">
       <transition name="ld-overlay-fade">
         <div v-if="mobileOpen" class="ld-mobile-overlay" @click.self="mobileOpen = false">
@@ -79,7 +73,6 @@ const heroImages = [
   '/recursos/2.jpg',
   '/recursos/3.jpeg',
 ]
-
 let slideTimer = null
 
 onMounted(() => {
@@ -94,7 +87,7 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-/* ─── Hero container ─── */
+
 .ld-hero {
   position: relative;
   width: 100%;
@@ -112,7 +105,13 @@ onUnmounted(() => {
   }
 }
 
-/* ─── Background slides ─── */
+@media (max-width: 480px) {
+  .ld-hero {
+    height: 350px;
+  }
+}
+
+
 .ld-hero-bg {
   position: absolute;
   inset: 0;
@@ -125,14 +124,36 @@ onUnmounted(() => {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: brightness(0.25);
+  filter: brightness(0.65) contrast(1.1); 
   opacity: 0;
-  transition: opacity 1.2s ease-in-out;
+  transition: opacity 1.2s ease-in-out, transform 5s ease-out;
+  transform: scale(1);
 }
 
 .ld-hero-slide--active {
   opacity: 1;
+  transform: scale(1.05); 
 }
+
+.ld-hero-slide::before {
+  content: "⚾";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 4rem;
+  color: rgba(255, 255, 255, 0.3);
+  display: none;
+}
+
+.ld-hero-slide[src=""],
+.ld-hero-slide:error {
+  background: linear-gradient(135deg, #3B4269, #1B2431);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 
 .ld-hero-gradient {
   position: absolute;
@@ -140,14 +161,37 @@ onUnmounted(() => {
   left: 0;
   right: 0;
   height: 60%;
-  background: linear-gradient(to top, #1a0a0a, transparent);
+  background: linear-gradient(
+    to top,
+    rgba(59, 66, 105, 1) 0%,
+    rgba(59, 66, 105, 0.8) 30%,
+    rgba(59, 66, 105, 0.3) 60%,
+    rgba(59, 66, 105, 0) 100%
+  );
   z-index: 1;
+  pointer-events: none;
+}
+
+/* Gradiente superior */
+.ld-hero-gradient-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 30%;
+  background: linear-gradient(
+    to bottom,
+    rgba(27, 36, 49, 0.6) 0%,
+    rgba(27, 36, 49, 0) 100%
+  );
+  z-index: 1;
+  pointer-events: none;
 }
 
 /* ─── Navbar ─── */
 .ld-nav {
   position: relative;
-  z-index: 10;
+  z-index: 15;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -165,10 +209,11 @@ onUnmounted(() => {
   font-weight: 900;
   font-style: italic;
   text-transform: uppercase;
-  color: #D4AF37;
+  color: #E4E3F1;
   text-decoration: none;
   letter-spacing: 2px;
   line-height: 1;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
 @media (min-width: 1024px) {
@@ -182,10 +227,11 @@ onUnmounted(() => {
   display: none;
   align-items: center;
   gap: 4px;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(8px);
+  background: rgba(27, 36, 49, 0.5);
+  backdrop-filter: blur(12px);
   border-radius: 999px;
   padding: 8px 16px;
+  border: 1px solid rgba(135, 176, 212, 0.2);
 }
 
 @media (min-width: 1024px) {
@@ -195,87 +241,44 @@ onUnmounted(() => {
 }
 
 .ld-nav-link {
-  color: rgba(255, 255, 255, 0.85);
+  color: #E4E3F1;
   text-decoration: none;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   padding: 6px 12px;
   border-radius: 999px;
-  transition: color 0.2s, background 0.2s;
+  transition: all 0.2s;
   white-space: nowrap;
   cursor: pointer;
 }
 
 .ld-nav-link:hover {
-  color: #FECE79;
-  background: rgba(255, 255, 255, 0.08);
+  color: #FFFFFF;
+  background: rgba(135, 176, 212, 0.2); /* Fondo azul cielo suave al hover */
 }
 
 .ld-nav-link--active {
-  color: #FECE79 !important;
+  color: #FFFFFF !important;
+  background: #C874C4; /* Orquídea para el enlace activo */
 }
 
 .ld-nav-btn {
-  color: #1a0d0a;
-  background: #D4AF37;
+  color: #FFFFFF;
+  background: #C874C4; /* Orquídea */
   text-decoration: none;
   font-size: 12px;
   font-weight: 900;
   padding: 7px 16px;
   border-radius: 999px;
   margin-left: 8px;
-  transition: background 0.2s, color 0.2s;
+  transition: all 0.2s;
   white-space: nowrap;
   letter-spacing: 0.5px;
 }
 
 .ld-nav-btn:hover {
-  background: #FECE79;
-}
-
-/* ─── Estadísticas dropdown ─── */
-.ld-nav-dropdown {
-  position: relative;
-}
-
-.ld-nav-link--drop {
-  user-select: none;
-}
-
-.ld-caret {
-  font-size: 10px;
-  margin-left: 2px;
-}
-
-.ld-dropdown-menu {
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(10, 4, 4, 0.95);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(212, 175, 55, 0.3);
-  border-radius: 12px;
-  padding: 8px 4px;
-  min-width: 140px;
-  z-index: 100;
-}
-
-.ld-dropdown-item {
-  display: block;
-  color: rgba(255, 255, 255, 0.85);
-  text-decoration: none;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  padding: 8px 16px;
-  border-radius: 8px;
-  transition: color 0.2s, background 0.2s;
-}
-
-.ld-dropdown-item:hover {
-  color: #FECE79;
-  background: rgba(212, 175, 55, 0.12);
+  background: #a858a4; /* Orquídea más oscuro al hover */
+  transform: translateY(-1px);
 }
 
 /* ─── Hamburger ─── */
@@ -287,6 +290,8 @@ onUnmounted(() => {
   border: none;
   cursor: pointer;
   padding: 8px;
+  z-index: 15;
+  position: relative;
 }
 
 @media (min-width: 1024px) {
@@ -299,14 +304,14 @@ onUnmounted(() => {
   display: block;
   width: 24px;
   height: 2px;
-  background: #D4AF37;
+  background: #E4E3F1;
   border-radius: 2px;
 }
 
 /* ─── Hero title ─── */
 .ld-hero-title {
   position: relative;
-  z-index: 10;
+  z-index: 15;
   padding: 0 24px 28px;
 }
 
@@ -317,15 +322,15 @@ onUnmounted(() => {
 }
 
 .ld-hero-title-bar {
-  width: 40px;
+  width: 50px;
   height: 4px;
-  background: #8C0902;
-  margin-bottom: 10px;
+  background: #87B0D4; /* Línea azul cielo */
+  margin-bottom: 16px;
   border-radius: 2px;
 }
 
 .ld-hero-title-top {
-  color: #D4AF37;
+  color: #FFFFFF;
   font-size: 28px;
   font-weight: 900;
   font-style: italic;
@@ -334,10 +339,11 @@ onUnmounted(() => {
   line-height: 1;
   margin: 0;
   padding: 0;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 .ld-hero-title-bottom {
-  color: #FECE79;
+  color: #87B0D4; /* Azul cielo para el texto secundario */
   font-size: 36px;
   font-weight: 900;
   font-style: italic;
@@ -346,6 +352,7 @@ onUnmounted(() => {
   line-height: 1.1;
   margin: 0;
   padding: 0;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 @media (min-width: 768px) {
@@ -357,11 +364,21 @@ onUnmounted(() => {
   }
 }
 
+@media (max-width: 480px) {
+  .ld-hero-title-top {
+    font-size: 22px;
+  }
+  .ld-hero-title-bottom {
+    font-size: 28px;
+  }
+}
+
 /* ─── Mobile overlay ─── */
 .ld-mobile-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(27, 36, 49, 0.9); /* Azul marino transparente */
+  backdrop-filter: blur(8px);
   z-index: 99999;
   display: flex;
   justify-content: flex-end;
@@ -371,8 +388,8 @@ onUnmounted(() => {
   width: 280px;
   max-width: 85vw;
   height: 100%;
-  background: #120604;
-  border-left: 1px solid rgba(212, 175, 55, 0.2);
+  background: #1B2431; /* Fondo azul marino del panel */
+  border-left: 1px solid rgba(135, 176, 212, 0.2);
   display: flex;
   flex-direction: column;
   padding: 24px 0;
@@ -384,8 +401,8 @@ onUnmounted(() => {
   margin-right: 20px;
   margin-bottom: 20px;
   background: none;
-  border: 1px solid rgba(212, 175, 55, 0.4);
-  color: #D4AF37;
+  border: 1px solid rgba(135, 176, 212, 0.4);
+  color: #87B0D4;
   font-size: 18px;
   width: 36px;
   height: 36px;
@@ -394,7 +411,6 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  line-height: 1;
 }
 
 .ld-mobile-links {
@@ -405,42 +421,25 @@ onUnmounted(() => {
 }
 
 .ld-mobile-link {
-  color: rgba(255, 255, 255, 0.85);
+  color: #E4E3F1; /* Texto lavanda */
   text-decoration: none;
   font-size: 15px;
   font-weight: 600;
   padding: 12px 16px;
   border-radius: 10px;
-  transition: color 0.2s, background 0.2s;
+  transition: all 0.2s;
 }
 
 .ld-mobile-link:hover {
-  color: #FECE79;
-  background: rgba(212, 175, 55, 0.1);
-}
-
-.ld-mobile-link--sub {
-  font-size: 13px;
-  padding-left: 28px;
-  color: rgba(255, 255, 255, 0.6);
-  letter-spacing: 1px;
-  font-weight: 700;
-}
-
-.ld-mobile-section-label {
-  color: #E6A341;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  padding: 12px 16px 4px;
+  color: #FFFFFF;
+  background: rgba(200, 116, 196, 0.15); /* Fondo rosado suave al hover */
 }
 
 .ld-mobile-btn {
   display: block;
   text-align: center;
-  color: #1a0d0a;
-  background: #D4AF37;
+  color: #FFFFFF;
+  background: #C874C4;
   text-decoration: none;
   font-size: 13px;
   font-weight: 900;
@@ -450,7 +449,7 @@ onUnmounted(() => {
   letter-spacing: 1px;
 }
 
-/* ─── Transition ─── */
+
 .ld-overlay-fade-enter-active,
 .ld-overlay-fade-leave-active {
   transition: opacity 0.25s ease;

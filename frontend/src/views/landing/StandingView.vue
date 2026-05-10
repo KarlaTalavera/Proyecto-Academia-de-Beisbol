@@ -2,15 +2,12 @@
   <div class="ld-page">
     <LandingHeader />
 
-    <!-- Main content -->
     <div class="ld-standing-wrap">
-      <!-- Section heading -->
       <div class="ld-section-head">
         <div class="ld-section-bar"></div>
         <h2 class="ld-section-title">POSICIONES</h2>
       </div>
 
-      <!-- Season tabs -->
       <div class="ld-tabs-row">
         <button
           class="ld-tab"
@@ -24,16 +21,13 @@
         >Playoffs</button>
       </div>
 
-      <!-- Playoffs coming soon -->
       <div v-if="tabActiva === 'playoffs'" class="ld-pronto-wrap">
         <span class="ld-pronto-icon">🏆</span>
         <p class="ld-pronto-title">Playoffs — Próximamente</p>
         <p class="ld-pronto-sub">La fase de playoffs comenzará al finalizar la temporada regular.<br/>Los 4 mejores equipos clasificarán.</p>
       </div>
 
-      <!-- Temporada content -->
       <template v-else>
-        <!-- Sub-tabs -->
         <div class="ld-subtabs-row">
           <button
             v-for="sub in subTabs"
@@ -47,25 +41,21 @@
           </button>
         </div>
 
-        <!-- Loading -->
         <div v-if="cargando" class="ld-spinner-wrap">
           <div class="ld-spinner"></div>
           <p class="ld-spinner-text">Cargando posiciones...</p>
         </div>
 
-        <!-- Error -->
         <div v-else-if="error" class="ld-empty">
           <p class="ld-empty-icon">⚠</p>
           <p class="ld-empty-msg">Error al cargar los datos.<br />Verifica que el servidor esté disponible.</p>
         </div>
 
-        <!-- No data -->
         <div v-else-if="!posiciones.length" class="ld-empty">
           <p class="ld-empty-icon">📊</p>
           <p class="ld-empty-msg">No hay datos para esta temporada</p>
         </div>
 
-        <!-- Standings table -->
         <div v-else class="ld-table-wrap">
           <table class="ld-table">
             <thead>
@@ -223,7 +213,7 @@ onMounted(cargar)
 /* ── Page shell ──────────────────────────────────────────── */
 .ld-page {
   min-height: 100vh;
-  background: #210100;
+  background: #1B2431;
   font-family: 'Arial Black', 'Segoe UI', Arial, sans-serif;
   color: #fff;
 }
@@ -246,7 +236,7 @@ onMounted(cargar)
 .ld-section-bar {
   width: 5px;
   height: 2.2rem;
-  background: #8C0902;
+  background: #87B0D4;
   border-radius: 3px;
   flex-shrink: 0;
 }
@@ -256,7 +246,7 @@ onMounted(cargar)
   font-weight: 900;
   font-style: italic;
   text-transform: uppercase;
-  color: #D4AF37;
+  color: #C874C4;
   letter-spacing: 0.04em;
   line-height: 1;
 }
@@ -266,7 +256,7 @@ onMounted(cargar)
   display: flex;
   gap: 0.5rem;
   margin-bottom: 1.5rem;
-  border-bottom: 2px solid rgba(212, 175, 55, 0.15);
+  border-bottom: 2px solid rgba(135, 176, 212, 0.15);
   padding-bottom: 0;
 }
 
@@ -287,14 +277,14 @@ onMounted(cargar)
 }
 
 .ld-tab:hover {
-  color: #FECE79;
-  background: rgba(212, 175, 55, 0.06);
+  color: #FFFFFF;
+  background: rgba(135, 176, 212, 0.1);
 }
 
 .ld-tab--active {
-  color: #FECE79;
-  background: #8C0902;
-  border-bottom-color: #D4AF37;
+  color: #FFFFFF;
+  background: #3B4269;
+  border-bottom-color: #C874C4;
 }
 
 /* ── Playoffs placeholder ────────────────────────────────── */
@@ -318,7 +308,7 @@ onMounted(cargar)
   font-size: 1.5rem;
   font-weight: 900;
   font-style: italic;
-  color: #D4AF37;
+  color: #C874C4;
   letter-spacing: 0.05em;
 }
 
@@ -351,15 +341,15 @@ onMounted(cargar)
 }
 
 .ld-subtab:hover {
-  background: rgba(212, 175, 55, 0.1);
-  color: #FECE79;
-  border-color: rgba(212, 175, 55, 0.3);
+  background: rgba(135, 176, 212, 0.1);
+  color: #FFFFFF;
+  border-color: rgba(135, 176, 212, 0.3);
 }
 
 .ld-subtab--active {
-  background: rgba(140, 9, 2, 0.55);
-  color: #FECE79;
-  border-color: #8C0902;
+  background: rgba(200, 116, 196, 0.2);
+  color: #FFFFFF;
+  border-color: #C874C4;
 }
 
 /* ── Loading spinner ─────────────────────────────────────── */
@@ -374,8 +364,8 @@ onMounted(cargar)
 .ld-spinner {
   width: 44px;
   height: 44px;
-  border: 3px solid rgba(212, 175, 55, 0.15);
-  border-top-color: #D4AF37;
+  border: 3px solid rgba(200, 116, 196, 0.15);
+  border-top-color: #C874C4;
   border-radius: 50%;
   animation: ld-spin 0.8s linear infinite;
 }
@@ -408,7 +398,7 @@ onMounted(cargar)
 .ld-table-wrap {
   border-radius: 1rem;
   overflow: hidden;
-  border: 1px solid rgba(212, 175, 55, 0.12);
+  border: 1px solid rgba(135, 176, 212, 0.15);
   overflow-x: auto;
 }
 
@@ -421,8 +411,8 @@ onMounted(cargar)
 
 /* ── Table header ────────────────────────────────────────── */
 .ld-th {
-  background: #E6A341;
-  color: #210100;
+  background: #3B4269;
+  color: #E4E3F1;
   font-size: 0.78rem;
   font-weight: 900;
   letter-spacing: 0.08em;
@@ -436,7 +426,7 @@ onMounted(cargar)
 .ld-th--equipo { text-align: left; padding-left: 1.25rem; }
 .ld-th--pos    { width: 48px; }
 .ld-th--stat   { width: 56px; }
-.ld-th--pts    { width: 64px; color: #210100; font-size: 0.85rem; }
+.ld-th--pts    { width: 64px; color: #C874C4; font-size: 0.85rem; }
 
 /* ── Table rows ──────────────────────────────────────────── */
 .ld-tr {
@@ -447,11 +437,11 @@ onMounted(cargar)
 .ld-tr:last-child { border-bottom: none; }
 
 .ld-tr:hover {
-  background: rgba(140, 9, 2, 0.18);
+  background: rgba(135, 176, 212, 0.1);
 }
 
 .ld-tr--top {
-  background: rgba(212, 175, 55, 0.04);
+  background: rgba(200, 116, 196, 0.05);
 }
 
 /* ── Table cells ─────────────────────────────────────────── */
@@ -470,7 +460,7 @@ onMounted(cargar)
 .ld-td--pts {
   font-size: 1rem;
   font-weight: 900;
-  color: #E6A341;
+  color: #C874C4;
 }
 
 /* ── Position badge ──────────────────────────────────────── */
@@ -487,7 +477,7 @@ onMounted(cargar)
   background: rgba(255, 255, 255, 0.08);
 }
 
-.ld-pos-badge--gold   { background: rgba(212, 175, 55, 0.25); color: #D4AF37; }
+.ld-pos-badge--gold   { background: rgba(200, 116, 196, 0.25); color: #C874C4; }
 .ld-pos-badge--silver { background: rgba(192, 192, 192, 0.2); color: #c0c0c0; }
 .ld-pos-badge--bronze { background: rgba(176, 116, 64, 0.25); color: #cd7f32; }
 
@@ -502,13 +492,13 @@ onMounted(cargar)
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #8C0902, #B14A36);
+  background: linear-gradient(135deg, #C874C4, #3B4269);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 0.85rem;
   font-weight: 900;
-  color: #FECE79;
+  color: #FFFFFF;
   text-transform: uppercase;
   flex-shrink: 0;
 }
@@ -518,7 +508,7 @@ onMounted(cargar)
   font-weight: 700;
   font-style: italic;
   text-transform: uppercase;
-  color: #FECE79;
+  color: #FFFFFF;
   letter-spacing: 0.03em;
   white-space: nowrap;
   overflow: hidden;

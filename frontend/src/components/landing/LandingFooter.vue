@@ -1,10 +1,8 @@
 <template>
   <footer class="lf-footer">
     <div class="lf-inner">
-      <!-- Grid -->
       <div class="lf-grid">
 
-        <!-- Col 1: Brand -->
         <div class="lf-col">
           <div class="lf-brand-row">
             <div class="lf-logo-diamond">
@@ -23,7 +21,6 @@
           </div>
         </div>
 
-        <!-- Col 2: Mapa del Sitio -->
         <div class="lf-col">
           <h4 class="lf-section-title">Mapa del Sitio</h4>
           <nav class="lf-nav-list">
@@ -33,7 +30,6 @@
           </nav>
         </div>
 
-        <!-- Col 3: La Academia -->
         <div class="lf-col">
           <h4 class="lf-section-title">La Academia</h4>
           <nav class="lf-nav-list">
@@ -43,7 +39,6 @@
           </nav>
         </div>
 
-        <!-- Col 4: Contacto -->
         <div class="lf-col">
           <h4 class="lf-section-title">Contacto</h4>
           <div class="lf-contact-list">
@@ -62,10 +57,7 @@
           </div>
         </div>
 
-      </div><!-- /grid -->
-
-      <!-- Bottom bar -->
-      <div class="lf-bottom">
+      </div><div class="lf-bottom">
         <p class="lf-copyright">© 2026 Liga Diamante de Béisbol &bull; Tradición y Pasión</p>
       </div>
     </div>
@@ -78,8 +70,8 @@ import { RouterLink } from 'vue-router'
 
 <style scoped>
 .lf-footer {
-  background: #210100;
-  color: white;
+  background: #1B2431; /* Azul marino oscuro de la paleta */
+  color: #E4E3F1; /* Texto lavanda claro */
   font-family: Arial, sans-serif;
 }
 
@@ -123,13 +115,13 @@ import { RouterLink } from 'vue-router'
 
 /* ─── Section title ─── */
 .lf-section-title {
-  color: #E6A341;
+  color: #87B0D4; /* Azul cielo para títulos de sección */
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 3px;
   text-transform: uppercase;
   padding-bottom: 10px;
-  border-bottom: 1px solid rgba(230, 163, 65, 0.3);
+  border-bottom: 1px solid rgba(135, 176, 212, 0.3);
   margin: 0 0 16px 0;
   line-height: 1.4;
 }
@@ -145,7 +137,7 @@ import { RouterLink } from 'vue-router'
 .lf-logo-diamond {
   width: 40px;
   height: 40px;
-  background: #8C0902;
+  background: #C874C4; /* Fondo del diamante en orquídea */
   transform: rotate(45deg);
   display: flex;
   align-items: center;
@@ -157,7 +149,7 @@ import { RouterLink } from 'vue-router'
 .lf-logo-letter {
   display: block;
   transform: rotate(-45deg);
-  color: #FECE79;
+  color: #1B2431; /* Letra en azul oscuro para contraste */
   font-size: 18px;
   font-weight: 900;
   font-style: italic;
@@ -165,7 +157,7 @@ import { RouterLink } from 'vue-router'
 }
 
 .lf-brand-name {
-  color: #D4AF37;
+  color: #C874C4; /* Orquídea */
   font-size: 16px;
   font-weight: 900;
   font-style: italic;
@@ -175,7 +167,7 @@ import { RouterLink } from 'vue-router'
 }
 
 .lf-brand-tagline {
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(228, 227, 241, 0.6); /* Lavanda con opacidad */
   font-size: 13px;
   line-height: 1.6;
   margin: 0 0 20px 0;
@@ -195,10 +187,10 @@ import { RouterLink } from 'vue-router'
   justify-content: center;
   width: 34px;
   height: 34px;
-  background: rgba(212, 175, 55, 0.1);
-  border: 1px solid rgba(212, 175, 55, 0.25);
+  background: rgba(135, 176, 212, 0.1);
+  border: 1px solid rgba(135, 176, 212, 0.25);
   border-radius: 8px;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(228, 227, 241, 0.7);
   text-decoration: none;
   font-size: 11px;
   font-weight: 700;
@@ -207,9 +199,9 @@ import { RouterLink } from 'vue-router'
 }
 
 .lf-social-btn:hover {
-  background: rgba(212, 175, 55, 0.25);
-  border-color: #D4AF37;
-  color: #FECE79;
+  background: rgba(135, 176, 212, 0.25);
+  border-color: #87B0D4;
+  color: #FFFFFF;
 }
 
 /* ─── Nav links ─── */
@@ -220,7 +212,7 @@ import { RouterLink } from 'vue-router'
 }
 
 .lf-nav-link {
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(228, 227, 241, 0.6);
   text-decoration: none;
   font-size: 14px;
   padding: 6px 0;
@@ -229,7 +221,7 @@ import { RouterLink } from 'vue-router'
 }
 
 .lf-nav-link:hover {
-  color: #FECE79;
+  color: #C874C4; /* Brilla en orquídea al hacer hover */
 }
 
 /* ─── Contact ─── */
@@ -246,7 +238,7 @@ import { RouterLink } from 'vue-router'
 }
 
 .lf-contact-icon {
-  color: #E6A341;
+  color: #87B0D4; /* Iconos en azul cielo */
   font-size: 14px;
   flex-shrink: 0;
   margin-top: 1px;
@@ -254,21 +246,21 @@ import { RouterLink } from 'vue-router'
 }
 
 .lf-contact-text {
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(228, 227, 241, 0.6);
   font-size: 13px;
   line-height: 1.5;
 }
 
-/* ─── Bottom bar ─── */
+
 .lf-bottom {
   margin-top: 40px;
-  border-top: 1px solid rgba(212, 175, 55, 0.15);
+  border-top: 1px solid rgba(135, 176, 212, 0.15);
   padding: 20px 0;
   text-align: center;
 }
 
 .lf-copyright {
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(228, 227, 241, 0.4);
   font-size: 12px;
   margin: 0;
   padding: 0;

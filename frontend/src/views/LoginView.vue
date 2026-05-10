@@ -1,23 +1,18 @@
 <template>
   <div class="login-bg">
-    <!-- Dot pattern -->
     <div class="login-dots"></div>
 
-    <!-- Baseball circle card -->
     <div class="login-ball">
-      <!-- Decorative stitches -->
       <div class="login-stitch login-stitch--top"></div>
       <div class="login-stitch login-stitch--bottom"></div>
 
       <div class="login-inner">
 
-        <!-- Header -->
         <div class="login-heading">
           <h1 class="login-title">LIGA<br><span class="login-title-ghost">DIAMANTE</span></h1>
           <p class="login-subtitle">PANEL DE ADMINISTRACIÓN</p>
         </div>
 
-        <!-- Tabs -->
         <div class="login-tabs">
           <button :class="['login-tab', { 'login-tab--active': modo === 'login' }]" @click="cambiarModo('login')">
             INGRESAR
@@ -27,21 +22,24 @@
           </button>
         </div>
 
-        <!-- Alerts -->
         <div v-if="error" class="login-alert login-alert--error">{{ error }}</div>
         <div v-if="exito" class="login-alert login-alert--success">{{ exito }}</div>
 
-        <!-- LOGIN -->
         <form v-if="modo === 'login'" @submit.prevent="iniciarSesion" class="login-form">
           <div class="login-field">
-            <span class="login-field-icon">✉</span>
+            <div class="login-field-icon">
+              <IconMail :size="18" stroke-width="1.8" />
+            </div>
             <input v-model="form.email" type="email" placeholder="CORREO" class="login-input" required autocomplete="email" />
           </div>
           <div class="login-field">
-            <span class="login-field-icon">🔒</span>
+            <div class="login-field-icon">
+              <IconLock :size="18" stroke-width="1.8" />
+            </div>
             <input v-model="form.password" :type="mostrarPassword ? 'text' : 'password'" placeholder="CONTRASEÑA" class="login-input" required autocomplete="current-password" />
-            <button type="button" class="login-eye" @click="mostrarPassword = !mostrarPassword">
-              {{ mostrarPassword ? '🙈' : '👁' }}
+            <button type="button" class="login-eye" @click="mostrarPassword = !mostrarPassword" aria-label="Mostrar/Ocultar contraseña">
+              <IconEyeOff v-if="mostrarPassword" :size="18" stroke-width="1.8" />
+              <IconEye v-else :size="18" stroke-width="1.8" />
             </button>
           </div>
           <button type="submit" class="login-submit" :disabled="cargando">
@@ -49,21 +47,27 @@
           </button>
         </form>
 
-        <!-- REGISTRO -->
         <form v-else @submit.prevent="registrarse" class="login-form">
           <div class="login-field">
-            <span class="login-field-icon">👤</span>
+            <div class="login-field-icon">
+              <IconUser :size="18" stroke-width="1.8" />
+            </div>
             <input v-model="regForm.nombre" type="text" placeholder="NOMBRE COMPLETO" class="login-input" required />
           </div>
           <div class="login-field">
-            <span class="login-field-icon">✉</span>
+            <div class="login-field-icon">
+              <IconMail :size="18" stroke-width="1.8" />
+            </div>
             <input v-model="regForm.email" type="email" placeholder="CORREO" class="login-input" required />
           </div>
           <div class="login-field">
-            <span class="login-field-icon">🔒</span>
+            <div class="login-field-icon">
+              <IconLock :size="18" stroke-width="1.8" />
+            </div>
             <input v-model="regForm.password" :type="mostrarPassword ? 'text' : 'password'" placeholder="CONTRASEÑA" class="login-input" required />
-            <button type="button" class="login-eye" @click="mostrarPassword = !mostrarPassword">
-              {{ mostrarPassword ? '🙈' : '👁' }}
+            <button type="button" class="login-eye" @click="mostrarPassword = !mostrarPassword" aria-label="Mostrar/Ocultar contraseña">
+              <IconEyeOff v-if="mostrarPassword" :size="18" stroke-width="1.8" />
+              <IconEye v-else :size="18" stroke-width="1.8" />
             </button>
           </div>
           <button type="submit" class="login-submit" :disabled="cargando">
@@ -72,7 +76,6 @@
           <p class="login-note">Tu cuenta iniciará con acceso de fanático.</p>
         </form>
 
-        <!-- Back link -->
         <RouterLink to="/" class="login-back">← Volver al Inicio</RouterLink>
 
       </div>
@@ -85,6 +88,8 @@ import { ref } from 'vue'
 import { useRouter, RouterLink } from 'vue-router'
 import { useAuthStore } from '@/store/auth'
 import api from '@/services/api'
+
+import { IconMail, IconLock, IconUser, IconEye, IconEyeOff } from '@tabler/icons-vue'
 
 const router          = useRouter()
 const auth            = useAuthStore()
@@ -111,7 +116,7 @@ async function iniciarSesion() {
     if (auth.rol === 'publico') {
       router.push({ name: 'FanInicio' })
     } else if (auth.rol === 'caja') {
-    router.push({ name: 'Ingresos' }) // o 'Egresos
+    router.push({ name: 'Ingresos' }) 
   } else {
     router.push({ name: 'Dashboard' })
   }
@@ -154,7 +159,7 @@ async function registrarse() {
 <style scoped>
 .login-bg {
   min-height: 100vh;
-  background: #1a0d0a;
+  background: #1B2431;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -168,34 +173,32 @@ async function registrarse() {
   position: absolute;
   inset: 0;
   opacity: 0.15;
-  background-image: radial-gradient(#D4AF37 1px, transparent 1px);
+  background-image: radial-gradient(#87B0D4 1px, transparent 1px);
   background-size: 30px 30px;
   pointer-events: none;
 }
 
-/* Baseball circle */
 .login-ball {
   position: relative;
   width: 100%;
   max-width: 480px;
   aspect-ratio: 1;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(59, 66, 105, 0.45);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 2px solid rgba(212, 175, 55, 0.2);
-  box-shadow: 0 0 80px rgba(0, 0, 0, 0.9);
+  border: 2px solid rgba(200, 116, 196, 0.2);
+  box-shadow: 0 0 80px rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
 }
 
-/* Stitches decoration */
 .login-stitch {
   position: absolute;
   border-radius: 50%;
-  border: 5px dashed rgba(140, 9, 2, 0.12);
+  border: 5px dashed rgba(135, 176, 212, 0.2);
   pointer-events: none;
 }
 .login-stitch--top {
@@ -219,7 +222,6 @@ async function registrarse() {
   padding: 0 16px;
 }
 
-/* Heading */
 .login-heading {
   text-align: center;
   margin-bottom: 20px;
@@ -238,12 +240,12 @@ async function registrarse() {
 }
 
 .login-title-ghost {
-  color: rgba(255, 255, 255, 0.08);
+  color: rgba(135, 176, 212, 0.15); 
   font-size: 40px;
 }
 
 .login-subtitle {
-  color: #D4AF37;
+  color: #C874C4; 
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 4px;
@@ -252,7 +254,6 @@ async function registrarse() {
   opacity: 0.85;
 }
 
-/* Tabs */
 .login-tabs {
   display: flex;
   gap: 4px;
@@ -267,7 +268,7 @@ async function registrarse() {
   flex: 1;
   background: none;
   border: none;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(228, 227, 241, 0.6); 
   font-size: 9px;
   font-weight: 900;
   letter-spacing: 1.5px;
@@ -279,11 +280,10 @@ async function registrarse() {
 }
 
 .login-tab--active {
-  background: #D4AF37;
-  color: #1a0d0a;
+  background: #C874C4; 
+  color: #1B2431; 
 }
 
-/* Alerts */
 .login-alert {
   width: 100%;
   padding: 8px 12px;
@@ -304,7 +304,6 @@ async function registrarse() {
   color: #86efac;
 }
 
-/* Form */
 .login-form {
   width: 100%;
   display: flex;
@@ -320,36 +319,55 @@ async function registrarse() {
 
 .login-field-icon {
   position: absolute;
-  left: 14px;
-  font-size: 13px;
+  left: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   opacity: 0.5;
   pointer-events: none;
   z-index: 1;
+  color: #E4E3F1; 
 }
 
 .login-input {
   width: 100%;
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(135, 176, 212, 0.15); 
   border-radius: 999px;
-  padding: 12px 40px 12px 38px;
+  padding: 12px 40px 12px 42px;
   color: white;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
+  /* Fuente genérica limpia para que los puntos de contraseña no se vean raros */
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
   outline: none;
   transition: border-color 0.2s, background 0.2s;
 }
 
+/* Solo el texto gris de fondo tendrá mayúsculas y espacio */
 .login-input::placeholder {
-  color: rgba(255, 255, 255, 0.2);
+  color: rgba(228, 227, 241, 0.4); 
+  font-family: 'Arial Black', Arial, sans-serif;
+  font-size: 10px;
   font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
 }
 
 .login-input:focus {
-  border-color: #D4AF37;
+  border-color: #C874C4; 
   background: rgba(255, 255, 255, 0.08);
+}
+
+
+.login-input:-webkit-autofill,
+.login-input:-webkit-autofill:hover, 
+.login-input:-webkit-autofill:focus, 
+.login-input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px #212c3d inset !important;
+    -webkit-text-fill-color: white !important;
+    transition: background-color 5000s ease-in-out 0s;
+    border-radius: 999px;
 }
 
 .login-eye {
@@ -358,17 +376,20 @@ async function registrarse() {
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   opacity: 0.5;
   padding: 0;
   transition: opacity 0.2s;
+  color: #E4E3F1;
 }
 .login-eye:hover { opacity: 1; }
 
 .login-submit {
   width: 100%;
-  background: #D4AF37;
-  color: #1a0d0a;
+  background: #C874C4; 
+  color: #1B2431; 
   border: none;
   border-radius: 999px;
   padding: 14px;
@@ -379,10 +400,10 @@ async function registrarse() {
   cursor: pointer;
   margin-top: 6px;
   transition: background 0.3s, transform 0.15s;
-  box-shadow: 0 4px 20px rgba(212, 175, 55, 0.2);
+  box-shadow: 0 4px 20px rgba(200, 116, 196, 0.2);
 }
 .login-submit:hover:not(:disabled) {
-  background: #FECE79;
+  background: #d98ad5; 
   transform: scale(1.02);
 }
 .login-submit:disabled {
@@ -392,7 +413,7 @@ async function registrarse() {
 
 .login-note {
   text-align: center;
-  color: rgba(255, 255, 255, 0.3);
+  color: rgba(228, 227, 241, 0.4);
   font-size: 9px;
   font-weight: 600;
   letter-spacing: 1px;
@@ -402,7 +423,7 @@ async function registrarse() {
 .login-back {
   display: block;
   margin-top: 16px;
-  color: rgba(255, 255, 255, 0.25);
+  color: rgba(228, 227, 241, 0.4);
   text-decoration: none;
   font-size: 9px;
   font-weight: 700;
@@ -411,7 +432,7 @@ async function registrarse() {
   text-align: center;
   transition: color 0.2s;
 }
-.login-back:hover { color: #D4AF37; }
+.login-back:hover { color: #C874C4; } 
 
 @media (max-width: 480px) {
   .login-ball {

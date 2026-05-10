@@ -2,7 +2,6 @@
   <div class="lj-page">
     <LandingHeader />
 
-    <!-- HERO -->
     <section class="lj-hero">
       <div class="lj-hero__content">
         <p class="lj-hero__kicker">LIGA DIAMANTE · TEMPORADA ACTIVA</p>
@@ -12,7 +11,6 @@
       <div class="lj-hero__diamond">◆</div>
     </section>
 
-    <!-- FILTROS -->
     <div class="lj-filters">
       <div class="lj-filters__inner">
         <div class="lj-search-wrap">
@@ -33,7 +31,6 @@
       </div>
     </div>
 
-    <!-- CONTENIDO -->
     <section class="lj-section">
       <div class="lj-container">
 
@@ -60,7 +57,6 @@
               class="lj-card"
               @click="abrirPerfil(j)"
             >
-              <!-- Foto / Avatar -->
               <div class="lj-card__foto-wrap">
                 <img v-if="j.foto_url" :src="apiBase + j.foto_url" :alt="j.nombre"
                   class="lj-card__foto" @error="j.foto_url = null" />
@@ -68,7 +64,6 @@
                   {{ j.nombre?.charAt(0)?.toUpperCase() }}{{ j.apellido?.charAt(0)?.toUpperCase() }}
                 </div>
               </div>
-              <!-- Info -->
               <div class="lj-card__body">
                 <h3 class="lj-card__name">{{ j.nombre }} {{ j.apellido }}</h3>
                 <span class="lj-card__pos">{{ j.posicion }} · {{ j.rol }}</span>
@@ -86,7 +81,6 @@
       </div>
     </section>
 
-    <!-- MODAL PERFIL -->
     <transition name="lj-fade">
       <div v-if="perfil" class="lj-overlay" @click.self="cerrarPerfil">
         <div class="lj-modal">
@@ -97,7 +91,6 @@
           </div>
 
           <template v-else-if="perfil">
-            <!-- Header -->
             <div class="lj-modal__header">
               <div class="lj-modal__foto-wrap">
                 <img v-if="perfil.foto_url" :src="apiBase + perfil.foto_url"
@@ -117,7 +110,6 @@
               </div>
             </div>
 
-            <!-- Info personal -->
             <div class="lj-modal__info-grid">
 
               <div class="lj-modal__info-item" v-if="perfil.fecha_nacimiento">
@@ -130,7 +122,6 @@
               </div>
             </div>
 
-            <!-- Estadísticas de bateo -->
             <div v-if="perfil.rol !== 'pitcher' && perfil.bateo?.AB > 0" class="lj-modal__stats-section">
               <p class="lj-modal__stats-title">ESTADÍSTICAS DE BATEO</p>
               <div class="lj-modal__stats-grid">
@@ -169,7 +160,6 @@
               </div>
             </div>
 
-            <!-- Estadísticas de pitcheo -->
             <div v-if="(perfil.rol === 'pitcher' || perfil.rol === 'utilidad') && perfil.pitcheo?.IP > 0" class="lj-modal__stats-section">
               <p class="lj-modal__stats-title">ESTADÍSTICAS DE PITCHEO</p>
               <div class="lj-modal__stats-grid">
@@ -208,7 +198,6 @@
               </div>
             </div>
 
-            <!-- Sin estadísticas -->
             <div v-if="!hayStat" class="lj-modal__no-stats">
               Aún no hay estadísticas registradas para este jugador.
             </div>
@@ -305,14 +294,14 @@ cargar()
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;700&family=Barlow:wght@400;500&display=swap');
 
 .lj-page {
-  --gold:    #D4AF37;
-  --red:     #8C0902;
-  --bg:      #0d0908;
-  --bg-dark: #080504;
-  --bg-card: #160c0a;
-  --border:  rgba(212,175,55,0.12);
-  --txt:     rgba(255,255,255,0.7);
-  --txt-dim: rgba(255,255,255,0.35);
+  --gold:    #C874C4;
+  --red:     #87B0D4;
+  --bg:      #1B2431;
+  --bg-dark: #131a24;
+  --bg-card: #212c3d;
+  --border:  rgba(135,176,212,0.15);
+  --txt:     #E4E3F1;
+  --txt-dim: rgba(228,227,241,0.5);
   background: var(--bg);
   color: white;
   font-family: 'Barlow', sans-serif;
@@ -329,7 +318,7 @@ cargar()
   padding: 130px 60px 64px;
   overflow: hidden;
   background:
-    radial-gradient(ellipse 55% 65% at 80% 50%, rgba(140,9,2,0.2) 0%, transparent 70%),
+    radial-gradient(ellipse 55% 65% at 80% 50%, rgba(135,176,212,0.15) 0%, transparent 70%),
     var(--bg-dark);
   border-bottom: 1px solid var(--border);
 }
@@ -352,7 +341,7 @@ cargar()
 .lj-hero__diamond {
   position: absolute; right: 6%; bottom: -40px;
   font-size: clamp(160px, 24vw, 320px);
-  color: rgba(212,175,55,0.03);
+  color: rgba(200,116,196,0.03);
   user-select: none; pointer-events: none;
   animation: spin 80s linear infinite;
 }
@@ -388,7 +377,7 @@ cargar()
   font-size: 13px; font-weight: 700; letter-spacing: 1px;
   padding: 8px 14px; cursor: pointer; outline: none;
 }
-.lj-select option { background: #1a0e0b; }
+.lj-select option { background: var(--bg-card); }
 
 /* ── Section ── */
 .lj-section { padding: 60px 0 100px; }
@@ -426,7 +415,7 @@ cargar()
 }
 .lj-card:hover {
   transform: translateY(-3px);
-  border-color: rgba(212,175,55,0.4);
+  border-color: rgba(200,116,196,0.4);
   box-shadow: 0 8px 28px rgba(0,0,0,0.4);
 }
 .lj-card__foto-wrap { flex-shrink: 0; }
@@ -437,8 +426,8 @@ cargar()
 }
 .lj-card__avatar {
   width: 52px; height: 52px; border-radius: 50%;
-  background: linear-gradient(135deg, rgba(140,9,2,0.5), rgba(212,175,55,0.2));
-  border: 2px solid rgba(212,175,55,0.2);
+  background: linear-gradient(135deg, rgba(135,176,212,0.3), rgba(200,116,196,0.2));
+  border: 2px solid rgba(200,116,196,0.2);
   display: flex; align-items: center; justify-content: center;
   font-family: 'Bebas Neue', sans-serif; font-size: 17px; color: var(--gold);
 }
@@ -476,7 +465,7 @@ cargar()
 
 /* ── Modal ── */
 .lj-modal {
-  background: #130a08;
+  background: var(--bg-card);
   border: 1px solid var(--border); border-radius: 22px;
   max-width: 500px; width: 100%; max-height: 90vh;
   overflow-y: auto; position: relative;
@@ -507,12 +496,12 @@ cargar()
 .lj-modal__foto {
   width: 80px; height: 80px; border-radius: 50%;
   object-fit: cover; object-position: top;
-  border: 3px solid rgba(212,175,55,0.2);
+  border: 3px solid rgba(200,116,196,0.2);
 }
 .lj-modal__avatar {
   width: 80px; height: 80px; border-radius: 50%;
-  background: linear-gradient(135deg, rgba(140,9,2,0.6), rgba(212,175,55,0.15));
-  border: 3px solid rgba(212,175,55,0.2);
+  background: linear-gradient(135deg, rgba(135,176,212,0.4), rgba(200,116,196,0.25));
+  border: 3px solid rgba(200,116,196,0.2);
   display: flex; align-items: center; justify-content: center;
   font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--gold);
 }

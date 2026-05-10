@@ -11,8 +11,9 @@ import { RouterView } from 'vue-router'
 import LandingFooter from '@/components/landing/LandingFooter.vue'
 
 onMounted(() => {
-  document.documentElement.style.setProperty('background', '#1a0d0a', 'important')
-  document.body.style.setProperty('background', '#1a0d0a', 'important')
+  /* Aplicamos el fondo azul marino oscuro a todo el documento */
+  document.documentElement.style.setProperty('background', '#1B2431', 'important')
+  document.body.style.setProperty('background', '#1B2431', 'important')
 })
 
 onUnmounted(() => {

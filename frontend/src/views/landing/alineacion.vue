@@ -2,7 +2,6 @@
   <div class="al-page">
     <LandingHeader />
 
-    <!-- ── HERO ── -->
     <section class="al-hero">
       <div class="al-hero__glow" />
       <div class="al-hero__content">
@@ -18,7 +17,6 @@
       <div class="al-hero__deco">◆</div>
     </section>
 
-    <!-- ── SELECTOR DE PARTIDO ── -->
     <section class="al-section al-section--dark">
       <div class="al-container">
         <span class="al-eyebrow al-eyebrow--center">PASO 1 — ELIGE UN PARTIDO</span>
@@ -53,7 +51,6 @@
       </div>
     </section>
 
-    <!-- ── LINEUP ── -->
     <section v-if="partidoActivo" class="al-section">
       <div class="al-container">
         <h2 class="al-title al-title--center">
@@ -62,19 +59,16 @@
           {{ partidoActivo.equipo_visitante }}
         </h2>
 
-        <!-- Cargando -->
         <div v-if="cargandoLineup" class="al-loading">
           <div class="al-loading__spinner" />
           <span>Cargando alineación...</span>
         </div>
 
-        <!-- Sin titulares -->
         <div v-else-if="!lineupData.length" class="al-empty al-empty--big">
           <p>El anotador aún no cargó la alineación para este partido.</p>
           <span class="al-empty__sub">Se publica antes del inicio del juego.</span>
         </div>
 
-        <!-- Dos columnas: equipo casa | equipo visitante -->
         <div v-else class="al-lineup-cols">
 
           <div v-for="lado in ['casa', 'visitante']" :key="lado" class="al-lineup-equipo">
@@ -91,7 +85,6 @@
                 :key="jugadorKey(j)"
                 class="al-player-card"
               >
-                <!-- Foto o avatar -->
                 <div class="al-player-card__foto-wrap">
                   <img
                     v-if="j.foto_url"
@@ -102,9 +95,7 @@
                   <div v-else class="al-player-card__avatar">
                     {{ j.nombre?.charAt(0) }}{{ j.apellido?.charAt(0) }}
                   </div>
-                  <!-- Badge de posición -->
                   <span class="al-player-card__pos-badge">{{ j.posicion_juego || j.posicion }}</span>
-                  <!-- Número de orden al bate -->
                   <span v-if="j.orden_bateo" class="al-player-card__orden">#{{ j.orden_bateo }}</span>
                 </div>
                 <div class="al-player-card__info">
@@ -119,7 +110,6 @@
       </div>
     </section>
 
-    <!-- ── CTA ── -->
     <section class="al-cta">
       <div class="al-cta__deco">◆</div>
       <div class="al-cta__content">
@@ -131,7 +121,6 @@
       </div>
     </section>
 
-    <!-- ── MODAL DETALLE ── -->
     <transition name="al-fade">
       <div v-if="modalPartido" class="al-modal-overlay" @click.self="cerrarModal">
         <div class="al-modal">
@@ -288,15 +277,16 @@ onMounted(async () => {
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;700&family=Barlow:wght@400;500&display=swap');
 
 .al-page {
-  --gold:    #D4AF37;
-  --gold-lt: #F5D76E;
-  --red:     #8C0902;
-  --bg:      #120908;
-  --bg-dark: #0d0605;
-  --bg-card: #1c0f0c;
-  --border:  rgba(212,175,55,0.15);
-  --txt:     rgba(255,255,255,0.68);
-  --txt-dim: rgba(255,255,255,0.3);
+  /* NUEVA PALETA DE COLORES */
+  --gold:    #C874C4; /* Orquídea */
+  --gold-lt: #d98ad5; /* Orquídea claro */
+  --red:     #87B0D4; /* Celeste / Azul Cielo */
+  --bg:      #1B2431; /* Azul marino */
+  --bg-dark: #131a24; /* Azul marino oscuro */
+  --bg-card: #212c3d; /* Fondo de tarjetas */
+  --border:  rgba(135,176,212,0.15); /* Bordes celestes sutiles */
+  --txt:     #E4E3F1; /* Lavanda para texto */
+  --txt-dim: rgba(228,227,241,0.5); /* Lavanda oscuro */
 
   background: var(--bg);
   color: white;
@@ -311,13 +301,13 @@ onMounted(async () => {
   display: flex; align-items: flex-end;
   padding: 140px 60px 72px; overflow: hidden;
   background:
-    radial-gradient(ellipse 55% 65% at 85% 50%, rgba(140,9,2,0.2) 0%, transparent 70%),
+    radial-gradient(ellipse 55% 65% at 85% 50%, rgba(135,176,212,0.2) 0%, transparent 70%),
     var(--bg-dark);
   border-bottom: 1px solid var(--border);
 }
 .al-hero__glow {
   position: absolute; inset: 0;
-  background: radial-gradient(ellipse 40% 40% at 15% 80%, rgba(212,175,55,0.04) 0%, transparent 60%);
+  background: radial-gradient(ellipse 40% 40% at 15% 80%, rgba(200,116,196,0.06) 0%, transparent 60%);
   pointer-events: none;
 }
 .al-hero__content { position: relative; z-index: 2; max-width: 680px; }
@@ -379,7 +369,7 @@ onMounted(async () => {
   font-size: 10px; font-weight: 700; letter-spacing: 2px;
   text-transform: uppercase; padding: 2px 8px; border-radius: 999px;
 }
-.al-estado--programado { background: rgba(100,100,255,0.15); color: #8888ff; }
+.al-estado--programado { background: rgba(135,176,212,0.15); color: #87B0D4; }
 .al-estado--en_curso   { background: rgba(80,200,80,0.15);  color: #80e080; }
 .al-estado--finalizado { background: rgba(255,255,255,0.06); color: var(--txt-dim); }
 .al-estado--suspendido { background: rgba(255,150,0,0.15);  color: #ffaa00; }
@@ -396,7 +386,7 @@ onMounted(async () => {
   border-radius: 14px; padding: 16px 18px; cursor: pointer;
   transition: all 0.2s; text-align: left; display: flex; flex-direction: column; gap: 8px;
 }
-.al-partido-btn:hover { border-color: var(--gold); background: rgba(212,175,55,0.05); }
+.al-partido-btn:hover { border-color: var(--gold); background: rgba(200,116,196,0.05); }
 .al-partido-btn--active { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold); }
 
 .al-partido-btn__teams { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
@@ -425,7 +415,7 @@ onMounted(async () => {
   font-family: 'Barlow Condensed', sans-serif;
   font-size: 10px; font-weight: 700; letter-spacing: 3px;
   text-transform: uppercase; padding: 3px 10px; border-radius: 999px;
-  background: rgba(140,9,2,0.4); color: var(--gold); border: 1px solid rgba(212,175,55,0.2);
+  background: rgba(135,176,212,0.15); color: var(--red); border: 1px solid rgba(135,176,212,0.2);
 }
 .al-lineup-equipo__nombre {
   font-family: 'Bebas Neue', sans-serif;
@@ -445,13 +435,13 @@ onMounted(async () => {
   transition: border-color 0.2s, transform 0.2s;
 }
 .al-player-card:hover {
-  border-color: rgba(212,175,55,0.35);
+  border-color: rgba(200,116,196,0.35);
   transform: translateY(-3px);
 }
 
 .al-player-card__foto-wrap {
   position: relative; width: 100%; aspect-ratio: 1;
-  background: linear-gradient(135deg, #1c0f0c, #2a1510);
+  background: linear-gradient(135deg, #212c3d, #2a374a);
   display: flex; align-items: center; justify-content: center;
 }
 .al-player-card__foto {
@@ -459,18 +449,18 @@ onMounted(async () => {
 }
 .al-player-card__avatar {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 36px; color: rgba(212,175,55,0.4); letter-spacing: 2px;
+  font-size: 36px; color: rgba(200,116,196,0.4); letter-spacing: 2px;
 }
 .al-player-card__pos-badge {
   position: absolute; top: 7px; left: 7px;
   background: rgba(0,0,0,0.75); color: var(--gold);
   font-family: 'Bebas Neue', sans-serif; font-size: 13px;
   padding: 2px 7px; border-radius: 6px; backdrop-filter: blur(4px);
-  border: 1px solid rgba(212,175,55,0.25);
+  border: 1px solid rgba(200,116,196,0.25);
 }
 .al-player-card__orden {
   position: absolute; bottom: 7px; right: 7px;
-  background: rgba(140,9,2,0.85); color: white;
+  background: rgba(135,176,212,0.85); color: #1B2431;
   font-family: 'Bebas Neue', sans-serif; font-size: 12px;
   padding: 1px 6px; border-radius: 6px;
 }
@@ -496,7 +486,7 @@ onMounted(async () => {
 }
 .al-loading__spinner {
   width: 36px; height: 36px; border-radius: 50%;
-  border: 3px solid rgba(212,175,55,0.2);
+  border: 3px solid rgba(200,116,196,0.2);
   border-top-color: var(--gold); animation: rotate 0.8s linear infinite;
 }
 @keyframes rotate { to { transform: rotate(360deg); } }
@@ -524,7 +514,7 @@ onMounted(async () => {
 /* ── CTA ── */
 .al-cta {
   position: relative; overflow: hidden; padding: 96px 60px; text-align: center;
-  background: radial-gradient(ellipse 50% 70% at 50% 50%, rgba(140,9,2,0.2) 0%, transparent 70%), var(--bg-dark);
+  background: radial-gradient(ellipse 50% 70% at 50% 50%, rgba(135,176,212,0.15) 0%, transparent 70%), var(--bg-dark);
   border-top: 1px solid var(--border);
 }
 .al-cta__deco {
@@ -559,7 +549,7 @@ onMounted(async () => {
   z-index: 1000; padding: 24px; backdrop-filter: blur(6px);
 }
 .al-modal {
-  background: #1a0e0b; border: 1px solid var(--border);
+  background: var(--bg-card); border: 1px solid var(--border);
   border-radius: 24px; max-width: 460px; width: 100%; position: relative; overflow: hidden;
 }
 .al-modal__close {
@@ -569,10 +559,10 @@ onMounted(async () => {
   cursor: pointer; display: flex; align-items: center; justify-content: center;
   transition: background 0.2s; z-index: 10;
 }
-.al-modal__close:hover { background: var(--red); }
+.al-modal__close:hover { background: var(--gold); color: var(--bg-dark); }
 .al-modal__header {
   padding: 28px 28px 20px; border-bottom: 1px solid rgba(255,255,255,0.06);
-  background: rgba(212,175,55,0.04); display: flex; flex-direction: column; gap: 10px;
+  background: rgba(200,116,196,0.04); display: flex; flex-direction: column; gap: 10px;
 }
 .al-modal__teams { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .al-modal__team { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: white; }

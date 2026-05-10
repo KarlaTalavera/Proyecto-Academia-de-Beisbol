@@ -2,7 +2,6 @@
   <div class="eq-page">
     <LandingHeader />
 
-    <!-- ── HERO ── -->
     <section class="eq-hero">
       <div class="eq-hero__glow" />
       <div class="eq-hero__content">
@@ -19,7 +18,6 @@
       <div class="eq-hero__deco">◆</div>
     </section>
 
-    <!-- ── STRIP ── -->
     <div class="eq-strip">
       <div class="eq-strip__inner">
         <div class="eq-strip__item">
@@ -44,7 +42,6 @@
       </div>
     </div>
 
-    <!-- ── SKELETON ── -->
     <section v-if="cargando" class="eq-section">
       <div class="eq-container">
         <div class="eq-grid">
@@ -53,7 +50,6 @@
       </div>
     </section>
 
-    <!-- ── ERROR ── -->
     <section v-else-if="error" class="eq-section">
       <div class="eq-container eq-error">
         <span class="eq-error__icon">⚠️</span>
@@ -62,7 +58,6 @@
       </div>
     </section>
 
-    <!-- ── GRID DE EQUIPOS ── -->
     <section v-else class="eq-section">
       <div class="eq-container">
         <span class="eq-eyebrow eq-eyebrow--center">CLAUSURA 2026</span>
@@ -78,11 +73,9 @@
             :style="{ '--team-color': teamColor(i) }"
             @click="openModal(team, i)"
           >
-            <!-- Logo -->
             <div class="eq-card__logo-wrap">
               <div class="eq-card__logo-bg" />
 
-              <!-- Si existe el logo lo muestra, si no muestra iniciales SVG -->
               <img
                 v-if="logoExists(team)"
                 :src="logoSrc(team)"
@@ -103,7 +96,6 @@
               </svg>
             </div>
 
-            <!-- Info -->
             <div class="eq-card__body">
               <h3 class="eq-card__name">{{ team.nombre_equipo }}</h3>
               <div class="eq-card__meta">
@@ -123,7 +115,6 @@
       </div>
     </section>
 
-    <!-- ── CTA ── -->
     <section class="eq-cta">
       <div class="eq-cta__deco">◆</div>
       <div class="eq-cta__content">
@@ -136,14 +127,12 @@
       </div>
     </section>
 
-    <!-- ── MODAL ── -->
     <transition name="eq-fade">
       <div v-if="selected" class="eq-modal-overlay" @click.self="closeModal">
         <div class="eq-modal" :style="{ '--team-color': selectedColor }">
           <button class="eq-modal__close" @click="closeModal">✕</button>
 
           <div class="eq-modal__header">
-            <!-- Logo modal -->
             <div class="eq-modal__logo-wrap">
               <img
                 v-if="logoExists(selected)"
@@ -171,7 +160,6 @@
           </div>
 
           <div class="eq-modal__body">
-            <!-- Info general -->
             <div class="eq-modal__grid">
               <div class="eq-modal__item">
                 <span class="eq-modal__lbl">Director Técnico</span>
@@ -183,7 +171,6 @@
               </div>
             </div>
 
-            <!-- Record de la temporada -->
             <div v-if="detalleEquipo" class="eq-modal__record">
               <div class="eq-modal__record-item">
                 <span class="eq-modal__record-val" style="color:#4ade80;">{{ detalleEquipo.record.ganados }}</span>
@@ -201,7 +188,6 @@
               </div>
             </div>
 
-            <!-- Plantilla -->
             <div v-if="cargandoDetalle" class="eq-modal__loading">Cargando plantilla...</div>
             <div v-else-if="detalleEquipo?.jugadores?.length">
               <p class="eq-modal__roster-title">PLANTILLA ({{ detalleEquipo.jugadores.length }} jugadores)</p>
@@ -313,15 +299,16 @@ onMounted(cargarEquipos)
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;700&family=Barlow:wght@400;500&display=swap');
 
 .eq-page {
-  --gold:    #D4AF37;
-  --gold-lt: #F5D76E;
-  --red:     #8C0902;
-  --bg:      #120908;
-  --bg-dark: #0d0605;
-  --bg-card: #1c0f0c;
-  --border:  rgba(212,175,55,0.15);
-  --txt:     rgba(255,255,255,0.68);
-  --txt-dim: rgba(255,255,255,0.3);
+  /* NUEVA PALETA DE COLORES */
+  --gold:    #C874C4; /* Orquídea */
+  --gold-lt: #d98ad5; 
+  --red:     #87B0D4; /* Celeste */
+  --bg:      #1B2431; /* Marino oscuro */
+  --bg-dark: #131a24;
+  --bg-card: #212c3d;
+  --border:  rgba(135,176,212,0.15);
+  --txt:     #E4E3F1; /* Lavanda */
+  --txt-dim: rgba(228,227,241,0.5);
 
   background: var(--bg);
   color: white;
@@ -339,13 +326,13 @@ onMounted(cargarEquipos)
   padding: 140px 60px 80px;
   overflow: hidden;
   background:
-    radial-gradient(ellipse 55% 65% at 85% 50%, rgba(140,9,2,0.2) 0%, transparent 70%),
+    radial-gradient(ellipse 55% 65% at 85% 50%, rgba(135,176,212,0.15) 0%, transparent 70%),
     var(--bg-dark);
   border-bottom: 1px solid var(--border);
 }
 .eq-hero__glow {
   position: absolute; inset: 0;
-  background: radial-gradient(ellipse 40% 40% at 15% 80%, rgba(212,175,55,0.04) 0%, transparent 60%);
+  background: radial-gradient(ellipse 40% 40% at 15% 80%, rgba(200,116,196,0.06) 0%, transparent 60%);
   pointer-events: none;
 }
 .eq-hero__content { position: relative; z-index: 2; max-width: 680px; }
@@ -374,14 +361,14 @@ onMounted(cargarEquipos)
   position: absolute; right: 60px; top: 50%;
   transform: translateY(-50%);
   font-size: clamp(120px, 18vw, 260px);
-  color: rgba(212,175,55,0.04);
+  color: rgba(200,116,196,0.04);
   user-select: none; pointer-events: none;
   animation: spin 50s linear infinite;
 }
 @keyframes spin { to { transform: translateY(-50%) rotate(360deg); } }
 
 /* ── Strip ── */
-.eq-strip { background: var(--red); border-bottom: 3px solid var(--gold); }
+.eq-strip { background: #3B4269; border-bottom: 3px solid var(--gold); }
 .eq-strip__inner {
   max-width: 1200px; margin: 0 auto; padding: 0 60px;
   display: flex; align-items: center;
@@ -497,7 +484,7 @@ onMounted(cargarEquipos)
 .eq-card__logo-bg {
   position: absolute; inset: 0;
   background: radial-gradient(ellipse 60% 60% at 50% 50%,
-    color-mix(in srgb, var(--team-color, #D4AF37) 10%, transparent) 0%,
+    color-mix(in srgb, var(--team-color, #C874C4) 10%, transparent) 0%,
     transparent 70%
   );
 }
@@ -552,7 +539,7 @@ onMounted(cargarEquipos)
   position: relative; overflow: hidden;
   padding: 120px 60px; text-align: center;
   background:
-    radial-gradient(ellipse 50% 70% at 50% 50%, rgba(140,9,2,0.22) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 70% at 50% 50%, rgba(135,176,212,0.15) 0%, transparent 70%),
     var(--bg-dark);
   border-top: 1px solid var(--border);
 }
@@ -560,7 +547,7 @@ onMounted(cargarEquipos)
   position: absolute; inset: 0;
   display: flex; align-items: center; justify-content: center;
   font-size: clamp(180px, 30vw, 380px);
-  color: rgba(212,175,55,0.03);
+  color: rgba(200,116,196,0.03);
   user-select: none; pointer-events: none;
   animation: spin 70s linear infinite reverse;
 }
@@ -600,8 +587,8 @@ onMounted(cargarEquipos)
   backdrop-filter: blur(4px);
 }
 .eq-modal {
-  background: #1a0e0b;
-  border: 1px solid color-mix(in srgb, var(--team-color, #D4AF37) 30%, transparent);
+  background: var(--bg-card);
+  border: 1px solid color-mix(in srgb, var(--team-color, #C874C4) 30%, transparent);
   border-radius: 24px;
   max-width: 520px; width: 100%;
   position: relative;
@@ -614,13 +601,13 @@ onMounted(cargarEquipos)
   cursor: pointer; display: flex; align-items: center; justify-content: center;
   z-index: 10; transition: background 0.2s;
 }
-.eq-modal__close:hover { background: var(--red); }
+.eq-modal__close:hover { background: var(--gold); color: var(--bg-dark); }
 
 .eq-modal__header {
   display: flex; align-items: center; gap: 24px;
   padding: 36px 36px 24px;
   border-bottom: 1px solid rgba(255,255,255,0.06);
-  background: color-mix(in srgb, var(--team-color, #D4AF37) 6%, transparent);
+  background: color-mix(in srgb, var(--team-color, #C874C4) 6%, transparent);
 }
 .eq-modal__logo-wrap {
   width: 80px; height: 80px; flex-shrink: 0;
@@ -687,7 +674,7 @@ onMounted(cargarEquipos)
 }
 .eq-modal__player-avatar {
   width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
-  background: rgba(212,175,55,0.15); border: 1px solid rgba(212,175,55,0.2);
+  background: rgba(200,116,196,0.15); border: 1px solid rgba(200,116,196,0.2);
   display: flex; align-items: center; justify-content: center;
   font-family: 'Bebas Neue', sans-serif; font-size: 14px; color: var(--gold);
 }

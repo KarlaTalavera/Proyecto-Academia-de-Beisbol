@@ -2,12 +2,10 @@
   <div class="nv-page">
     <LandingHeader />
 
-    <!-- Banner -->
     <div class="nv-banner">
       <h1 class="nv-banner-title">NOTICIAS</h1>
     </div>
 
-    <!-- Skeleton loading -->
     <section v-if="loading" class="nv-section">
       <div class="nv-container">
         <div class="nv-carousel-track">
@@ -23,12 +21,10 @@
       </div>
     </section>
 
-    <!-- Carousel -->
     <section v-else class="nv-section">
       <div class="nv-container">
         <div class="nv-carousel-wrapper">
 
-          <!-- Prev arrow (desktop) -->
           <button
             class="nv-arrow nv-arrow--prev"
             @click="prev"
@@ -36,7 +32,6 @@
             aria-label="Anterior"
           >&#8249;</button>
 
-          <!-- Cards track (desktop: clipped window, mobile: horizontal scroll) -->
           <div class="nv-viewport" ref="viewport">
             <div
               class="nv-track"
@@ -61,7 +56,6 @@
             </div>
           </div>
 
-          <!-- Next arrow (desktop) -->
           <button
             class="nv-arrow nv-arrow--next"
             @click="next"
@@ -70,7 +64,6 @@
           >&#8250;</button>
         </div>
 
-        <!-- Dots -->
         <div class="nv-dots">
           <button
             v-for="d in dotCount"
@@ -125,7 +118,7 @@ onMounted(async () => {
 <style scoped>
 /* ─── Page ─── */
 .nv-page {
-  background: #1a0d0a;
+  background: #1B2431;
   min-height: 100vh;
   font-family: Arial, sans-serif;
   color: white;
@@ -262,7 +255,7 @@ onMounted(async () => {
   position: absolute;
   top: 12px;
   left: 12px;
-  background: #8C0902;
+  background: #C874C4;
   color: white;
   font-size: 10px;
   font-weight: 700;
@@ -281,7 +274,7 @@ onMounted(async () => {
 }
 
 .nv-card-title {
-  color: #8C0902;
+  color: #C874C4;
   font-size: 15px;
   font-weight: 700;
   font-style: italic;
@@ -320,10 +313,10 @@ onMounted(async () => {
   justify-content: center;
   width: 44px;
   height: 44px;
-  background: rgba(212, 175, 55, 0.15);
-  border: 1px solid rgba(212, 175, 55, 0.35);
+  background: rgba(135, 176, 212, 0.15);
+  border: 1px solid rgba(135, 176, 212, 0.35);
   border-radius: 50%;
-  color: #D4AF37;
+  color: #87B0D4;
   font-size: 28px;
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
@@ -341,8 +334,8 @@ onMounted(async () => {
 }
 
 .nv-arrow:hover:not(:disabled) {
-  background: rgba(212, 175, 55, 0.3);
-  color: #FECE79;
+  background: rgba(135, 176, 212, 0.3);
+  color: #FFFFFF;
 }
 
 .nv-arrow:disabled {
@@ -368,7 +361,7 @@ onMounted(async () => {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: rgba(212, 175, 55, 0.25);
+  background: rgba(135, 176, 212, 0.25);
   border: none;
   cursor: pointer;
   padding: 0;
@@ -376,7 +369,7 @@ onMounted(async () => {
 }
 
 .nv-dot--active {
-  background: #D4AF37;
+  background: #C874C4;
   transform: scale(1.3);
 }
 

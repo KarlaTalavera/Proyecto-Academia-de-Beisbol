@@ -2,7 +2,6 @@
   <div class="ig-page">
     <LandingHeader />
 
-    <!-- ── HERO ── -->
     <section class="ig-hero">
       <div class="ig-hero__glow" />
       <div class="ig-hero__content">
@@ -13,27 +12,26 @@
         </h1>
         <p class="ig-hero__sub">
           Béisbol semiprofesional venezolano.<br />
-          8 equipos. Una temporada. Un campeón.
+          Una temporada. Un campeón.
         </p>
       </div>
       <div class="ig-hero__deco">◆</div>
     </section>
 
-    <!-- ── STRIP DE DATOS REALES ── -->
     <div class="ig-strip">
       <div class="ig-strip__inner">
         <div class="ig-strip__item">
-          <span class="ig-strip__val">8</span>
+          <span class="ig-strip__val">{{ cargandoEquipos ? '-' : equipos.length }}</span>
           <span class="ig-strip__lbl">EQUIPOS INSCRITOS</span>
         </div>
         <div class="ig-strip__sep">◆</div>
         <div class="ig-strip__item">
-          <span class="ig-strip__val">80</span>
+          <span class="ig-strip__val">{{ cargandoEquipos ? '-' : equipos.length * 10 }}</span>
           <span class="ig-strip__lbl">JUGADORES ACTIVOS</span>
         </div>
         <div class="ig-strip__sep">◆</div>
         <div class="ig-strip__item">
-          <span class="ig-strip__val">Bs. 5.500</span>
+          <span class="ig-strip__val">{{ costoInscripcion ? `Bs. ${costoInscripcion}` : '...' }}</span>
           <span class="ig-strip__lbl">COSTO INSCRIPCIÓN</span>
         </div>
         <div class="ig-strip__sep">◆</div>
@@ -44,7 +42,6 @@
       </div>
     </div>
 
-    <!-- ── SOBRE LA TEMPORADA ── -->
     <section class="ig-section">
       <div class="ig-container ig-about">
         <div class="ig-about__text">
@@ -52,20 +49,22 @@
           <h2 class="ig-title">La temporada<br /><em>más grande</em></h2>
           <p>
             La Liga Diamante de Béisbol inició su <strong>Temporada Clausura 2026</strong>
-            el 1 de febrero de 2026, reuniendo por primera vez a los 8 equipos más
+            el 1 de febrero de 2026, reuniendo por primera vez a los equipos más
             representativos del béisbol semiprofesional venezolano en una misma competencia.
           </p>
           <p>
-            Con un costo de inscripción de <strong>Bs. 5.500 por equipo</strong> y
-            80 peloteros registrados, esta temporada marca el nivel más alto de
-            organización y competencia en la historia de nuestra liga.
-            Cada juego es anotado en tiempo real por nuestros anotadores oficiales,
-            garantizando estadísticas precisas para cada jugador.
+            Con un costo de inscripción de <strong>{{ costoInscripcion ? `Bs. ${costoInscripcion}` : '...' }}</strong>, 
+            esta temporada marca el nivel más alto de organización y competencia 
+            en la historia de nuestra liga. Cada juego es anotado en tiempo real 
+            por nuestros anotadores oficiales, garantizando estadísticas precisas 
+            para cada jugador.
           </p>
         </div>
         <div class="ig-about__card">
           <div class="ig-about__card-inner">
-            <div class="ig-about__logo">◆</div>
+            <div class="ig-about__logo">
+              <IconTrophy :size="52" stroke-width="1.2" />
+            </div>
             <div class="ig-about__card-title">CLAUSURA<br />2026</div>
             <div class="ig-about__dates">
               <div class="ig-about__date-row">
@@ -88,17 +87,27 @@
       </div>
     </section>
 
-    <!-- ── LOS 8 EQUIPOS ── -->
     <section class="ig-section ig-section--dark">
       <div class="ig-container">
         <span class="ig-eyebrow ig-eyebrow--center">CLAUSURA 2026</span>
-        <h2 class="ig-title ig-title--center">Los <em>8 equipos</em><br />de la temporada</h2>
-        <div class="ig-teams">
-          <div class="ig-team" v-for="team in teams" :key="team.name">
-            <div class="ig-team__icon">⚾</div>
+        <h2 class="ig-title ig-title--center">
+          Los equipos de la temporada
+        </h2>
+        
+        <div v-if="cargandoEquipos" class="ig-teams-msg">
+          <p>Cargando equipos inscritos...</p>
+        </div>
+        <div v-else-if="equipos.length === 0" class="ig-teams-msg">
+          <p>Aún no hay equipos inscritos en esta temporada.</p>
+        </div>
+        <div v-else class="ig-teams">
+          <div class="ig-team" v-for="equipo in equipos" :key="equipo.id_equipo">
+            <div class="ig-team__icon">
+              <IconShield :size="24" stroke-width="1.5" />
+            </div>
             <div class="ig-team__info">
-              <span class="ig-team__name">{{ team.name }}</span>
-              <span class="ig-team__coach">DT: {{ team.coach }}</span>
+              <span class="ig-team__name">{{ equipo.nombre_equipo }}</span>
+              <span class="ig-team__coach">DT: {{ equipo.entrenador || 'Por definir' }}</span>
             </div>
             <span class="ig-team__badge ig-team__badge--paid">PARTICIPANTE</span>
           </div>
@@ -106,15 +115,15 @@
       </div>
     </section>
 
-
-    <!-- ── REGLAMENTO REAL ── -->
     <section class="ig-section ig-section--dark">
       <div class="ig-container">
         <span class="ig-eyebrow ig-eyebrow--center">REGLAMENTO OFICIAL</span>
         <h2 class="ig-title ig-title--center">Las reglas de la<br /><em>Liga Diamante</em></h2>
         <div class="ig-rules">
           <div class="ig-rule" v-for="rule in rules" :key="rule.title">
-            <div class="ig-rule__icon">{{ rule.icon }}</div>
+            <div class="ig-rule__icon">
+              <component :is="rule.icon" :size="32" stroke-width="1.5" />
+            </div>
             <div>
               <h4 class="ig-rule__title">{{ rule.title }}</h4>
               <p class="ig-rule__text">{{ rule.text }}</p>
@@ -124,16 +133,15 @@
       </div>
     </section>
 
-
-
-    <!-- ── SANCIONES ── -->
     <section class="ig-section ig-section--dark">
       <div class="ig-container">
         <span class="ig-eyebrow ig-eyebrow--center">DISCIPLINA</span>
         <h2 class="ig-title ig-title--center">Control<br /><em>disciplinario</em></h2>
         <div class="ig-sanctions">
           <div class="ig-sanction" v-for="s in sanctions" :key="s.type">
-            <div class="ig-sanction__icon">{{ s.icon }}</div>
+            <div class="ig-sanction__icon">
+              <component :is="s.icon" :size="36" stroke-width="1.5" />
+            </div>
             <h4 class="ig-sanction__type">{{ s.type }}</h4>
             <p class="ig-sanction__text">{{ s.text }}</p>
           </div>
@@ -146,7 +154,6 @@
       </div>
     </section>
 
-    <!-- ── CTA ── -->
     <section class="ig-cta">
       <div class="ig-cta__deco">◆</div>
       <div class="ig-cta__content">
@@ -170,138 +177,107 @@
 </template>
 
 <script setup>
+import { ref, onMounted, markRaw } from 'vue'
 import LandingHeader from '@/components/landing/LandingHeader.vue'
+import api from '@/services/api'
 
-// Datos reales del test-data.sql
-const teams = [
-  { name: 'Leones de Caracas',         coach: 'Carlos Mendoza'   },
-  { name: 'Tigres de Aragua',           coach: 'José Rodríguez'   },
-  { name: 'Águilas del Zulia',          coach: 'Miguel Hernández' },
-  { name: 'Navegantes del Magallanes',  coach: 'Roberto Silva'    },
-  { name: 'Caribes de Anzoátegui',      coach: 'Fernando Torres'  },
-  { name: 'Bravos de Margarita',        coach: 'Andrés Morales'   },
-  { name: 'Cardenales de Lara',         coach: 'Ricardo Vargas'   },
-  { name: 'Tiburones de La Guaira',     coach: 'Daniel Castillo'  },
-]
+import {
+  IconShield,
+  IconClipboardCheck,
+  IconUsers,
+  IconClock,
+  IconPencil,
+  IconTrophy,
+  IconActivity,
+  IconGavel,
+  IconWallet,
+  IconAlertCircle,
+  IconBan,
+  IconUserX
+} from '@tabler/icons-vue'
 
-// Posiciones del ENUM en la BD
-const positions = [
-  { code: 'P',  name: 'Pitcher' },
-  { code: 'C',  name: 'Cátcher' },
-  { code: '1B', name: 'Primera Base' },
-  { code: '2B', name: 'Segunda Base' },
-  { code: '3B', name: 'Tercera Base' },
-  { code: 'SS', name: 'Shortstop' },
-  { code: 'LF', name: 'Left Field' },
-  { code: 'CF', name: 'Center Field' },
-  { code: 'RF', name: 'Right Field' },
-  { code: 'DH', name: 'Bateador Designado' },
-  { code: 'UT', name: 'Utilidad' },
-]
+// ── Estado reactivo para los equipos desde BD ──
+const equipos = ref([])
+const cargandoEquipos = ref(true)
 
-// Reglas basadas en la estructura real de la BD
+async function cargarEquipos() {
+  try {
+    const { data } = await api.get('/pub/equipos')
+    equipos.value = data
+  } catch (error) {
+    console.error("Error al cargar equipos:", error)
+  } finally {
+    cargandoEquipos.value = false
+  }
+}
+
+onMounted(() => {
+  cargarEquipos()
+})
+
+// Reglas basadas en la estructura real de la BD usando markRaw
 const rules = [
   {
-    icon: '📋',
+    icon: markRaw(IconClipboardCheck),
     title: 'Inscripción por temporada',
-    text: 'Cada equipo debe inscribirse y cancelar Bs. 5.500 para participar en la temporada. Sin pago confirmado, el equipo no puede disputar juegos oficiales.',
+    text: 'Cada equipo debe inscribirse y cancelar para participar en la temporada. Sin pago confirmado, el equipo no puede disputar juegos oficiales.',
   },
   {
-    icon: '👥',
+    icon: markRaw(IconUsers),
     title: 'Roster de jugadores',
     text: 'Cada equipo registra hasta 10 jugadores por nómina activa. Cada jugador debe tener cédula de identidad, fecha de nacimiento, posición y rol registrados.',
   },
   {
-    icon: '⚾',
+    icon: markRaw(IconClock),
     title: 'Innings programados',
     text: 'Los partidos se programan a 9 innings. El sistema registra la cantidad de innings jugados en el resultado final de cada partido.',
   },
   {
-    icon: '📝',
+    icon: markRaw(IconPencil),
     title: 'Anotación oficial',
     text: 'Cada partido es anotado por un anotador oficial de la liga, que registra el desempeño individual de bateadores y pitchers en tiempo real.',
   },
   {
-    icon: '🏆',
+    icon: markRaw(IconTrophy),
     title: 'Pitcher ganador y perdedor',
     text: 'Al finalizar cada juego se designa oficialmente un pitcher ganador, un pitcher perdedor y, si aplica, un pitcher salvador. Estos datos quedan en el resultado.',
   },
   {
-    icon: '🔄',
+    icon: markRaw(IconActivity),
     title: 'Estados del partido',
     text: 'Un partido puede estar: programado, en curso, finalizado o suspendido. Solo los partidos finalizados cuentan para el standing de la temporada.',
   },
   {
-    icon: '🚫',
+    icon: markRaw(IconGavel),
     title: 'Suspensión de jugadores',
     text: 'El comité disciplinario puede suspender jugadores por conducta antideportiva. La suspensión especifica la cantidad exacta de partidos que no puede jugar.',
   },
   {
-    icon: '💰',
+    icon: markRaw(IconWallet),
     title: 'Multas a equipos',
     text: 'Los equipos pueden recibir multas económicas por incumplimientos como retrasos al estadio o infracciones al reglamento. El monto queda registrado en el sistema.',
   },
 ]
 
-// Stats del schema desempeno_bateador
-const batStats = [
-  'Turnos al bate (AB)',
-  'Hits',
-  'Dobles',
-  'Triples',
-  'Jonrones (HR)',
-  'Carreras anotadas',
-  'Carreras impulsadas (RBI)',
-  'Bases por bolas (BB)',
-  'Ponches recibidos (K)',
-  'Fouls',
-  'Outs',
-  'Asistencias',
-]
-
-// Stats del schema desempeno_pitcher
-const pitchStats = [
-  'Innings pitcheados (IP)',
-  'Hits permitidos',
-  'Carreras permitidas',
-  'Carreras limpias (ER)',
-  'Jonrones permitidos',
-  'Golpes al bateador (HBP)',
-  'Bases por bolas dadas (BB)',
-  'Ponches (K)',
-  'Ganado / Perdido / Salvado',
-]
-
-// Stats del schema resultado
-const gameStats = [
-  'Carreras por equipo',
-  'Hits por equipo',
-  'Errores por equipo',
-  'Innings totales jugados',
-  'Pitcher ganador',
-  'Pitcher perdedor',
-  'Pitcher salvador',
-]
-
-// Tipos de sanción del ENUM en BD
+// Tipos de sanción del ENUM en BD usando markRaw
 const sanctions = [
   {
-    icon: '⚠️',
+    icon: markRaw(IconAlertCircle),
     type: 'Amonestación',
     text: 'Advertencia oficial registrada en el historial del jugador o equipo. No implica suspensión de juegos pero queda en el expediente de la temporada.',
   },
   {
-    icon: '🚫',
+    icon: markRaw(IconBan),
     type: 'Suspensión',
     text: 'El jugador no puede participar en la cantidad de partidos indicada. La sanción es por conductas antideportivas graves como agresiones verbales o físicas.',
   },
   {
-    icon: '💸',
+    icon: markRaw(IconWallet),
     type: 'Multa',
     text: 'Sanción económica aplicada al equipo por incumplimientos administrativos como retrasos, irregularidades en el roster o faltas al reglamento de la liga.',
   },
   {
-    icon: '🔴',
+    icon: markRaw(IconUserX),
     type: 'Expulsión',
     text: 'La sanción más severa. El jugador es expulsado de la temporada en curso. Solo se aplica en casos de faltas muy graves evaluadas por el comité disciplinario.',
   },
@@ -312,15 +288,15 @@ const sanctions = [
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;700&family=Barlow:wght@400;500&display=swap');
 
 .ig-page {
-  --gold:    #D4AF37;
-  --gold-lt: #F5D76E;
-  --red:     #8C0902;
-  --bg:      #120908;
-  --bg-dark: #0d0605;
-  --bg-card: #1c0f0c;
-  --border:  rgba(212,175,55,0.15);
-  --txt:     rgba(255,255,255,0.68);
-  --txt-dim: rgba(255,255,255,0.3);
+  --gold:    #C874C4; 
+  --gold-lt: #d98ad5;
+  --red:     #87B0D4; 
+  --bg:      #1B2431; 
+  --bg-dark: #131a24;
+  --bg-card: #212c3d;
+  --border:  rgba(135,176,212,0.15);
+  --txt:     #E4E3F1; 
+  --txt-dim: rgba(228,227,241,0.5);
 
   background: var(--bg);
   color: white;
@@ -338,7 +314,7 @@ const sanctions = [
   padding: 140px 60px 80px;
   overflow: hidden;
   background:
-    radial-gradient(ellipse 55% 65% at 85% 50%, rgba(140,9,2,0.2) 0%, transparent 70%),
+    radial-gradient(ellipse 55% 65% at 85% 50%, rgba(135,176,212,0.15) 0%, transparent 70%),
     var(--bg-dark);
   border-bottom: 1px solid var(--border);
 }
@@ -346,7 +322,7 @@ const sanctions = [
 .ig-hero__glow {
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse 40% 40% at 20% 80%, rgba(212,175,55,0.04) 0%, transparent 60%);
+  background: radial-gradient(ellipse 40% 40% at 20% 80%, rgba(200,116,196,0.06) 0%, transparent 60%);
   pointer-events: none;
 }
 
@@ -401,7 +377,7 @@ const sanctions = [
   top: 50%;
   transform: translateY(-50%);
   font-size: clamp(120px, 18vw, 260px);
-  color: rgba(212,175,55,0.04);
+  color: rgba(200,116,196,0.04);
   user-select: none;
   pointer-events: none;
   animation: spin 50s linear infinite;
@@ -410,7 +386,7 @@ const sanctions = [
 
 /* ── Strip ── */
 .ig-strip {
-  background: var(--red);
+  background: #3B4269;
   border-bottom: 3px solid var(--gold);
 }
 .ig-strip__inner {
@@ -517,9 +493,11 @@ const sanctions = [
   text-align: center;
 }
 .ig-about__logo {
-  font-size: 40px;
   color: var(--gold);
   line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .ig-about__card-title {
   font-family: 'Bebas Neue', sans-serif;
@@ -553,6 +531,14 @@ const sanctions = [
 .ig-about__divline { height: 1px; background: var(--border); }
 
 /* ── Teams ── */
+.ig-teams-msg {
+  text-align: center;
+  color: var(--txt-dim);
+  padding: 40px 0;
+  font-size: 15px;
+  font-style: italic;
+}
+
 .ig-teams {
   display: flex;
   flex-direction: column;
@@ -569,8 +555,13 @@ const sanctions = [
   gap: 16px;
   transition: background 0.2s;
 }
-.ig-team:hover { background: rgba(212,175,55,0.06); }
-.ig-team__icon { font-size: 20px; flex-shrink: 0; }
+.ig-team:hover { background: rgba(200,116,196,0.06); }
+.ig-team__icon { 
+  flex-shrink: 0; 
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+}
 .ig-team__info { flex: 1; display: flex; flex-direction: column; gap: 2px; }
 .ig-team__name {
   font-family: 'Barlow Condensed', sans-serif;
@@ -592,55 +583,7 @@ const sanctions = [
   padding: 4px 12px;
   border-radius: 999px;
 }
-.ig-team__badge--paid    { background: rgba(212,175,55,0.15); color: var(--gold); }
-.ig-team__badge--pending { background: rgba(255,255,255,0.06); color: var(--txt-dim); }
-
-/* ── Positions ── */
-.ig-positions-layout {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 64px;
-  align-items: start;
-}
-@media (max-width: 768px) { .ig-positions-layout { grid-template-columns: 1fr; gap: 40px; } }
-
-.ig-positions-text p {
-  font-size: 15px;
-  line-height: 1.85;
-  color: var(--txt);
-  margin: 0 0 16px;
-}
-.ig-positions-text strong { color: white; }
-
-.ig-positions-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 2px;
-  border-radius: 16px;
-  overflow: hidden;
-  background: rgba(255,255,255,0.03);
-}
-.ig-pos {
-  background: var(--bg-card);
-  padding: 16px 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  transition: background 0.2s;
-}
-.ig-pos:hover { background: rgba(212,175,55,0.07); }
-.ig-pos__code {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 22px;
-  color: var(--gold);
-  letter-spacing: 1px;
-  line-height: 1;
-}
-.ig-pos__name {
-  font-size: 11px;
-  color: var(--txt-dim);
-  line-height: 1.3;
-}
+.ig-team__badge--paid    { background: rgba(200,116,196,0.15); color: var(--gold); }
 
 /* ── Rules ── */
 .ig-rules {
@@ -661,8 +604,14 @@ const sanctions = [
   align-items: flex-start;
   transition: background 0.2s;
 }
-.ig-rule:hover { background: rgba(212,175,55,0.05); }
-.ig-rule__icon { font-size: 24px; flex-shrink: 0; margin-top: 2px; }
+.ig-rule:hover { background: rgba(200,116,196,0.05); }
+.ig-rule__icon { 
+  flex-shrink: 0; 
+  margin-top: 2px;
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+}
 .ig-rule__title {
   font-family: 'Barlow Condensed', sans-serif;
   font-size: 14px;
@@ -673,40 +622,6 @@ const sanctions = [
   margin: 0 0 6px;
 }
 .ig-rule__text { font-size: 13px; line-height: 1.7; color: var(--txt); margin: 0; }
-
-/* ── Stats ── */
-.ig-stats-layout {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 2px;
-  border-radius: 20px;
-  overflow: hidden;
-  background: rgba(255,255,255,0.03);
-}
-@media (max-width: 1023px) { .ig-stats-layout { grid-template-columns: 1fr; } }
-
-.ig-stat-group {
-  background: var(--bg-card);
-  padding: 32px 28px;
-}
-.ig-stat-group__title {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  color: var(--gold);
-  text-transform: uppercase;
-  margin: 0 0 20px;
-}
-.ig-stat-list { display: flex; flex-direction: column; gap: 10px; }
-.ig-stat-item {
-  font-size: 13px;
-  color: var(--txt);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.ig-stat-item__dot { color: var(--red); font-size: 8px; flex-shrink: 0; }
 
 /* ── Sanctions ── */
 .ig-sanctions {
@@ -729,8 +644,13 @@ const sanctions = [
   gap: 10px;
   transition: background 0.2s;
 }
-.ig-sanction:hover { background: rgba(140,9,2,0.12); }
-.ig-sanction__icon { font-size: 28px; line-height: 1; }
+.ig-sanction:hover { background: rgba(135,176,212,0.12); }
+.ig-sanction__icon { 
+  line-height: 1; 
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+}
 .ig-sanction__type {
   font-family: 'Bebas Neue', sans-serif;
   font-size: 20px;
@@ -757,7 +677,7 @@ const sanctions = [
   padding: 120px 60px;
   text-align: center;
   background:
-    radial-gradient(ellipse 50% 70% at 50% 50%, rgba(140,9,2,0.22) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 70% at 50% 50%, rgba(135,176,212,0.15) 0%, transparent 70%),
     var(--bg-dark);
   border-top: 1px solid var(--border);
 }
@@ -768,7 +688,7 @@ const sanctions = [
   align-items: center;
   justify-content: center;
   font-size: clamp(180px, 30vw, 380px);
-  color: rgba(212,175,55,0.03);
+  color: rgba(200,116,196,0.03);
   user-select: none;
   pointer-events: none;
   animation: spin 70s linear infinite reverse;

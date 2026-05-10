@@ -2,12 +2,10 @@
   <div class="ld-page">
     <LandingHeader />
 
-    <!-- Banner -->
     <div class="ld-banner">
       <h2 class="ld-banner-title">RESULTADOS</h2>
     </div>
 
-    <!-- Date navigation bar -->
     <div class="ld-date-nav-wrap">
       <div class="ld-date-nav">
         <button
@@ -24,27 +22,22 @@
       </div>
     </div>
 
-    <!-- Content -->
     <div class="ld-content">
-      <!-- Loading -->
       <div v-if="cargando" class="ld-spinner-wrap">
         <div class="ld-spinner"></div>
         <p class="ld-spinner-text">Cargando partidos...</p>
       </div>
 
-      <!-- Error -->
       <div v-else-if="error" class="ld-empty">
         <p class="ld-empty-icon">⚠</p>
         <p class="ld-empty-msg">Error al cargar los partidos.<br />Verifica que el servidor esté disponible.</p>
       </div>
 
-      <!-- No games for date -->
       <div v-else-if="!juegosDia.length" class="ld-empty">
         <p class="ld-empty-icon">📅</p>
         <p class="ld-empty-msg">No hay juegos para esta fecha</p>
       </div>
 
-      <!-- Game cards -->
       <div v-else class="ld-games-list">
         <div
           v-for="juego in juegosDia"
@@ -52,7 +45,6 @@
           class="ld-game-card"
           :class="{ 'ld-game-card--live': juego.estado === 'en_juego' }"
         >
-          <!-- Card top row: hora, lugar, badge -->
           <div class="ld-game-header">
             <div class="ld-game-meta">
               <span v-if="juego.hora_juego" class="ld-game-hora">{{ formatHora(juego.hora_juego) }}</span>
@@ -71,7 +63,6 @@
             </div>
           </div>
 
-          <!-- Matchup row -->
           <div class="ld-matchup">
             <div class="ld-team ld-team--casa">
               <div class="ld-team-avatar">{{ juego.equipo_casa ? juego.equipo_casa.charAt(0) : '?' }}</div>
@@ -184,7 +175,7 @@ onMounted(cargar)
 /* ── Page shell ──────────────────────────────────────────── */
 .ld-page {
   min-height: 100vh;
-  background: #1a0a0a;
+  background: #1B2431;
   font-family: 'Arial Black', 'Segoe UI', Arial, sans-serif;
   color: #fff;
 }
@@ -193,7 +184,7 @@ onMounted(cargar)
 .ld-banner {
   padding: 3rem 1.5rem 2rem;
   text-align: center;
-  background: linear-gradient(180deg, #0d0404 0%, #1a0a0a 100%);
+  background: linear-gradient(180deg, #3B4269 0%, #1B2431 100%);
 }
 
 .ld-banner-title {
@@ -204,7 +195,7 @@ onMounted(cargar)
   color: #ffffff;
   letter-spacing: 0.04em;
   line-height: 1;
-  text-shadow: 0 4px 24px rgba(140, 9, 2, 0.5);
+  text-shadow: 0 4px 24px rgba(200, 116, 196, 0.4);
 }
 
 /* ── Date navigation bar ─────────────────────────────────── */
@@ -212,9 +203,9 @@ onMounted(cargar)
   position: sticky;
   top: 0;
   z-index: 50;
-  background: #001d3d;
-  border-top: 1px solid rgba(212, 175, 55, 0.15);
-  border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+  background: rgba(27, 36, 49, 0.95);
+  border-top: 1px solid rgba(135, 176, 212, 0.15);
+  border-bottom: 1px solid rgba(135, 176, 212, 0.15);
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
@@ -245,13 +236,13 @@ onMounted(cargar)
 }
 
 .ld-date-btn:hover {
-  background: rgba(254, 206, 121, 0.08);
-  border-color: rgba(254, 206, 121, 0.25);
+  background: rgba(200, 116, 196, 0.08);
+  border-color: rgba(200, 116, 196, 0.25);
 }
 
 .ld-date-btn--active {
-  background: rgba(254, 206, 121, 0.12);
-  border-color: #FECE79;
+  background: rgba(200, 116, 196, 0.12);
+  border-color: #C874C4;
 }
 
 .ld-date-btn-dow {
@@ -261,7 +252,7 @@ onMounted(cargar)
   color: rgba(255, 255, 255, 0.5);
   text-transform: uppercase;
 }
-.ld-date-btn--active .ld-date-btn-dow { color: #FECE79; }
+.ld-date-btn--active .ld-date-btn-dow { color: #C874C4; }
 
 .ld-date-btn-num {
   font-size: 1.35rem;
@@ -269,7 +260,7 @@ onMounted(cargar)
   color: rgba(255, 255, 255, 0.8);
   line-height: 1;
 }
-.ld-date-btn--active .ld-date-btn-num { color: #FECE79; }
+.ld-date-btn--active .ld-date-btn-num { color: #C874C4; }
 
 .ld-date-btn-mon {
   font-size: 0.65rem;
@@ -278,7 +269,7 @@ onMounted(cargar)
   color: rgba(255, 255, 255, 0.45);
   text-transform: uppercase;
 }
-.ld-date-btn--active .ld-date-btn-mon { color: #FECE79; }
+.ld-date-btn--active .ld-date-btn-mon { color: #C874C4; }
 
 /* ── Content area ────────────────────────────────────────── */
 .ld-content {
@@ -299,8 +290,8 @@ onMounted(cargar)
 .ld-spinner {
   width: 44px;
   height: 44px;
-  border: 3px solid rgba(212, 175, 55, 0.15);
-  border-top-color: #D4AF37;
+  border: 3px solid rgba(200, 116, 196, 0.15);
+  border-top-color: #C874C4;
   border-radius: 50%;
   animation: ld-spin 0.8s linear infinite;
 }
@@ -339,7 +330,7 @@ onMounted(cargar)
 /* ── Game card ───────────────────────────────────────────── */
 .ld-game-card {
   background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(212, 175, 55, 0.1);
+  border: 1px solid rgba(135, 176, 212, 0.15);
   border-radius: 1.5rem;
   padding: 1.25rem 1.5rem;
   transition: background 0.2s, border-color 0.2s, transform 0.2s;
@@ -347,13 +338,13 @@ onMounted(cargar)
 
 .ld-game-card:hover {
   background: rgba(255, 255, 255, 0.07);
-  border-color: rgba(212, 175, 55, 0.25);
+  border-color: rgba(200, 116, 196, 0.25);
   transform: translateY(-1px);
 }
 
 .ld-game-card--live {
-  border-color: rgba(177, 74, 54, 0.5);
-  background: rgba(140, 9, 2, 0.08);
+  border-color: rgba(200, 116, 196, 0.5);
+  background: rgba(200, 116, 196, 0.08);
 }
 
 /* ── Card header row ─────────────────────────────────────── */
@@ -396,7 +387,7 @@ onMounted(cargar)
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #e53e3e;
+  background: #C874C4;
   animation: ld-pulse 1.4s ease-in-out infinite;
   flex-shrink: 0;
 }
@@ -431,9 +422,9 @@ onMounted(cargar)
 }
 
 .ld-status-badge--next {
-  background: rgba(212, 175, 55, 0.12);
-  color: #FECE79;
-  border-color: rgba(212, 175, 55, 0.3);
+  background: rgba(135, 176, 212, 0.12);
+  color: #87B0D4;
+  border-color: rgba(135, 176, 212, 0.3);
 }
 
 /* ── Matchup ─────────────────────────────────────────────── */
@@ -460,13 +451,13 @@ onMounted(cargar)
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #8C0902, #B14A36);
+  background: linear-gradient(135deg, #C874C4, #3B4269);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.1rem;
   font-weight: 900;
-  color: #FECE79;
+  color: #FFFFFF;
   text-transform: uppercase;
   flex-shrink: 0;
 }
