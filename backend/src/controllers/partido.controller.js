@@ -1,5 +1,6 @@
 const PartidoModel   = require('../models/partido.model')
 const DesempenoModel = require('../models/desempeno.model')
+const EstadioModel   = require('../models/estadio.model')
 const db             = require('../config/database')
 
 const PartidoController = {
@@ -18,12 +19,17 @@ const PartidoController = {
   },
 
   async crear(req, res) {
-    const { id_temporada, id_equipo_casa, id_equipo_visitante, fecha_juego, hora_juego } = req.body
+    const { id_temporada, id_equipo_casa, id_equipo_visitante, fecha_juego, hora_juego, id_estadio, lugar } = req.body
     if (!id_temporada || !id_equipo_casa || !id_equipo_visitante || !fecha_juego || !hora_juego) {
       return res.status(400).json({ error: 'id_temporada, equipos, fecha_juego y hora_juego son requeridos' })
     }
     if (new Date(`${fecha_juego}T${hora_juego}`) <= new Date()) {
       return res.status(400).json({ error: 'Solo se pueden programar partidos en fechas futuras' })
+    }
+    if (id_estadio) {
+      const estadio = await EstadioModel.findById(id_estadio)
+      if (!estadio) return res.status(400).json({ error: 'Estadio no encontrado' })
+      if (!lugar) req.body.lugar = estadio.nombre
     }
     const id = await PartidoModel.create(req.body)
     res.status(201).json({ id_partido: id })

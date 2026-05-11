@@ -14,6 +14,23 @@ async function runMigrations() {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
   `)
 
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS estadio (
+      id_estadio INT AUTO_INCREMENT PRIMARY KEY,
+      nombre VARCHAR(150) NOT NULL,
+      ciudad VARCHAR(100) NOT NULL,
+      direccion VARCHAR(255) DEFAULT NULL,
+      capacidad INT NOT NULL DEFAULT 0,
+      foto_url VARCHAR(255) DEFAULT NULL,
+      activo TINYINT(1) NOT NULL DEFAULT 1,
+      created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+      updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  `)
+
+  await db.query(`ALTER TABLE partido ADD COLUMN id_estadio int(11) DEFAULT NULL AFTER hora_juego`).catch(() => {})
+  await db.query(`ALTER TABLE partido ADD CONSTRAINT fk_partido_estadio FOREIGN KEY (id_estadio) REFERENCES estadio(id_estadio) ON DELETE SET NULL`).catch(() => {})
+
   // Agrega columna categoria a ingreso si no existe
   await db.query(
     `ALTER TABLE ingreso ADD COLUMN categoria

@@ -99,6 +99,12 @@
 
             <template v-if="auth.esAdmin">
               <li class="nav-item">
+                <RouterLink class="nav-link" :to="{ name: 'Estadios' }">
+                  <span class="nav-link-icon"><IconBuilding :size="20" stroke-width="1.7" /></span>
+                  <span class="nav-link-title">Estadios</span>
+                </RouterLink>
+              </li>
+              <li class="nav-item">
                 <RouterLink class="nav-link" :to="{ name: 'Temporadas' }">
                   <span class="nav-link-icon"><IconCalendar :size="20" stroke-width="1.7" /></span>
                   <span class="nav-link-title">Temporadas</span>
@@ -209,7 +215,7 @@ import api from '@/services/api'
 import {
   IconLayoutDashboard, IconShield, IconUsers, IconCalendarEvent,
   IconWallet, IconChartBar, IconLogout, IconUsersGroup, IconCalendar,
-  IconGavel, IconBuildingStore, IconClipboardCheck, IconNews, IconBell,
+  IconGavel, IconBuilding, IconBuildingStore, IconClipboardCheck, IconNews, IconBell,
 } from '@tabler/icons-vue'
 
 const auth   = useAuthStore()

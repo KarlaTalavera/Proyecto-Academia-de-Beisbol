@@ -5,7 +5,7 @@
         <h2 class="page-title">Partidos</h2>
         <p class="page-subtitle">Calendario y gestión de juegos</p>
       </div>
-      <button v-if="auth.puedeEditar" class="btn btn-primary d-flex align-items-center gap-2" @click="abrirNuevoPartido">
+      <button v-if="auth.esAdmin" class="btn btn-primary d-flex align-items-center gap-2" @click="abrirNuevoPartido">
         <IconPlus :size="18" stroke-width="2" /> Programar Partido
       </button>
     </div>
@@ -148,8 +148,24 @@
                   </select>
                 </div>
                 <div class="col-md-6 mb-3">
+                  <label class="form-label fw-semibold" style="font-size:0.82rem;">Estadio</label>
+                  <select v-model="nuevoForm.id_estadio" class="form-select">
+                    <option value="">— Seleccionar —</option>
+                    <option v-for="estadio in estadios" :key="estadio.id_estadio" :value="estadio.id_estadio">
+                      {{ estadio.nombre }} · {{ estadio.ciudad }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
                   <label class="form-label fw-semibold" style="font-size:0.82rem;">Lugar</label>
-                  <input v-model="nuevoForm.lugar" class="form-control" placeholder="Estadio..." />
+                  <input
+                    v-model="nuevoForm.lugar"
+                    class="form-control"
+                    :readonly="nuevoForm.id_estadio"
+                    :placeholder="nuevoForm.id_estadio ? 'Lugar tomado del estadio seleccionado' : 'Ingresar lugar del partido'"
+                  />
                 </div>
               </div>
               <div class="row">
@@ -644,6 +660,7 @@ const partidos   = ref([])
 const equipos    = ref([])
 const jugadores  = ref([])
 const temporadas = ref([])
+const estadios   = ref([])
 const cargando   = ref(false)
 const filtroEstado = ref('')
 const busqueda     = ref('')
@@ -666,7 +683,7 @@ const estados = [
 const modalNuevo   = ref(false)
 const guardandoNuevo = ref(false)
 const errorNuevo   = ref('')
-const nuevoForm    = ref({ id_temporada: '', id_equipo_casa: '', id_equipo_visitante: '', fecha_juego: '', hora_juego: '10:00', lugar: '', innings_programados: 9 })
+const nuevoForm    = ref({ id_temporada: '', id_equipo_casa: '', id_equipo_visitante: '', id_estadio: '', fecha_juego: '', hora_juego: '10:00', lugar: '', innings_programados: 9 })
 
 // Modal detalle
 const modalDetalle  = ref(false)
@@ -794,16 +811,18 @@ const pitchersNoEnStats = computed(() => {
 async function cargar() {
   cargando.value = true
   try {
-    const [resP, resE, resJ, resT] = await Promise.all([
+    const [resP, resE, resJ, resT, resEs] = await Promise.all([
       api.get('/partidos'),
       api.get('/equipos'),
       api.get('/jugadores'),
       api.get('/temporadas'),
+      auth.esAdmin ? api.get('/estadios?activo=1') : Promise.resolve({ data: [] }),
     ])
     partidos.value   = resP.data
     equipos.value    = resE.data
     jugadores.value  = resJ.data
     temporadas.value = resT.data
+    estadios.value   = resEs.data
   } finally { cargando.value = false }
 }
 
@@ -844,9 +863,15 @@ async function verDetalle(partido) {
   else taquillaForm.value = { boletos_general: 0, precio_general: 0, boletos_vip: 0, precio_vip: 0, capacidad_estadio: 0 }
 }
 
+watch(() => nuevoForm.value.id_estadio, id => {
+  if (!id) return
+  const estadio = estadios.value.find(e => e.id_estadio === Number(id))
+  if (estadio) nuevoForm.value.lugar = estadio.nombre
+})
+
 function abrirNuevoPartido() {
   errorNuevo.value = ''
-  nuevoForm.value = { id_temporada: temporadas.value.find(t => t.activa)?.id_temporada || '', id_equipo_casa: '', id_equipo_visitante: '', fecha_juego: '', hora_juego: '10:00', lugar: '', innings_programados: 9 }
+  nuevoForm.value = { id_temporada: temporadas.value.find(t => t.activa)?.id_temporada || '', id_equipo_casa: '', id_equipo_visitante: '', id_estadio: '', fecha_juego: '', hora_juego: '10:00', lugar: '', innings_programados: 9 }
   modalNuevo.value = true
 }
 

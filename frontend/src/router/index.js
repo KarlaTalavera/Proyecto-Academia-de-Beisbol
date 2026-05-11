@@ -48,6 +48,7 @@ const routes = [
       { path: 'equipos',   name: 'Equipos',   component: () => import('@/views/equipos/EquiposView.vue'),   meta: { soloGestion: true } },
       { path: 'jugadores', name: 'Jugadores', component: () => import('@/views/jugadores/JugadoresView.vue'), meta: { soloGestion: true } },
       { path: 'partidos',  name: 'Partidos',  component: () => import('@/views/partidos/PartidosView.vue'),  meta: { soloGestion: true } },
+      { path: 'estadios',  name: 'Estadios',  component: () => import('@/views/estadios/EstadiosView.vue'), meta: { soloAdmin: true } },
       { path: 'reportes', name: 'Reportes', component: () => import('@/views/reportes/ReportesView.vue'), meta: { soloReportes: true } },
       { path: 'reportes/origen-ingresos',    redirect: '/app/reportes' },
       { path: 'reportes/historico-ingresos', redirect: '/app/reportes' },

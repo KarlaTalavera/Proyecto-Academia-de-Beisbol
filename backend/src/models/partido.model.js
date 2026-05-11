@@ -8,12 +8,17 @@ const PartidoModel = {
              ev.nombre_equipo AS equipo_visitante,
              t.nombre         AS temporada,
              r.carreras_home  AS carreras_casa,
-             r.carreras_visitantes AS carreras_visitante
+             r.carreras_visitantes AS carreras_visitante,
+             es.nombre       AS estadio_nombre,
+             es.ciudad       AS estadio_ciudad,
+             es.direccion    AS estadio_direccion,
+             es.capacidad    AS estadio_capacidad
       FROM partido p
       JOIN equipo ec    ON p.id_equipo_casa      = ec.id_equipo
       JOIN equipo ev    ON p.id_equipo_visitante  = ev.id_equipo
       JOIN temporada t  ON p.id_temporada         = t.id_temporada
-      LEFT JOIN resultado r ON p.id_partido       = r.id_partido`
+      LEFT JOIN resultado r ON p.id_partido       = r.id_partido
+      LEFT JOIN estadio es ON p.id_estadio        = es.id_estadio`
     const params = []
     if (id_temporada) {
       base += ' WHERE p.id_temporada = ?'
@@ -33,21 +38,26 @@ const PartidoModel = {
     const [rows] = await db.query(
       `SELECT p.*,
               ec.nombre_equipo AS equipo_casa,
-              ev.nombre_equipo AS equipo_visitante
+              ev.nombre_equipo AS equipo_visitante,
+              es.nombre       AS estadio_nombre,
+              es.ciudad       AS estadio_ciudad,
+              es.direccion    AS estadio_direccion,
+              es.capacidad    AS estadio_capacidad
        FROM partido p
        JOIN equipo ec ON p.id_equipo_casa     = ec.id_equipo
        JOIN equipo ev ON p.id_equipo_visitante = ev.id_equipo
+       LEFT JOIN estadio es ON p.id_estadio = es.id_estadio
        WHERE p.id_partido = ?`,
       [id]
     )
     return rows[0] || null
   },
 
-  async create({ id_temporada, id_equipo_casa, id_equipo_visitante, fecha_juego, hora_juego, lugar, innings_programados }) {
+  async create({ id_temporada, id_equipo_casa, id_equipo_visitante, fecha_juego, hora_juego, id_estadio, lugar, innings_programados }) {
     const [result] = await db.query(
-      `INSERT INTO partido (id_temporada, id_equipo_casa, id_equipo_visitante, fecha_juego, hora_juego, lugar, innings_programados)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [id_temporada, id_equipo_casa, id_equipo_visitante, fecha_juego, hora_juego, lugar || null, innings_programados || 9]
+      `INSERT INTO partido (id_temporada, id_equipo_casa, id_equipo_visitante, fecha_juego, hora_juego, id_estadio, lugar, innings_programados)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [id_temporada, id_equipo_casa, id_equipo_visitante, fecha_juego, hora_juego, id_estadio || null, lugar || null, innings_programados || 9]
     )
     return result.insertId
   },
