@@ -17,7 +17,7 @@
           <span class="input-group-text" style="background:transparent;">
             <IconSearch :size="14" class="text-muted" />
           </span>
-          <input v-model="busqueda" class="form-control" placeholder="Buscar jugador..." style="border-left:none;" />
+          <input v-model="busqueda" class="form-control" placeholder="Buscar jugador" style="border-left:none;" />
         </div>
         <select v-model="filtroEquipo" class="form-select form-select-sm" style="max-width:200px;">
           <option value="">Todos los equipos</option>
@@ -322,7 +322,7 @@ async function guardar() {
     const hoy = new Date()
     const nacimiento = new Date(form.value.fecha_nacimiento)
     const edad = (hoy - nacimiento) / (1000 * 60 * 60 * 24 * 365.25)
-    if (edad < 10 || edad > 60) { toast.warn('La edad del jugador debe estar entre 10 y 60 años'); return }
+    if (edad < 3 || edad > 80) { toast.warn('La edad del jugador debe estar entre 3 y 80 años'); return }
   }
   if (!form.value.posicion) { toast.warn('Selecciona una posición para el jugador'); return }
   guardando.value = true

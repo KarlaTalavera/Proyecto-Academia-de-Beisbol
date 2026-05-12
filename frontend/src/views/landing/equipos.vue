@@ -258,7 +258,7 @@ function onLogoError(id) {
 // ── Modal ──
 async function openModal(team, index) {
   selected.value      = team
-  selectedIndex.value = index
+  selectedIndex.value = index--
   detalleEquipo.value = null
   document.body.style.overflow = 'hidden'
   // Cargar detalle con plantilla y record
