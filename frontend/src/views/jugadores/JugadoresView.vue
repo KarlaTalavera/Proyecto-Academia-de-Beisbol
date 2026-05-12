@@ -322,7 +322,7 @@ async function guardar() {
     const hoy = new Date()
     const nacimiento = new Date(form.value.fecha_nacimiento)
     const edad = (hoy - nacimiento) / (1000 * 60 * 60 * 24 * 365.25)
-    if (edad < 3 || edad > 80) { toast.warn('La edad del jugador debe estar entre 3 y 80 años'); return }
+    if (edad < 3 || edad > 80) { toast.warn('La edad del jugador debe estar entre 3 y 80 años...'); return }
   }
   if (!form.value.posicion) { toast.warn('Selecciona una posición para el jugador'); return }
   guardando.value = true
