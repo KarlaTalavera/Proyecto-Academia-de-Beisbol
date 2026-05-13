@@ -31,6 +31,9 @@ async function runMigrations() {
   await db.query(`ALTER TABLE partido ADD COLUMN id_estadio int(11) DEFAULT NULL AFTER hora_juego`).catch(() => {})
   await db.query(`ALTER TABLE partido ADD CONSTRAINT fk_partido_estadio FOREIGN KEY (id_estadio) REFERENCES estadio(id_estadio) ON DELETE SET NULL`).catch(() => {})
 
+  // Agrega columna tipo_pago a inscripcion si no existe
+  await db.query(`ALTER TABLE inscripcion ADD COLUMN tipo_pago VARCHAR(50) DEFAULT NULL AFTER estado_pago`).catch(() => {})
+
   // Agrega columna categoria a ingreso si no existe
   await db.query(
     `ALTER TABLE ingreso ADD COLUMN categoria

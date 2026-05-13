@@ -127,9 +127,23 @@
                   </select>
                 </div>
               </div>
-              <div class="mb-3">
-                <label class="form-label">Monto Pagado</label>
-                <input v-model="form.monto_pagado" type="number" step="0.01" min="0" class="form-control" placeholder="0.00" />
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Tipo de Pago</label>
+                  <select v-model="form.tipo_pago" class="form-select">
+                    <option value="">— Seleccionar —</option>
+                    <option value="Efectivo">Efectivo</option>
+                    <option value="Transferencia">Transferencia</option>
+                    <option value="Divisas">Divisas</option>
+                    <option value="Pago Móvil">Pago Móvil</option>
+                    <option value="Cheque">Cheque</option>
+                    <option value="Zelle">Zelle</option>
+                  </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Monto Pagado</label>
+                  <input v-model="form.monto_pagado" type="number" step="0.01" min="0" class="form-control" placeholder="0.00" />
+                </div>
               </div>
               <div class="mb-3">
                 <label class="form-label">Observaciones</label>
@@ -185,7 +199,15 @@ function abrirFormulario(ins = null) {
     form.value = { ...ins, fecha_inscripcion: ins.fecha_inscripcion?.substring(0, 10) }
   } else {
     editando.value = false
-    form.value = { id_equipo: '', id_temporada: '', fecha_inscripcion: new Date().toISOString().substring(0, 10), estado_pago: 'pendiente', monto_pagado: 0, observaciones: '' }
+    form.value = {
+      id_equipo: '',
+      id_temporada: '',
+      fecha_inscripcion: new Date().toISOString().substring(0, 10),
+      estado_pago: 'pendiente',
+      tipo_pago: '',
+      monto_pagado: 0,
+      observaciones: '',
+    }
   }
   modal.value = true
 }

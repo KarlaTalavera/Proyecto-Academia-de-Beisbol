@@ -27,6 +27,11 @@ const IngresoModel = {
     return rows[0] || null
   },
 
+  async findByConcepto(concepto) {
+    const [rows] = await db.query('SELECT * FROM ingreso WHERE concepto = ? LIMIT 1', [concepto])
+    return rows[0] || null
+  },
+
   async create({ id_equipo, id_temporada, concepto, valor, fecha_ingreso, tipo_pago, categoria }) {
     const [result] = await db.query(
       `INSERT INTO ingreso (id_equipo, id_temporada, concepto, valor, fecha_ingreso, tipo_pago, categoria)

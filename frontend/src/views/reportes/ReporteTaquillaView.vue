@@ -106,6 +106,7 @@
                   type="date"
                   class="form-control form-control-sm"
                   style="max-width:135px;"
+                  @change="cargar"
                 />
               </div>
               <div class="d-flex align-items-center gap-1" style="font-size:0.82rem; color:#64748b;">
@@ -115,6 +116,7 @@
                   type="date"
                   class="form-control form-control-sm"
                   style="max-width:135px;"
+                  @change="cargar"
                 />
               </div>
               <FiltroMultiSelect
@@ -372,9 +374,10 @@ async function cargar() {
   if (!temporadaId.value) return
   cargando.value = true
   try {
-    const { data } = await api.get('/reportes/taquilla', {
-      params: { temporada: temporadaId.value, limite: limite.value },
-    })
+    const params = { temporada: temporadaId.value, limite: limite.value }
+    if (fechaDesde.value) params.fechaDesde = fechaDesde.value
+    if (fechaHasta.value) params.fechaHasta = fechaHasta.value
+    const { data } = await api.get('/reportes/taquilla', { params })
     datos.value = data
   } finally { cargando.value = false }
 }

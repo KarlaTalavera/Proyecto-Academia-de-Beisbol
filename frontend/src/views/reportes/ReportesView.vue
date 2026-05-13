@@ -43,7 +43,19 @@
       <div v-else-if="tab === 'finanzas'">
 
         <!-- Botones exportar -->
-        <div class="d-flex justify-content-end gap-2 mb-3">
+        <div class="d-flex flex-wrap align-items-center gap-3 mb-3">
+        <div class="d-flex align-items-center gap-2" style="font-size:0.84rem; color:#475569;">
+          <span class="fw-semibold">Fecha inicio:</span>
+          <input v-model="fechaDesde" type="date" class="form-control form-control-sm" style="max-width:145px;" @change="cargar" />
+        </div>
+        <div class="d-flex align-items-center gap-2" style="font-size:0.84rem; color:#475569;">
+          <span class="fw-semibold">Fecha fin:</span>
+          <input v-model="fechaHasta" type="date" class="form-control form-control-sm" style="max-width:145px;" @change="cargar" />
+        </div>
+        <button v-if="fechaDesde || fechaHasta" class="btn btn-sm btn-ghost-secondary" @click="fechaDesde=''; fechaHasta=''; cargar()">
+          Limpiar fechas
+        </button>
+        <div class="ms-auto d-flex justify-content-end gap-2">
           <button class="btn btn-sm btn-outline-danger" @click="exportFinanzasPDF">
             <IconFileTypePdf :size="16" class="me-1" /> Exportar PDF
           </button>
@@ -51,8 +63,9 @@
             <IconFileSpreadsheet :size="16" class="me-1" /> Exportar Excel
           </button>
         </div>
+      </div>
 
-        <div v-if="cargando" class="card shadow-sm">
+      <div v-if="cargando" class="card shadow-sm">
           <div class="card-body text-center py-5">
             <span class="spinner-border spinner-border-sm text-primary me-2"></span> Cargando...
           </div>
@@ -285,6 +298,8 @@ const auth = useAuthStore()
 const tab        = ref(auth.puedeEditar ? 'bateadores' : 'finanzas')
 const temporadas = ref([])
 const temporadaId = ref('')
+const fechaDesde = ref('')
+const fechaHasta = ref('')
 const cargando   = ref(false)
 const finanzas   = ref({
   total_ingresos: 0,
@@ -346,8 +361,12 @@ async function cargar() {
   if (!temporadaId.value) return
   cargando.value = true
   try {
+    const params = { temporada: temporadaId.value }
+    if (fechaDesde.value) params.fechaDesde = fechaDesde.value
+    if (fechaHasta.value) params.fechaHasta = fechaHasta.value
+
     const { data } = await api.get('/reportes/finanzas', {
-      params: { temporada: temporadaId.value },
+      params,
     }).catch(() => ({ data: {} }))
     finanzas.value = {
       total_ingresos: Number(data.total_ingresos || 0),

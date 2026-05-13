@@ -81,14 +81,31 @@ router.get('/promedios-pitcheo', verificarToken, async (req, res) => {
 
 // Balance financiero por temporada
 router.get('/finanzas', verificarToken, async (req, res) => {
-  const { temporada } = req.query
+  const { temporada, fechaDesde, fechaHasta } = req.query
   if (!temporada) return res.status(400).json({ error: 'Parámetro temporada requerido' })
+
+  const ingresoParams = [temporada]
+  const egresoParams  = [temporada]
+  let ingresoDateClause = ''
+  let egresoDateClause  = ''
+  if (fechaDesde) {
+    ingresoDateClause += ' AND fecha_ingreso >= ?'
+    egresoDateClause  += ' AND fecha_egreso >= ?'
+    ingresoParams.push(fechaDesde)
+    egresoParams.push(fechaDesde)
+  }
+  if (fechaHasta) {
+    ingresoDateClause += ' AND fecha_ingreso <= ?'
+    egresoDateClause  += ' AND fecha_egreso <= ?'
+    ingresoParams.push(fechaHasta)
+    egresoParams.push(fechaHasta)
+  }
 
   const [[balance]] = await db.query(
     `SELECT
-       (SELECT COALESCE(SUM(valor), 0) FROM ingreso WHERE id_temporada = ?) AS total_ingresos,
-       (SELECT COALESCE(SUM(gasto), 0) FROM egreso  WHERE id_temporada = ?) AS total_egresos`,
-    [temporada, temporada]
+       (SELECT COALESCE(SUM(valor), 0) FROM ingreso WHERE id_temporada = ?${ingresoDateClause}) AS total_ingresos,
+       (SELECT COALESCE(SUM(gasto), 0) FROM egreso  WHERE id_temporada = ?${egresoDateClause}) AS total_egresos`,
+    [...ingresoParams, ...egresoParams]
   )
 
   const [ingresosPorConcepto] = await db.query(
@@ -102,9 +119,9 @@ router.get('/finanzas', verificarToken, async (req, res) => {
          ELSE 'Otros'
        END AS categoria,
        SUM(valor) AS total
-     FROM ingreso WHERE id_temporada = ?
+     FROM ingreso WHERE id_temporada = ?${ingresoDateClause}
      GROUP BY categoria ORDER BY total DESC`,
-    [temporada]
+    ingresoParams
   )
 
   const [egresosPorProveedor] = await db.query(
@@ -113,9 +130,9 @@ router.get('/finanzas', verificarToken, async (req, res) => {
        SUM(e.gasto) AS total
      FROM egreso e
      LEFT JOIN proveedor p ON e.id_proveedor = p.id_proveedor
-     WHERE e.id_temporada = ?
+     WHERE e.id_temporada = ?${egresoDateClause}
      GROUP BY proveedor ORDER BY total DESC`,
-    [temporada]
+    egresoParams
   )
 
   res.json({
@@ -222,8 +239,15 @@ router.get('/origen-ingresos', verificarToken, async (req, res) => {
     `SELECT
        COALESCE(SUM(monto_pagado), 0) AS total,
        COUNT(*) AS cantidad
-     FROM inscripcion
-     WHERE id_temporada = ? AND estado_pago != 'pendiente'${dateClauseInscripcion}`,
+     FROM inscripcion i
+     WHERE i.id_temporada = ?
+       AND i.estado_pago != 'pendiente'
+       AND NOT EXISTS (
+         SELECT 1 FROM ingreso x
+         WHERE x.concepto = CONCAT('Inscripción equipo #', i.id_inscripcion)
+           AND x.id_equipo = i.id_equipo
+           AND x.id_temporada = i.id_temporada
+       )${dateClauseInscripcion}`,
     paramsInscripcion
   )
 
@@ -306,8 +330,14 @@ router.get('/historico-ingresos', verificarToken, soloRoles('administrador', 'ca
 
 // ── Reporte de Taquilla por Partido ──────────────────────────────────────────
 router.get('/taquilla', verificarToken, async (req, res) => {
-  const { temporada, limite = 10 } = req.query
+  const { temporada, limite = 10, fechaDesde, fechaHasta } = req.query
   if (!temporada) return res.status(400).json({ error: 'Parámetro temporada requerido' })
+
+  const params = [temporada]
+  let dateClause = ''
+  if (fechaDesde) { dateClause += ' AND p.fecha_juego >= ?'; params.push(fechaDesde) }
+  if (fechaHasta) { dateClause += ' AND p.fecha_juego <= ?'; params.push(fechaHasta) }
+
   const [rows] = await db.query(
     `SELECT
        p.id_partido,
@@ -337,10 +367,10 @@ router.get('/taquilla', verificarToken, async (req, res) => {
      JOIN equipo ec ON p.id_equipo_casa      = ec.id_equipo
      JOIN equipo ev ON p.id_equipo_visitante = ev.id_equipo
      LEFT JOIN resultado r ON r.id_partido   = p.id_partido
-     WHERE p.id_temporada = ? AND p.estado = 'finalizado'
+     WHERE p.id_temporada = ? AND p.estado = 'finalizado'${dateClause}
      ORDER BY p.fecha_juego DESC
      LIMIT ?`,
-    [temporada, Number(limite)]
+    [...params, Number(limite)]
   )
   res.json(rows)
 })

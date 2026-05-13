@@ -1,4 +1,38 @@
 const InscripcionModel = require('../models/inscripcion.model')
+const IngresoModel     = require('../models/ingreso.model')
+
+async function sincronizarIngreso(inscripcionId, { id_equipo, id_temporada, fecha_inscripcion, estado_pago, monto_pagado }) {
+  const concepto = `Inscripción equipo #${inscripcionId}`
+  const ingresoExistente = await IngresoModel.findByConcepto(concepto)
+  const valor = Number(monto_pagado || 0)
+  const estado = String(estado_pago || 'pendiente').toLowerCase()
+
+  if (estado !== 'pendiente' && valor > 0) {
+    if (ingresoExistente) {
+      await IngresoModel.update(ingresoExistente.id_ingreso, {
+        id_equipo,
+        id_temporada,
+        concepto,
+        valor,
+        fecha_ingreso: fecha_inscripcion,
+        tipo_pago: null,
+        categoria: 'inscripcion',
+      })
+    } else {
+      await IngresoModel.create({
+        id_equipo,
+        id_temporada,
+        concepto,
+        valor,
+        fecha_ingreso: fecha_inscripcion,
+        tipo_pago: null,
+        categoria: 'inscripcion',
+      })
+    }
+  } else if (ingresoExistente) {
+    await IngresoModel.delete(ingresoExistente.id_ingreso)
+  }
+}
 
 const InscripcionController = {
   async listar(req, res) {
@@ -19,6 +53,7 @@ const InscripcionController = {
     }
     try {
       const id = await InscripcionModel.create(req.body)
+      await sincronizarIngreso(id, req.body)
       res.status(201).json({ id_inscripcion: id })
     } catch (e) {
       if (e.code === 'ER_DUP_ENTRY') return res.status(409).json({ error: 'Este equipo ya está inscrito en esta temporada' })
@@ -29,6 +64,7 @@ const InscripcionController = {
   async actualizar(req, res) {
     const affected = await InscripcionModel.update(req.params.id, req.body)
     if (!affected) return res.status(404).json({ error: 'Inscripción no encontrada' })
+    await sincronizarIngreso(req.params.id, req.body)
     res.json({ ok: true })
   },
 

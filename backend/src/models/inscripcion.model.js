@@ -27,20 +27,20 @@ const InscripcionModel = {
     return rows[0] || null
   },
 
-  async create({ id_equipo, id_temporada, fecha_inscripcion, estado_pago, monto_pagado, observaciones }) {
+  async create({ id_equipo, id_temporada, fecha_inscripcion, estado_pago, tipo_pago, monto_pagado, observaciones }) {
     const [result] = await db.query(
-      `INSERT INTO inscripcion (id_equipo, id_temporada, fecha_inscripcion, estado_pago, monto_pagado, observaciones)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [id_equipo, id_temporada, fecha_inscripcion, estado_pago || 'pendiente', monto_pagado || 0, observaciones || null]
+      `INSERT INTO inscripcion (id_equipo, id_temporada, fecha_inscripcion, estado_pago, tipo_pago, monto_pagado, observaciones)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [id_equipo, id_temporada, fecha_inscripcion, estado_pago || 'pendiente', tipo_pago || null, monto_pagado || 0, observaciones || null]
     )
     return result.insertId
   },
 
-  async update(id, { id_equipo, id_temporada, fecha_inscripcion, estado_pago, monto_pagado, observaciones }) {
+  async update(id, { id_equipo, id_temporada, fecha_inscripcion, estado_pago, tipo_pago, monto_pagado, observaciones }) {
     const [result] = await db.query(
-      `UPDATE inscripcion SET id_equipo=?, id_temporada=?, fecha_inscripcion=?, estado_pago=?, monto_pagado=?, observaciones=?
+      `UPDATE inscripcion SET id_equipo=?, id_temporada=?, fecha_inscripcion=?, estado_pago=?, tipo_pago=?, monto_pagado=?, observaciones=?
        WHERE id_inscripcion=?`,
-      [id_equipo, id_temporada, fecha_inscripcion, estado_pago, monto_pagado || 0, observaciones || null, id]
+      [id_equipo, id_temporada, fecha_inscripcion, estado_pago, tipo_pago || null, monto_pagado || 0, observaciones || null, id]
     )
     return result.affectedRows
   },
